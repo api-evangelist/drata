@@ -13,29 +13,34 @@ tags:
 - ISO 27001
 - Security
 - Plans
-description: Placeholder plans/pricing artifact for Drata. Replace with real published pricing once
-  the pipeline researches the provider's plans page.
-notes: Initial scaffold — plans/pricing have not yet been reconciled.
+description: Drata does not publish public pricing tiers. Pricing is quote-based and varies by
+  framework count, headcount, and integrations.
+notes: Pricing is sales-led; no self-serve plan page exists. API access is included with paid
+  subscriptions; no separate API plan is published.
 sources:
-- https://drata.com/
+- https://drata.com/pricing
+- https://developers.drata.com/
 plans:
-- id: drata-default
-  name: To Be Reconciled
+- id: drata-quote-based
+  name: Quote-Based Subscription
   type: enterprise
-  description: Initial scaffold; replace with provider plan tiers once pricing is reconciled.
+  description: Annual subscription with pricing scoped to selected frameworks (SOC 2, ISO 27001,
+    HIPAA, PCI DSS, GDPR, etc.), employee headcount, and integration count. Contact Drata sales.
   entries:
-  - label: API Access
-    name: api_access
+  - label: Subscription
+    name: subscription
     type: flat
-    metric: varies
+    metric: annual subscription
     limit: -1
-    timeFrame: usage
+    timeFrame: yearly
     geo: global
     unit: 1
-    price: see https://drata.com/
+    price: contact sales
     userMultiplied: false
   elements:
-  - name: Pending Reconciliation
+  - name: API Access (included)
+  - name: Custom Connections
+  - name: Continuous Monitoring
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

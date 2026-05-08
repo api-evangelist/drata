@@ -3,7 +3,10 @@ url: https://raw.githubusercontent.com/api-evangelist/drata/refs/heads/main/apis
 name: Drata
 x-type: company
 description: >-
-  Drata is a continuous security and compliance automation platform supporting SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR, and more, with policies, evidence, and trust center.
+  Drata is a continuous security and compliance automation platform supporting
+  SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR, and more, with policies, evidence,
+  and trust center. Drata exposes a public REST API plus the SafeBase Trust API
+  (acquired) and a Custom Connections framework for evidence collection.
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 tags:
   - GRC
@@ -14,10 +17,70 @@ tags:
 created: '2026-05-08'
 modified: '2026-05-08'
 specificationVersion: '0.19'
-apis: []
+apis:
+  - aid: drata:public-api-v2
+    name: Drata Public API v2
+    description: >-
+      Public REST API for managing controls, frameworks, evidence, personnel,
+      assets, policies, and tests. v2 expands endpoints and improves data
+      structures over v1.
+    humanURL: https://developers.drata.com/openapi/reference/v2/overview/
+    baseURL: https://public-api.drata.com
+    tags:
+      - GRC
+      - Compliance
+      - REST
+    properties:
+      - type: Documentation
+        url: https://developers.drata.com/openapi/reference/v2/overview/
+      - type: Authentication
+        url: https://developers.drata.com/openapi/reference/v2/overview/
+  - aid: drata:custom-connections
+    name: Drata Custom Connections API
+    description: >-
+      Build custom integrations to automate evidence collection from any
+      internal or third-party system.
+    humanURL: https://developers.drata.com/openapi/reference/v2/tag/Custom-Connections/
+    baseURL: https://public-api.drata.com
+    tags:
+      - GRC
+      - Integrations
+      - Evidence
+    properties:
+      - type: Documentation
+        url: https://developers.drata.com/openapi/reference/v2/tag/Custom-Connections/
+  - aid: drata:safebase-trust-api
+    name: SafeBase Trust API
+    description: >-
+      Manage SafeBase trust centers and security questionnaires programmatically;
+      acquired by Drata and now part of the Drata platform.
+    humanURL: https://docs.safebase.io/reference/getaccounts
+    baseURL: https://api.safebase.io
+    tags:
+      - Trust Center
+      - Questionnaires
+      - Security
+    properties:
+      - type: Documentation
+        url: https://docs.safebase.io/reference/getaccounts
+  - aid: drata:mcp
+    name: Drata MCP Server
+    description: >-
+      Model Context Protocol server enabling AI agents to interact with Drata
+      for compliance workflows.
+    humanURL: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
+    tags:
+      - MCP
+      - AI
+      - Compliance
+    properties:
+      - type: Blog
+        url: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
 common:
   - type: Website
     url: https://drata.com/
+  - type: Developer
+    url: https://developers.drata.com/
   - type: Plans
     url: plans/drata-plans-pricing.yml
   - type: RateLimits
