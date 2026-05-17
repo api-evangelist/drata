@@ -1,7 +1,7 @@
 aid: drata
 url: https://raw.githubusercontent.com/api-evangelist/drata/refs/heads/main/apis.yml
 name: Drata
-x-type: company
+kind: company
 description: >-
   Drata is a continuous security and compliance automation platform supporting
   SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR, and more, with policies, evidence,
