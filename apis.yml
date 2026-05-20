@@ -77,6 +77,10 @@ apis:
       - type: Blog
         url: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
 common:
+  - type: GitHubOrganization
+    url: https://github.com/drata
+  - type: LinkedIn
+    url: https://www.linkedin.com/company/drata
   - type: Website
     url: https://drata.com/
   - type: Developer
