@@ -1,0 +1,404 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Assets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Find assets by search terms and filters",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/assets",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query"
+              }
+            ]
+          },
+          "docs": "Find assets by search terms and filters"
+        },
+        {
+          "info": {
+            "name": "Manually add a new asset to the account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://public-api.drata.com/public/v2/assets",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Manually add a new asset to the account"
+        },
+        {
+          "info": {
+            "name": "Retrieve an asset",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/assets/:assetId",
+            "params": [
+              {
+                "name": "assetId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve an asset"
+        },
+        {
+          "info": {
+            "name": "Update asset properties",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://public-api.drata.com/public/v2/assets/:assetId",
+            "params": [
+              {
+                "name": "assetId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update asset properties"
+        },
+        {
+          "info": {
+            "name": "Remove a virtual or manually added asset",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://public-api.drata.com/public/v2/assets/:assetId",
+            "params": [
+              {
+                "name": "assetId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Remove a virtual or manually added asset"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Personnel",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/personnel"
+          },
+          "docs": "List personnel"
+        },
+        {
+          "info": {
+            "name": "Create personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://public-api.drata.com/public/v2/personnel"
+          },
+          "docs": "Create personnel"
+        },
+        {
+          "info": {
+            "name": "Get personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/personnel/:personnelId",
+            "params": [
+              {
+                "name": "personnelId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get personnel"
+        },
+        {
+          "info": {
+            "name": "Update personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://public-api.drata.com/public/v2/personnel/:personnelId",
+            "params": [
+              {
+                "name": "personnelId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update personnel"
+        },
+        {
+          "info": {
+            "name": "Delete personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://public-api.drata.com/public/v2/personnel/:personnelId",
+            "params": [
+              {
+                "name": "personnelId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete personnel"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Controls",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List controls",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/controls"
+          },
+          "docs": "List controls"
+        },
+        {
+          "info": {
+            "name": "Get a control",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/controls/:controlId",
+            "params": [
+              {
+                "name": "controlId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get a control"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Frameworks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List frameworks (SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR, etc.)",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/frameworks"
+          },
+          "docs": "List frameworks (SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR, etc.)"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Policies",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List policies",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/policies"
+          },
+          "docs": "List policies"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Vendors",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List vendors",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/vendors"
+          },
+          "docs": "List vendors"
+        },
+        {
+          "info": {
+            "name": "Create a vendor",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://public-api.drata.com/public/v2/vendors"
+          },
+          "docs": "Create a vendor"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Tasks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List tasks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/tasks"
+          },
+          "docs": "List tasks"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Audits",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List audits",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/audits"
+          },
+          "docs": "List audits"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Risks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List risks in the risk register",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/risks"
+          },
+          "docs": "List risks in the risk register"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Evidence Library",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List evidence in the evidence library",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/evidence-library"
+          },
+          "docs": "List evidence in the evidence library"
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Monitoring Tests",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List monitoring tests",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/monitoring-tests"
+          },
+          "docs": "List monitoring tests"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
