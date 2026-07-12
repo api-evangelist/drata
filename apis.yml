@@ -77,6 +77,14 @@ apis:
       - type: Blog
         url: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
 common:
+  - type: TrustCenter
+    url: security/drata-trust-center.yml
+  - type: VulnerabilityDisclosure
+    url: security/drata-vulnerability-disclosure.yml
+  - type: DomainSecurity
+    url: security/drata-domain-security.yml
+  - type: Authentication
+    url: authentication/drata-authentication.yml
   - type: GitHubOrganization
     url: https://github.com/drata
   - type: LinkedIn
