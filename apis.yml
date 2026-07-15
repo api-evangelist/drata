@@ -77,6 +77,8 @@ apis:
       - type: Blog
         url: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
 common:
+  - type: AgenticAccess
+    url: agentic-access/drata-agentic-access.yml
   - type: TrustCenter
     url: security/drata-trust-center.yml
   - type: VulnerabilityDisclosure
