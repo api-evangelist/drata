@@ -1,0 +1,47 @@
+openapi: 3.1.0
+info:
+  title: Drata Public API v2 Assets Controls API
+  version: 2.0.0
+  description: Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.
+  contact:
+    name: API Evangelist
+    email: kin@apievangelist.com
+    url: https://developers.drata.com/openapi/reference/v2/overview/
+servers:
+- url: https://public-api.drata.com/public/v2
+  description: Drata Public API v2
+security:
+- bearerAuth: []
+tags:
+- name: Controls
+paths:
+  /controls:
+    get:
+      tags:
+      - Controls
+      summary: List controls
+      operationId: listControls
+      responses:
+        '200':
+          description: A page of controls
+  /controls/{controlId}:
+    parameters:
+    - name: controlId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Controls
+      summary: Get a control
+      operationId: getControl
+      responses:
+        '200':
+          description: Control details
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: Drata Public API v2 Assets API
+  version: 2.0.0
+  description: Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.
+  contact:
+    name: API Evangelist
+    email: kin@apievangelist.com
+    url: https://developers.drata.com/openapi/reference/v2/overview/
+servers:
+- url: https://public-api.drata.com/public/v2
+  description: Drata Public API v2
+security:
+- bearerAuth: []
+tags:
+- name: Assets
+paths:
+  /assets:
+    get:
+      tags:
+      - Assets
+      summary: Find assets by search terms and filters
+      operationId: listAssets
+      parameters:
+      - name: cursor
+        in: query
+        schema:
+          type: string
+      - name: limit
+        in: query
+        schema:
+          type: integer
+          default: 25
+      responses:
+        '200':
+          description: A page of assets
+    post:
+      tags:
+      - Assets
+      summary: Manually add a new asset to the account
+      operationId: createAsset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Asset'
+      responses:
+        '201':
+          description: Asset created
+  /assets/{assetId}:
+    parameters:
+    - name: assetId
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Assets
+      summary: Retrieve an asset
+      operationId: getAsset
+      responses:
+        '200':
+          description: Asset details
+    put:
+      tags:
+      - Assets
+      summary: Update asset properties
+      operationId: updateAsset
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Asset'
+      responses:
+        '200':
+          description: Asset updated
+    delete:
+      tags:
+      - Assets
+      summary: Remove a virtual or manually added asset
+      operationId: deleteAsset
+      responses:
+        '204':
+          description: Asset removed
+components:
+  schemas:
+    Asset:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+        owner:
+          type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
