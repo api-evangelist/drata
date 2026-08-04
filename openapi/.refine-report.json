@@ -1,0 +1,34 @@
+{
+  "provider": "drata",
+  "sources": [
+    "drata-assets-api-openapi.yml",
+    "drata-audits-api-openapi.yml",
+    "drata-controls-api-openapi.yml",
+    "drata-evidence-library-api-openapi.yml",
+    "drata-frameworks-api-openapi.yml",
+    "drata-monitoring-tests-api-openapi.yml",
+    "drata-personnel-api-openapi.yml",
+    "drata-policies-api-openapi.yml",
+    "drata-risks-api-openapi.yml",
+    "drata-tasks-api-openapi.yml",
+    "drata-vendors-api-openapi.yml"
+  ],
+  "outputs": [
+    "drata-assets-api-openapi.yml",
+    "drata-audits-api-openapi.yml",
+    "drata-controls-api-openapi.yml",
+    "drata-evidence-library-api-openapi.yml",
+    "drata-frameworks-api-openapi.yml",
+    "drata-monitoring-tests-api-openapi.yml",
+    "drata-personnel-api-openapi.yml",
+    "drata-policies-api-openapi.yml",
+    "drata-risks-api-openapi.yml",
+    "drata-tasks-api-openapi.yml",
+    "drata-vendors-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}
