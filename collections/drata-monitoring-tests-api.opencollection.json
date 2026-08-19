@@ -1,0 +1,35 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets Monitoring Tests API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Monitoring Tests",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List monitoring tests",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/monitoring-tests"
+          },
+          "docs": "List monitoring tests"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

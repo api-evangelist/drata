@@ -1,0 +1,35 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets Tasks API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Tasks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List tasks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/tasks"
+          },
+          "docs": "List tasks"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

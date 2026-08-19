@@ -1,0 +1,35 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets Risks API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Risks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List risks in the risk register",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/risks"
+          },
+          "docs": "List risks in the risk register"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

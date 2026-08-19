@@ -1,0 +1,53 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets Controls API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Controls",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List controls",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/controls"
+          },
+          "docs": "List controls"
+        },
+        {
+          "info": {
+            "name": "Get a control",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/controls/:controlId",
+            "params": [
+              {
+                "name": "controlId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get a control"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

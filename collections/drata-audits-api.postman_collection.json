@@ -1,0 +1,106 @@
+{
+  "item": [
+    {
+      "id": "7c745c89-6d40-425b-8ea2-6b7fb39077d1",
+      "name": "Audits",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "57d8b61e-2cfb-4b29-9125-c643160911f8",
+          "name": "List audits",
+          "request": {
+            "name": "List audits",
+            "description": {},
+            "url": {
+              "path": [
+                "audits"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "42f27aa6-6d0e-44a9-94d0-02afd55f6162",
+              "name": "A page of audits",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "audits"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://public-api.drata.com/public/v2",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "fd8ed4cb-b0ad-45aa-94bb-8a642e9151a3",
+    "name": "Drata Public API v2 Assets Audits API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.\n\nContact Support:\n Name: API Evangelist\n Email: kin@apievangelist.com",
+      "type": "text/plain"
+    }
+  }
+}

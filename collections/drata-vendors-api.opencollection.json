@@ -1,0 +1,46 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets Vendors API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Vendors",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List vendors",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/vendors"
+          },
+          "docs": "List vendors"
+        },
+        {
+          "info": {
+            "name": "Create a vendor",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://public-api.drata.com/public/v2/vendors"
+          },
+          "docs": "Create a vendor"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

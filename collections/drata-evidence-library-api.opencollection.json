@@ -1,0 +1,35 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets Evidence Library API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Evidence Library",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List evidence in the evidence library",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/evidence-library"
+          },
+          "docs": "List evidence in the evidence library"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

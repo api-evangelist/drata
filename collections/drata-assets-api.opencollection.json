@@ -1,0 +1,120 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Assets",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Find assets by search terms and filters",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/assets",
+            "params": [
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query"
+              }
+            ]
+          },
+          "docs": "Find assets by search terms and filters"
+        },
+        {
+          "info": {
+            "name": "Manually add a new asset to the account",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://public-api.drata.com/public/v2/assets",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Manually add a new asset to the account"
+        },
+        {
+          "info": {
+            "name": "Retrieve an asset",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/assets/:assetId",
+            "params": [
+              {
+                "name": "assetId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Retrieve an asset"
+        },
+        {
+          "info": {
+            "name": "Update asset properties",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://public-api.drata.com/public/v2/assets/:assetId",
+            "params": [
+              {
+                "name": "assetId",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Update asset properties"
+        },
+        {
+          "info": {
+            "name": "Remove a virtual or manually added asset",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://public-api.drata.com/public/v2/assets/:assetId",
+            "params": [
+              {
+                "name": "assetId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Remove a virtual or manually added asset"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

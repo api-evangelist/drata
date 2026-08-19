@@ -1,0 +1,100 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Drata Public API v2 Assets Personnel API",
+    "version": "2.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Personnel",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/personnel"
+          },
+          "docs": "List personnel"
+        },
+        {
+          "info": {
+            "name": "Create personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://public-api.drata.com/public/v2/personnel"
+          },
+          "docs": "Create personnel"
+        },
+        {
+          "info": {
+            "name": "Get personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://public-api.drata.com/public/v2/personnel/:personnelId",
+            "params": [
+              {
+                "name": "personnelId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Get personnel"
+        },
+        {
+          "info": {
+            "name": "Update personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://public-api.drata.com/public/v2/personnel/:personnelId",
+            "params": [
+              {
+                "name": "personnelId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Update personnel"
+        },
+        {
+          "info": {
+            "name": "Delete personnel",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://public-api.drata.com/public/v2/personnel/:personnelId",
+            "params": [
+              {
+                "name": "personnelId",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Delete personnel"
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

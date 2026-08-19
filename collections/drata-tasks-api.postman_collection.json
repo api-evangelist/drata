@@ -1,0 +1,106 @@
+{
+  "item": [
+    {
+      "id": "2d470b36-b599-45e1-b927-0301753a17d3",
+      "name": "Tasks",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "f5ecef96-e04a-4f58-ba5a-2dfc8eb1783e",
+          "name": "List tasks",
+          "request": {
+            "name": "List tasks",
+            "description": {},
+            "url": {
+              "path": [
+                "tasks"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "8fca1f26-e55d-4f72-9fac-1921e8a7c478",
+              "name": "A page of tasks",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "tasks"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://public-api.drata.com/public/v2",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "b297c0b5-d2d3-4194-9a6f-095c5df64125",
+    "name": "Drata Public API v2 Assets Tasks API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.\n\nContact Support:\n Name: API Evangelist\n Email: kin@apievangelist.com",
+      "type": "text/plain"
+    }
+  }
+}
