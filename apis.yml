@@ -55,6 +55,10 @@ apis:
   baseURL: https://public-api.drata.com
   tags:
   - GRC
+  - Integration
+  - Evidence
+  tags_raw:
+  - GRC
   - Integrations
   - Evidence
   properties:
@@ -80,6 +84,10 @@ apis:
     Model Context Protocol server enabling AI agents to interact with Drata for compliance workflows.
   humanURL: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
   tags:
+  - MCP
+  - Artificial Intelligence
+  - Compliance
+  tags_raw:
   - MCP
   - AI
   - Compliance
@@ -182,6 +190,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com
   tags:
+  - Task
+  tags_raw:
   - Tasks
   properties:
   - type: OpenAPI
