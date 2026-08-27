@@ -2,11 +2,9 @@ aid: drata
 url: https://raw.githubusercontent.com/api-evangelist/drata/refs/heads/main/apis.yml
 name: Drata
 kind: company
-description: >-
-  Drata is a continuous security and compliance automation platform supporting
-  SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR, and more, with policies, evidence,
-  and trust center. Drata exposes a public REST API plus the SafeBase Trust API
-  (acquired) and a Custom Connections framework for evidence collection.
+description: Drata is a continuous security and compliance automation platform supporting SOC 2, ISO 27001, HIPAA,
+  PCI DSS, GDPR, and more, with policies, evidence, and trust center. Drata exposes a public REST API plus the SafeBase
+  Trust API (acquired) and a Custom Connections framework for evidence collection.
 accessModel:
   pricing: paid
   onboarding: self-serve
@@ -22,37 +20,54 @@ accessModel:
   method: derived
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/drata.png
 tags:
-  - GRC
-  - Compliance
-  - SOC 2
-  - ISO 27001
-  - Security
+- GRC
+- Compliance
+- SOC 2
+- ISO 27001
+- Security
+- Risk Management
+- Trust Center
+- Audit
+- Vendor Risk Management
+- Compliance Automation
 created: '2026-05-08'
-modified: '2026-05-08'
+modified: '2026-08-27'
 specificationVersion: '0.23'
 apis:
 - aid: drata:public-api-v2
   name: Drata Public API v2
-  description: >-
-    Public REST API for managing controls, frameworks, evidence, personnel, assets, policies, and tests.
-    v2 expands endpoints and improves data structures over v1.
+  description: Drata's Public REST API v2 — 197 operations across 132 paths covering assets, audits, audit requests,
+    background checks, company, control library, controls, control notes/owners, custom connections, custom data
+    records, custom field definitions, devices and device documents, events, evidence and the evidence library,
+    frameworks, groups, HRIS user identities, monitoring tests, personnel, policies and policy languages, risks,
+    risk registers, risk library, risk notes and documents, tasks, uploads, user documents, user-assigned policies,
+    users and roles, vendors, vendor documents, vendor security reviews, vendor types, and workspaces. Bearer API-key
+    auth, cursor pagination, and an `expand[]` query parameter for related objects. Regional bases exist for US,
+    EU and APAC.
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
+  baseURL: https://public-api.drata.com/public/v2
   tags:
   - GRC
   - Compliance
   - REST
   properties:
+  - type: OpenAPI
+    url: openapi/drata-api-v2-openapi.yml
   - type: Documentation
     url: https://developers.drata.com/openapi/reference/v2/overview/
-  - type: Authentication
+  - type: APIReference
     url: https://developers.drata.com/openapi/reference/v2/overview/
+  - type: GettingStarted
+    url: https://developers.drata.com/developer-portal/v2/recipes/create-an-api-key/
+  - type: Authentication
+    url: authentication/drata-authentication.yml
+  - type: Overlay
+    url: overlays/drata-api-v2-overlay.yaml
 - aid: drata:custom-connections
   name: Drata Custom Connections API
-  description: >-
-    Build custom integrations to automate evidence collection from any internal or third-party system.
+  description: Build custom integrations to automate evidence collection from any internal or third-party system.
   humanURL: https://developers.drata.com/openapi/reference/v2/tag/Custom-Connections/
-  baseURL: https://public-api.drata.com
+  baseURL: https://public-api.drata.com/public/v2
   tags:
   - GRC
   - Integration
@@ -64,25 +79,36 @@ apis:
   properties:
   - type: Documentation
     url: https://developers.drata.com/openapi/reference/v2/tag/Custom-Connections/
+  - type: GettingStarted
+    url: https://developers.drata.com/developer-portal/v2/recipes/custom-connections/
+  - type: OpenAPI
+    url: openapi/drata-api-v2-openapi.yml
 - aid: drata:safebase-trust-api
   name: SafeBase Trust API
-  description: >-
-    Manage SafeBase trust centers and security questionnaires programmatically; acquired by Drata and
-    now part of the Drata platform.
+  description: SafeBase Trust API — 41 operations for trust centers, security questionnaires, NDA settings, document
+    libraries, knowledge-base entries, access requests and trust-center updates. SafeBase was acquired by Drata
+    in 2024 and the API remains published on the safebase.io domain; the spec declares servers https://app.safebase.io/api/ext/v1/rest
+    and contact support@safebase.io. Authenticated with an `x-sb-api-key` header.
   humanURL: https://docs.safebase.io/reference/getaccounts
-  baseURL: https://api.safebase.io
+  baseURL: https://app.safebase.io/api/ext/v1/rest
   tags:
   - Trust Center
   - Questionnaires
   - Security
   properties:
+  - type: OpenAPI
+    url: openapi/drata-safebase-trust-api-openapi.yml
   - type: Documentation
+    url: https://docs.safebase.io/reference/getaccounts
+  - type: APIReference
     url: https://docs.safebase.io/reference/getaccounts
 - aid: drata:mcp
   name: Drata MCP Server
-  description: >-
-    Model Context Protocol server enabling AI agents to interact with Drata for compliance workflows.
-  humanURL: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
+  description: Drata's hosted remote Model Context Protocol server (Beta). MCP-compatible clients (Claude, ChatGPT,
+    Cursor, Microsoft Copilot) connect over OAuth 2.1 with PKCE to regional endpoints for the US, EU and APAC, and
+    read live compliance data — controls, policies, monitoring tests, risks, risk registers, workspaces and assigned
+    policies — bounded by the intersection of the granted OAuth scopes and the user's Drata role.
+  humanURL: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
   tags:
   - MCP
   - Artificial Intelligence
@@ -92,145 +118,106 @@ apis:
   - AI
   - Compliance
   properties:
+  - type: MCPServer
+    url: mcp/drata-mcp.yml
+  - type: ToolCrosswalk
+    url: mcp/drata-tool-crosswalk.yml
+  - type: Documentation
+    url: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  - type: OAuthScopes
+    url: scopes/drata-scopes.yml
   - type: Blog
-    url: https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management
-- aid: drata:drata-assets-api
-  name: Drata Assets API
-  description: The Assets API from Drata — 2 operation(s) for assets.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Assets
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-assets-api-openapi.yml
-- aid: drata:drata-audits-api
-  name: Drata Audits API
-  description: The Audits API from Drata — 1 operation(s) for audits.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Audits
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-audits-api-openapi.yml
-- aid: drata:drata-controls-api
-  name: Drata Controls API
-  description: The Controls API from Drata — 2 operation(s) for controls.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Controls
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-controls-api-openapi.yml
-- aid: drata:drata-evidence-library-api
-  name: Drata Evidence Library API
-  description: The Evidence Library API from Drata — 1 operation(s) for evidence library.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Evidence Library
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-evidence-library-api-openapi.yml
-- aid: drata:drata-frameworks-api
-  name: Drata Frameworks API
-  description: The Frameworks API from Drata — 1 operation(s) for frameworks.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Frameworks
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-frameworks-api-openapi.yml
-- aid: drata:drata-monitoring-tests-api
-  name: Drata Monitoring Tests API
-  description: The Monitoring Tests API from Drata — 1 operation(s) for monitoring tests.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Monitoring Tests
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-monitoring-tests-api-openapi.yml
-- aid: drata:drata-personnel-api
-  name: Drata Personnel API
-  description: The Personnel API from Drata — 2 operation(s) for personnel.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Personnel
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-personnel-api-openapi.yml
-- aid: drata:drata-policies-api
-  name: Drata Policies API
-  description: The Policies API from Drata — 1 operation(s) for policies.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Policies
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-policies-api-openapi.yml
-- aid: drata:drata-risks-api
-  name: Drata Risks API
-  description: The Risks API from Drata — 1 operation(s) for risks.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Risks
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-risks-api-openapi.yml
-- aid: drata:drata-tasks-api
-  name: Drata Tasks API
-  description: The Tasks API from Drata — 1 operation(s) for tasks.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Task
-  tags_raw:
-  - Tasks
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-tasks-api-openapi.yml
-- aid: drata:drata-vendors-api
-  name: Drata Vendors API
-  description: The Vendors API from Drata — 1 operation(s) for vendors.
-  humanURL: https://developers.drata.com/openapi/reference/v2/overview/
-  baseURL: https://public-api.drata.com
-  tags:
-  - Vendors
-  properties:
-  - type: OpenAPI
-    url: openapi/drata-vendors-api-openapi.yml
+    url: https://drata.com/blog/introducing-mcp-built-for-ai
+  baseURL: https://mcp.drata.com/mcp/
 common:
-  - type: AgenticAccess
-    url: agentic-access/drata-agentic-access.yml
-  - type: TrustCenter
-    url: security/drata-trust-center.yml
-  - type: VulnerabilityDisclosure
-    url: security/drata-vulnerability-disclosure.yml
-  - type: DomainSecurity
-    url: security/drata-domain-security.yml
-  - type: Authentication
-    url: authentication/drata-authentication.yml
-  - type: GitHubOrganization
-    url: https://github.com/drata
-  - type: LinkedIn
-    url: https://www.linkedin.com/company/drata
-  - type: Website
-    url: https://drata.com/
-  - type: Developer
-    url: https://developers.drata.com/
-  - type: Plans
-    url: plans/drata-plans-pricing.yml
-  - type: RateLimits
-    url: rate-limits/drata-rate-limits.yml
-  - type: FinOps
-    url: finops/drata-finops.yml
+- type: AgenticAccess
+  url: agentic-access/drata-agentic-access.yml
+- type: TrustCenter
+  url: security/drata-trust-center.yml
+- type: VulnerabilityDisclosure
+  url: security/drata-vulnerability-disclosure.yml
+- type: DomainSecurity
+  url: security/drata-domain-security.yml
+- type: Authentication
+  url: authentication/drata-authentication.yml
+- type: GitHubOrganization
+  url: https://github.com/drata
+- type: LinkedIn
+  url: https://www.linkedin.com/company/drata
+- type: Website
+  url: https://drata.com/
+- type: Developer
+  url: https://developers.drata.com/
+- type: Plans
+  url: plans/drata-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/drata-rate-limits.yml
+- type: FinOps
+  url: finops/drata-finops.yml
+- type: MCPServer
+  url: mcp/drata-mcp.yml
+- type: ToolCrosswalk
+  url: mcp/drata-tool-crosswalk.yml
+- type: OAuthScopes
+  url: scopes/drata-scopes.yml
+- type: WellKnown
+  url: well-known/drata-well-known.yml
+- type: Conventions
+  url: conventions/drata-conventions.yml
+- type: ErrorCatalog
+  url: errors/drata-problem-types.yml
+- type: Lifecycle
+  url: lifecycle/drata-lifecycle.yml
+- type: ChangeLog
+  url: changelog/drata-changelog.yml
+- type: Conformance
+  url: conformance/drata-conformance.yml
+- type: DataModel
+  url: data-model/drata-data-model.yml
+- type: Packages
+  url: packages/drata-packages.yml
+- type: LLMsTxt
+  url: llms/drata-llms.txt
+- type: Overlay
+  url: overlays/drata-api-v2-overlay.yaml
+- type: Examples
+  url: examples/drata-examples.yml
+- type: AgentSkill
+  url: skills/_index.yml
+  name: Drata Agent Skills
+- type: StatusPage
+  url: https://status.drata.com/
+- type: Security
+  url: security/drata-vulnerability-disclosure.yml
+- type: Compliance
+  url: https://trust.drata.com/
+- type: DeveloperPortal
+  url: https://developers.drata.com/
+- type: Documentation
+  url: https://developers.drata.com/openapi/reference/v2/overview/
+- type: APIReference
+  url: https://developers.drata.com/openapi/reference/v2/overview/
+- type: GettingStarted
+  url: https://developers.drata.com/developer-portal/v2/recipes/create-an-api-key/
+- type: Support
+  url: https://help.drata.com/
+- type: Blog
+  url: https://drata.com/blog
+- type: Pricing
+  url: https://drata.com/pricing
+- type: SignUp
+  url: https://drata.com/demo
+- type: Login
+  url: https://app.drata.com/
+- type: TermsOfService
+  url: https://drata.com/terms
+- type: PrivacyPolicy
+  url: https://drata.com/privacy
 maintainers:
-  - FN: Kin Lane
-    email: kin@apievangelist.com
+- FN: Kin Lane
+  email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-08-27'
+  status: enriched
+  artifacts_added: 17
+  pass: local-v1
