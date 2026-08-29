@@ -1,0 +1,722 @@
+openapi: 3.2.0
+info:
+  title: Drata HRIS User Identities API
+  version: V2
+  contact: {}
+  description: 'Operations tagged HRIS User Identities across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: HRIS User Identities
+  description: HR user identity records for a Custom HRIS connection. Use the batch upsert endpoint to submit employee records keyed by your own `identityId`, then use the update endpoint to reflect employment changes (e.g. set `separatedAt` when an employee leaves). Deleting a record is intended for data submitted in error, not for offboarding. Changes are not applied immediately — they are incorporated the next time identity sync runs, which happens nightly by default. A sync can also be triggered manually from the Personnel page.
+paths:
+  /custom-connections/{connectionId}/hris-user-identities:
+    get:
+      description: 'Returns a cursor-paginated list of all active HR user identities for the specified custom HRIS connection.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **HRIS User Identities: List HRIS User Identities** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomHrisUserIdentitiesPublicV2Controller_listCustomHrisUserIdentities
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUserIdentitiesResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List HRIS User Identities 🧪
+      tags:
+      - HRIS User Identities
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - user-identities-hris-get
+      x-product-area:
+      - CUSTOM_FRAMEWORKS
+    post:
+      description: 'Submit one or more HR user identities for a custom HRIS connection. Each record is keyed by the customer-defined `identityId`: if a record with that `identityId` already exists for this connection it is updated, otherwise a new one is created. Invalid items are reported per-item and do not prevent valid items from being processed.
+
+
+        Partial updates are supported — omitted fields are left unchanged, while an explicit `null` clears a field.
+
+
+        `separatedAt` is write-once: once a separation date is stored, a different non-null value is ignored. To change a stored separation date, submit `"separatedAt": null` first to clear it, then send the new date in a subsequent request.
+
+
+        A record whose submitted values already match what is stored returns a per-item `{ "statusCode": 200, "data": null }` — this is a success (nothing changed), not an error.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **HRIS User Identities: Create or Update HRIS User Identities** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomHrisUserIdentitiesPublicV2Controller_createCustomHrisUserIdentities
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        description: List of HR user identity records to upsert. Duplicate `identityId` values within a batch are reported as per-item errors.
+        content:
+          application/json:
+            schema:
+              type: array
+              minItems: 1
+              maxItems: 1000
+              items:
+                $ref: '#/components/schemas/CustomUserIdentityRecordPublicV2Dto'
+      responses:
+        '200':
+          description: At least one record was updated (mix of creates and updates).
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomUserIdentityBulkResponsePublicV2Dto'
+        '201':
+          description: All records were newly created.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomUserIdentityBulkResponsePublicV2Dto'
+        '207':
+          description: Some records succeeded and some failed. Per-item `statusCode` indicates each outcome.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CustomUserIdentityBulkResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create or Update HRIS User Identities 🧪
+      tags:
+      - HRIS User Identities
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - user-identity-hris-post
+      x-product-area:
+      - CUSTOM_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}/hris-user-identities/{userIdentityId}:
+    get:
+      description: 'Returns a single HR user identity. The `:userIdentityId` path parameter accepts two forms: a Drata-assigned internal numeric ID (e.g. `1001`), or a customer-assigned identityId prefixed with `identity-id:` (e.g. `identity-id:emp-001`).
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **HRIS User Identities: Get HRIS User Identity** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomHrisUserIdentitiesPublicV2Controller_getCustomHrisUserIdentity
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: userIdentityId
+        required: true
+        in: path
+        description: Drata internal numeric ID (e.g. `1001`) or customer-assigned identityId prefixed with `identity-id:` (e.g. `identity-id:emp-001`)
+        schema:
+          oneOf:
+          - type: number
+            description: Drata internal numeric ID
+          - type: string
+            description: Customer-assigned identityId prefixed with 'identity-id:'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get HRIS User Identity 🧪
+      tags:
+      - HRIS User Identities
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - user-identity-hris-get
+      x-product-area:
+      - CUSTOM_FRAMEWORKS
+    delete:
+      description: 'Soft-deletes an HR user identity. The `:userIdentityId` path parameter accepts two forms: a Drata-assigned internal numeric ID (e.g. `1001`), or a customer-assigned identityId prefixed with `identity-id:` (e.g. `identity-id:emp-001`). This endpoint is intended for removing records submitted in error (e.g. test data, duplicates, or employees who should never have been included). To indicate that an employee has left, re-submit the record via the batch upsert endpoint with the `separatedAt` field set — this preserves employment history and allows identity sync to correctly classify the person as `FORMER_EMPLOYEE` or `FORMER_CONTRACTOR`. If the deleted record was previously matched to a Drata user, that user''s employment status will move to `UNKNOWN` at the next identity sync. A deleted record can be restored by re-submitting it via the batch upsert endpoint with the same `identityId`.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **HRIS User Identities: Delete HRIS User Identity** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomHrisUserIdentitiesPublicV2Controller_deleteCustomHrisUserIdentity
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: userIdentityId
+        required: true
+        in: path
+        description: Drata internal numeric ID (e.g. `1001`) or customer-assigned identityId prefixed with `identity-id:` (e.g. `identity-id:emp-001`)
+        schema:
+          oneOf:
+          - type: number
+            description: Drata internal numeric ID
+          - type: string
+            description: Customer-assigned identityId prefixed with 'identity-id:'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete HRIS User Identity 🧪
+      tags:
+      - HRIS User Identities
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - user-identity-hris-delete
+      x-product-area:
+      - CUSTOM_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    CustomUserIdentitiesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of HR user identity records based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    CustomUserIdentityBulkResponsePublicV2Dto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 201
+          description: 'Per-item HTTP status code: 201 = created, 200 = updated, 400 = validation error.'
+        data:
+          additionalProperties: true
+          description: The saved identity. Null when `error` is present.
+          allOf:
+          - $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+          - message
+      required:
+      - statusCode
+      - data
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    CustomUserIdentityRecordPublicV2Dto:
+      type: object
+      properties:
+        identityId:
+          type: string
+          example: emp-001
+          description: Customer-defined stable identifier for this record (e.g. employee ID, HRIS record ID). Used as the upsert key for batch submissions.
+        email:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          format: email
+          example: jane.doe@acme.com
+          description: Primary email address. Used to match this record to an existing Drata user during identity sync.
+        secondaryEmail:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          format: email
+          example: jane.doe@personal.com
+          description: Secondary email address.
+        firstName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Jane
+          description: First name.
+        lastName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Doe
+          description: Last name.
+        jobTitle:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Software Engineer
+          description: Job title.
+        managerId:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: emp-050
+          description: The customer's own identifier for this person's manager (e.g. the manager's identityId in the customer's HRIS system). Not a Drata User ID.
+        managerName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Bob Manager
+          description: Manager's full name.
+        startedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2022-03-01T00:00:00.000Z'
+          description: Employment start date.
+        separatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2024-12-31T00:00:00.000Z'
+          description: 'Employment end date. Set `separatedAt` to indicate the employee has left rather than deleting the record. Write-once on an existing record: once a separation date is stored, a different non-null `separatedAt` in a later submission is ignored — only `null` is applied (which clears/reactivates the record). To change a stored separation date, first submit `"separatedAt": null` to clear it, then submit the new date in a subsequent request. (This guard also applies when re-activating a previously separated record.)'
+        isContractor:
+          type:
+          - boolean
+          - 'null'
+          example: false
+          description: If `true`, this person is a `CURRENT_CONTRACTOR`; `false` means `CURRENT_EMPLOYEE`. `null` means employment type is `UNKNOWN` — the person will appear as `UNKNOWN` in Drata until an explicit value is provided.
+      required:
+      - identityId
+    CustomUserIdentityResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1001
+          description: Drata-assigned internal ID. Use this in PUT, DELETE, and single-record GET requests.
+        identityId:
+          type: string
+          example: emp-001
+          description: Customer-defined stable identifier (upsert key).
+        email:
+          type:
+          - string
+          - 'null'
+          format: email
+          example: jane.doe@acme.com
+          description: Primary email address.
+        secondaryEmail:
+          type:
+          - string
+          - 'null'
+          format: email
+          example: null
+          description: Secondary email address.
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Jane
+          description: First name.
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Doe
+          description: Last name.
+        jobTitle:
+          type:
+          - string
+          - 'null'
+          example: Software Engineer
+          description: Job title.
+        managerId:
+          type:
+          - string
+          - 'null'
+          example: emp-050
+          description: The customer's own identifier for this person's manager. Not a Drata User ID.
+        managerName:
+          type:
+          - string
+          - 'null'
+          example: Bob Manager
+          description: Manager's full name.
+        startedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2022-03-01T00:00:00.000Z'
+          description: Employment start date.
+        separatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: null
+          description: Employment end date.
+        isContractor:
+          type:
+          - boolean
+          - 'null'
+          example: false
+          description: If `true`, this person is a `CURRENT_CONTRACTOR`; `false` means `CURRENT_EMPLOYEE`. `null` means employment type is `UNKNOWN` — the person will appear as `UNKNOWN` in Drata until an explicit value is provided.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-03-26T10:00:00.000Z'
+          description: Record created timestamp.
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2026-03-26T10:00:00.000Z'
+          description: Record last updated timestamp.
+      required:
+      - id
+      - identityId
+      - email
+      - secondaryEmail
+      - firstName
+      - lastName
+      - jobTitle
+      - managerId
+      - managerName
+      - startedAt
+      - separatedAt
+      - isContractor
+      - createdAt
+      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

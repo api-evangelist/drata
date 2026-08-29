@@ -1,0 +1,1832 @@
+openapi: 3.2.0
+info:
+  title: Drata Devices API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Devices across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Devices
+  description: Devices are computers used by personnel. The data is provided by the Drata Agent or an MDM connection.
+paths:
+  /devices:
+    get:
+      operationId: DevicesPublicV2Controller_getDevices
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: externalId
+        required: false
+        in: query
+        description: An externally sourced unique identifier for a device
+        schema:
+          maxLength: 191
+          type: string
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceExpandEnum'
+      - name: macAddress
+        required: false
+        in: query
+        description: The device MAC address
+        schema:
+          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
+          type: string
+      - name: serialNumber
+        required: false
+        in: query
+        description: The device serial number
+        schema:
+          example: NKRTSPY456
+          type: string
+      - name: sourceType
+        required: false
+        in: query
+        description: Device source type
+        schema:
+          $ref: '#/components/schemas/MobileDeviceManagementSourceTypeEnum'
+      - name: personnelId
+        required: false
+        in: query
+        description: Personnel ID
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicesResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Devices
+      tags:
+      - Devices
+      x-drata-permissions:
+      - devices-get
+      x-product-area:
+      - MDM
+      description: '🔒 Requires **Devices: List Devices** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /personnel/{personnelId}/devices:
+    get:
+      operationId: DevicesPublicV2Controller_getDevicesForPersonnel
+      parameters:
+      - name: personnelId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: externalId
+        required: false
+        in: query
+        description: An externally sourced unique identifier for a device
+        schema:
+          maxLength: 191
+          type: string
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceExpandEnum'
+      - name: macAddress
+        required: false
+        in: query
+        description: The device MAC address
+        schema:
+          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
+          type: string
+      - name: serialNumber
+        required: false
+        in: query
+        description: The device serial number
+        schema:
+          example: NKRTSPY456
+          type: string
+      - name: sourceType
+        required: false
+        in: query
+        description: Device source type
+        schema:
+          $ref: '#/components/schemas/MobileDeviceManagementSourceTypeEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicesResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Devices for Personnel
+      tags:
+      - Devices
+      x-drata-permissions:
+      - devices-get
+      x-product-area:
+      - MDM
+      description: '🔒 Requires **Devices: List Devices** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /devices/{deviceId}:
+    get:
+      operationId: DevicesPublicV2Controller_getDevice
+      parameters:
+      - name: deviceId
+        required: true
+        in: path
+        description: The device ID
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          example: complianceChecks
+          type: array
+          items:
+            type: string
+            enum:
+            - asset
+            - complianceChecks
+            - documents
+            - identifiers
+            - deviceApps
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponseIdPublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Device
+      tags:
+      - Devices
+      x-drata-permissions:
+      - devices-get
+      x-product-area:
+      - MDM
+      description: '🔒 Requires **Devices: List Devices** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /connections/{connectionId}/devices:
+    get:
+      description: 'Get a list of Devices for a given connection
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Devices: List Devices** permission.'
+      operationId: DevicesPublicV2Controller_getDevicesForCustomConnection
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        description: "\nThe ID of the connection may be obtained in one of two ways:\n* Calling GET /connections and noting the `id` of the desired custom device connection in the response.\n* In the Drata App: \n    * **New Device Connection** \n        1. Navigate to *Connections* **>** *MDM*.\n        2. Select the *Available Connections* tab.\n        3. Chose *Custom Device Connection*.\n        \n        After successfully creating a device connection, the connection ID will be displayed under *Account Information*.\n    * **Existing Device Connection**\n        1. Navigate to *Connections* **>** *MDM*.\n        2. Select the *Active Connections*  tab.\n        3. View a previously created custom device connection.\n\n        The connection ID will be displayed under *Account Information*.\n"
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: externalId
+        required: false
+        in: query
+        description: An externally sourced unique identifier for a device
+        schema:
+          maxLength: 191
+          type: string
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceExpandEnum'
+      - name: macAddress
+        required: false
+        in: query
+        description: The device MAC address
+        schema:
+          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
+          type: string
+      - name: serialNumber
+        required: false
+        in: query
+        description: The device serial number
+        schema:
+          example: NKRTSPY456
+          type: string
+      - name: personnelId
+        required: false
+        in: query
+        description: Personnel Id
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DevicesResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Devices for Connection 🧪
+      tags:
+      - Devices
+      x-drata-permissions:
+      - devices-get
+      x-product-area:
+      - MDM
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /devices/{deviceId}/apps:
+    get:
+      description: 'Get a list of Apps associated with a given Device.
+
+
+        🔒 Requires **Devices: List Devices** permission.'
+      operationId: DevicesPublicV2Controller_getDeviceApps
+      parameters:
+      - name: deviceId
+        required: true
+        in: path
+        description: The device ID
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceAppsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Apps for Device
+      tags:
+      - Devices
+      x-drata-permissions:
+      - devices-get
+      x-product-area:
+      - MDM
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}/devices:
+    post:
+      description: 'Create a new device or update an existing device for a custom connection.
+
+
+        An existing device is searched for based upon matching one or more of these supplied properties in the request payload:
+
+        * `serialNumber`
+
+        * `macAddress`
+
+        * `externalId`
+
+
+        If an existing device is found, the existing device is updated.
+
+        Otherwise a new device is created.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Devices: Create Device** permission.'
+      operationId: DevicesPublicV2Controller_createDeviceForCustomConnection
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        description: "\nThe ID of the connection may be obtained in one of two ways:\n* Calling GET /connections and noting the `id` of the desired custom device connection in the response.\n* In the Drata App: \n    * **New Device Connection** \n        1. Navigate to *Connections* **>** *MDM*.\n        2. Select the *Available Connections* tab.\n        3. Chose *Custom Device Connection*.\n        \n        After successfully creating a device connection, the connection ID will be displayed under *Account Information*.\n    * **Existing Device Connection**\n        1. Navigate to *Connections* **>** *MDM*.\n        2. Select the *Active Connections*  tab.\n        3. View a previously created custom device connection.\n\n        The connection ID will be displayed under *Account Information*.\n"
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '413':
+          description: The file was too large to upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '503':
+          description: Third party system was unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+      security:
+      - bearer: []
+      summary: Create or update Device for Custom Connection 🧪
+      tags:
+      - Devices
+      x-drata-permissions:
+      - devices-post
+      x-product-area:
+      - MDM
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}/devices/{deviceId}:
+    delete:
+      description: 'Delete a Device from a Custom Connection.
+
+
+        🔒 Requires **Devices: Delete Device** permission.'
+      operationId: DevicesPublicV2Controller_deleteDeviceFromCustomConnection
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        description: "\nThe ID of the connection may be obtained in one of two ways:\n* Calling GET /connections and noting the `id` of the desired custom device connection in the response.\n* In the Drata App: \n    * **New Device Connection** \n        1. Navigate to *Connections* **>** *MDM*.\n        2. Select the *Available Connections* tab.\n        3. Chose *Custom Device Connection*.\n        \n        After successfully creating a device connection, the connection ID will be displayed under *Account Information*.\n    * **Existing Device Connection**\n        1. Navigate to *Connections* **>** *MDM*.\n        2. Select the *Active Connections*  tab.\n        3. View a previously created custom device connection.\n\n        The connection ID will be displayed under *Account Information*.\n"
+        schema:
+          type: number
+      - name: deviceId
+        required: true
+        in: path
+        description: The Device ID
+        schema:
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Device
+      tags:
+      - Devices
+      x-drata-permissions:
+      - devices-delete-from-custom-connection
+      x-product-area:
+      - MDM
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    DeviceDocumentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Device document ID
+        type:
+          type: string
+          example: PASSWORD_MANAGER_EVIDENCE
+          description: The device document type
+        name:
+          type: string
+          example: Password Manager Evidence
+          description: The document name
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          example: http://localhost:5000/download/device-documents/1
+          description: The secure URL to the device document
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Device document created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Device document updated date timestamp
+        downloadUrl:
+          description: The signed URL to download the Device Document, only returned when `expand[]=downloadUrl` is passed.
+          allOf:
+          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
+      required:
+      - id
+      - type
+      - name
+      - fileUrl
+      - createdAt
+      - updatedAt
+    AppTypeRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Microsoft Defender Antivirus
+          description: Name of application
+        version:
+          type: string
+          maxLength: 191
+          example: 1.421.12.0
+          description: Version of application
+        description:
+          type:
+          - string
+          - 'null'
+          example: Microsoft Defender Antivirus
+          description: Protects against new malware and attack techniques.
+      required:
+      - name
+      - version
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    DeviceCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        personnelId:
+          description: Personnel integer ID or user's email address prefixed with `email:`
+          oneOf:
+          - type: number
+            example: 1
+            description: Personnel ID
+          - type: string
+            example: email:user@example.com
+            description: Email of the Personnel's User, prefixed with 'email:'
+        alias:
+          type: string
+          maxLength: 191
+          example: danielm-01
+          description: Name of the device.
+        antivirusEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Flag to indicate antivirus software is installed and enabled
+        antivirusExplanation:
+          type: object
+          example:
+            antivirusApps:
+            - Crowdstrike windows sensor
+          description: Any additional information to explain the antivirusEnabled value
+        appList:
+          description: List of installed applications
+          type: array
+          items:
+            $ref: '#/components/schemas/AppTypeRequestPublicV2Dto'
+        autoUpdateEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Flag to indicate auto-update enabled or disabled
+        autoUpdateExplanation:
+          type: object
+          example: Disabled
+          description: Any additional information to explain the autoUpdateEnabled value
+        browserExtensions:
+          description: List of installed browser extensions
+          type: array
+          items:
+            $ref: '#/components/schemas/AppTypeRequestPublicV2Dto'
+        externalId:
+          type: string
+          example: 0a33231a-3af0-4402-a1a9-e25da841b58f
+          description: An externally-sourced unique identifier for a device
+        firewallEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Flag to indicate the firewall is enabled or disabled
+        firewallExplanation:
+          type: object
+          example: 'On'
+          description: Any additional information to explain the firewallEnabled value
+        passwordManagerEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Flag to indicate a password manager is in use
+        encryptionEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Flag to indicate hard disk is encrypted
+        encryptionExplanation:
+          type: object
+          example:
+            bootPartitionEncryptionDetails:
+              partitionFileVault2Percent: 100
+              partitionFileVault2State: ENCRYPTED
+              partitionName: Macintosh HD (Boot Partition)
+          description: Any additional information to explain the encryptionEnabled value
+        model:
+          type: string
+          maxLength: 191
+          example: Mac16,1
+          description: Hardware model
+        serialNumber:
+          type: string
+          example: BKH8RXT4T9
+          description: Hardware serial number
+        macAddress:
+          type:
+          - string
+          - 'null'
+          example: 01-23-45-67-89-AB
+          description: MAC address
+        passwordManagerExplanation:
+          type: object
+          example:
+            passwordManagerApps:
+            - 1password
+          description: Any additional information to explain the hasPasswordManager value
+        platformName:
+          example: MACOS
+          description: The Operating System (OS) platform name of the device
+          allOf:
+          - $ref: '#/components/schemas/AgentPlatformEnum'
+        platformVersion:
+          type: string
+          maxLength: 191
+          description: The Operating System (OS) platform version of the device
+        screenLockEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Flag to indicate hard disk is encrypted
+        screenLockExplanation:
+          type: object
+          example: ScreenLock delay is immediate
+          description: Any additional information to explain the screenLockTime value
+        screenLockTime:
+          type: number
+          example: 15
+          description: Amount of time before display is turned off
+        windowsServices:
+          description: List of applicable Windows services
+          type: array
+          items:
+            $ref: '#/components/schemas/WindowsServiceRequestPublicV2Dto'
+      required:
+      - personnelId
+      - platformName
+      - platformVersion
+    WindowsServiceRequestPublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 191
+          example: Security feature that monitors and controls network traffic entering and exiting the device
+          description: Windows service description.
+        name:
+          type: string
+          maxLength: 191
+          example: Windows Firewall
+          description: Windows service name
+        startType:
+          type: string
+          maxLength: 191
+          example: Automatic
+          description: Windows service
+        status:
+          type: string
+          maxLength: 191
+          example: Running
+          description: Windows service status
+      required:
+      - description
+      - name
+      - startType
+      - status
+    ComplianceCheckStatusEnum:
+      type: string
+      enum:
+      - MISCONFIGURED
+      - PASS
+      - FAIL
+      - EXCLUDED
+    DeviceIdentifierResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Device identifier Id
+        type:
+          type: string
+          example: SERIAL_NUMBER
+          description: The identifier type
+        identifier:
+          type: string
+          example: C02CG123DC79
+          description: The identifier value
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Identifier createdAt timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Identifier updatedAt timestamp
+      required:
+      - id
+      - type
+      - identifier
+      - createdAt
+      - updatedAt
+    DevicesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ComplianceCheckTypeEnum:
+      type: string
+      enum:
+      - FULL_COMPLIANCE
+      - ACCEPTED_POLICIES
+      - IDENTITY_MFA
+      - BG_CHECK
+      - AGENT_INSTALLED
+      - PASSWORD_MANAGER
+      - HDD_ENCRYPTION
+      - ANTIVIRUS
+      - AUTO_UPDATES
+      - LOCK_SCREEN
+      - SECURITY_TRAINING
+      - LOCATION_SERVICES
+      - HIPAA_TRAINING
+      - OFFBOARDING
+      - NIST_AI_TRAINING
+    DeviceAppResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Installed app Id
+        installedApp:
+          type: string
+          example: Adobe Photoshop version 3.3 license 1a2b3c4d
+          description: The app description
+      required:
+      - id
+      - installedApp
+    DeviceExpandEnum:
+      type: string
+      enum:
+      - asset
+      - complianceChecks
+      - documents
+      - identifiers
+    DeviceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Device Id
+        assetId:
+          type:
+          - number
+          - 'null'
+          example: 123
+          description: Asset Id
+        osVersion:
+          type:
+          - string
+          - 'null'
+          example: MacOS 10.15.6
+          description: The device operating system version
+        serialNumber:
+          type:
+          - string
+          - 'null'
+          example: C02T6CDJGTFL
+          description: The device serial number
+        model:
+          type:
+          - string
+          - 'null'
+          example: MacBook Pro
+          description: The device model
+        macAddress:
+          type:
+          - string
+          - 'null'
+          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
+          description: The device MAC address
+        lastCheckedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Last time device data checked by the source
+        sourceType:
+          example: AGENT
+          description: The device source type
+          allOf:
+          - $ref: '#/components/schemas/MobileDeviceManagementSourceTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device updated date timestamp
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device deleted date timestamp
+        appsCount:
+          type:
+          - number
+          - 'null'
+          example: 20
+          description: The number of applications installed
+        isDeviceCompliant:
+          type: boolean
+          example: false
+          description: Indicates whether the Device meets all compliance requirements, only returned when `expand[]=complianceChecks` is passed.
+        complianceChecks:
+          example: []
+          description: The Device compliance checks list, only returned when `expand[]=complianceChecks` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceComplianceCheckResponsePublicV2Dto'
+        identifiers:
+          example: []
+          description: The Device identifiers list, only returned when `expand[]=identifiers` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceIdentifierResponsePublicV2Dto'
+        documents:
+          example: []
+          description: The Device documents list, only returned when `expand[]=documents` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+        screenLockTime:
+          type:
+          - number
+          - 'null'
+          example: 30
+          description: Denotes device actual screenLock time
+        screenLockExplanation:
+          type:
+          - object
+          - 'null'
+          example:
+            minutesIdleBeforeSleep: '2'
+            minutesSleepingBeforePasswordIsRequired: '2'
+          description: Screen lock explanation
+        antivirusEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual antivirus status
+        antivirusExplanation:
+          type:
+          - object
+          - 'null'
+          example: No matching app was found
+          description: Antivirus explanation
+        autoUpdateEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual auto-update status
+        autoUpdateExplanation:
+          type:
+          - object
+          - 'null'
+          example: No compliances found
+          description: Auto update explanation
+        passwordManagerEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual password manager status
+        passwordManagerExplanation:
+          type:
+          - object
+          - 'null'
+          example:
+            passwordManagerApps:
+            - 1password 7
+          description: Password manager explanation
+        encryptionEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: false
+          description: Denotes device actual encryption status
+        encryptionExplanation:
+          type:
+          - object
+          - 'null'
+          example: No encryption provided
+          description: Encryption explanation
+        firewallEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual firewall status
+        firewallExplanation:
+          type:
+          - object
+          - 'null'
+          example: '{}'
+          description: Firewall explanation
+        asset:
+          description: The Asset associated with this Device, only returned when `expand[]=asset` is passed.
+          allOf:
+          - $ref: '#/components/schemas/AssetCompactResponsePublicV2Dto'
+        userId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: User Id
+        personnelId:
+          type: number
+          example: 1
+          description: Personnel Id
+        externalId:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier for the device in the external system where it originated
+      required:
+      - id
+      - assetId
+      - osVersion
+      - serialNumber
+      - model
+      - macAddress
+      - lastCheckedAt
+      - sourceType
+      - createdAt
+      - updatedAt
+      - deletedAt
+      - appsCount
+      - screenLockTime
+      - screenLockExplanation
+      - antivirusEnabled
+      - antivirusExplanation
+      - autoUpdateEnabled
+      - autoUpdateExplanation
+      - passwordManagerEnabled
+      - passwordManagerExplanation
+      - encryptionEnabled
+      - encryptionExplanation
+      - firewallEnabled
+      - firewallExplanation
+      - personnelId
+      - externalId
+    DeviceAppsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: The set of installed apps for this device based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceAppResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    CheckFrequencyEnum:
+      type: string
+      enum:
+      - ONCE
+      - HOURLY
+      - QID
+      - DAILY
+      - WEEKLY
+      - BIWEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
+    SignedUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+      required:
+      - signedUrl
+      - fileBuffer
+      - fileName
+    AssetCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Assessment ID
+        name:
+          type: string
+          example: MacBook Pro - Space Black 16-inch
+          description: The name of the asset
+        description:
+          type: string
+          example: MacBook Pro Space Black - with 16-inch Liquid Retina XDR display
+          description: The description of the asset
+        assetType:
+          type: string
+          example: PHYSICAL
+          description: The asset type
+        assetProvider:
+          type: string
+          example: AGENT
+          description: The asset source provider
+        approvedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the asset was approved (if applicable)
+        removedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the asset stopped being tracked
+        company:
+          type: string
+          example: Acme, Inc
+          description: The owning company of the asset
+        notes:
+          type:
+          - string
+          - 'null'
+          description: The asset notes
+        assetReferenceType:
+          type:
+          - string
+          - 'null'
+          example: PERSONNEL
+          description: The asset reference type
+        uniqueId:
+          type: string
+          example: C02T6CDJGTFL
+          description: Unique Id associated with this asset
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset created timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset update timestamp
+        externalId:
+          type: string
+          example: i-0c844e3b433e4e3f
+          description: An externally sourced unique identifier for a virtual asset
+        externalOwnerId:
+          type: string
+          example: account-353
+          description: Used to track the source of virtual assets, typically an account id.
+      required:
+      - id
+      - name
+      - description
+      - assetType
+      - assetProvider
+      - approvedAt
+      - company
+      - assetReferenceType
+      - uniqueId
+      - createdAt
+      - updatedAt
+    DeviceResponseIdPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Device Id
+        assetId:
+          type:
+          - number
+          - 'null'
+          example: 123
+          description: Asset Id
+        osVersion:
+          type:
+          - string
+          - 'null'
+          example: MacOS 10.15.6
+          description: The device operating system version
+        serialNumber:
+          type:
+          - string
+          - 'null'
+          example: C02T6CDJGTFL
+          description: The device serial number
+        model:
+          type:
+          - string
+          - 'null'
+          example: MacBook Pro
+          description: The device model
+        macAddress:
+          type:
+          - string
+          - 'null'
+          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
+          description: The device MAC address
+        lastCheckedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Last time device data checked by the source
+        sourceType:
+          example: AGENT
+          description: The device source type
+          allOf:
+          - $ref: '#/components/schemas/MobileDeviceManagementSourceTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device updated date timestamp
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device deleted date timestamp
+        appsCount:
+          type:
+          - number
+          - 'null'
+          example: 20
+          description: The number of applications installed
+        isDeviceCompliant:
+          type: boolean
+          example: false
+          description: Indicates whether the Device meets all compliance requirements, only returned when `expand[]=complianceChecks` is passed.
+        complianceChecks:
+          example: []
+          description: The Device compliance checks list, only returned when `expand[]=complianceChecks` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceComplianceCheckResponsePublicV2Dto'
+        identifiers:
+          example: []
+          description: The Device identifiers list, only returned when `expand[]=identifiers` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceIdentifierResponsePublicV2Dto'
+        documents:
+          example: []
+          description: The Device documents list, only returned when `expand[]=documents` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+        screenLockTime:
+          type:
+          - number
+          - 'null'
+          example: 30
+          description: Denotes device actual screenLock time
+        screenLockExplanation:
+          type:
+          - object
+          - 'null'
+          example:
+            minutesIdleBeforeSleep: '2'
+            minutesSleepingBeforePasswordIsRequired: '2'
+          description: Screen lock explanation
+        antivirusEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual antivirus status
+        antivirusExplanation:
+          type:
+          - object
+          - 'null'
+          example: No matching app was found
+          description: Antivirus explanation
+        autoUpdateEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual auto-update status
+        autoUpdateExplanation:
+          type:
+          - object
+          - 'null'
+          example: No compliances found
+          description: Auto update explanation
+        passwordManagerEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual password manager status
+        passwordManagerExplanation:
+          type:
+          - object
+          - 'null'
+          example:
+            passwordManagerApps:
+            - 1password 7
+          description: Password manager explanation
+        encryptionEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: false
+          description: Denotes device actual encryption status
+        encryptionExplanation:
+          type:
+          - object
+          - 'null'
+          example: No encryption provided
+          description: Encryption explanation
+        firewallEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual firewall status
+        firewallExplanation:
+          type:
+          - object
+          - 'null'
+          example: '{}'
+          description: Firewall explanation
+        asset:
+          description: The Asset associated with this Device, only returned when `expand[]=asset` is passed.
+          allOf:
+          - $ref: '#/components/schemas/AssetCompactResponsePublicV2Dto'
+        userId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: User Id
+        personnelId:
+          type: number
+          example: 1
+          description: Personnel Id
+        externalId:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier for the device in the external system where it originated
+        apps:
+          description: Apps associated with the given device, only returned when `expand[]=apps` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceAppResponsePublicV2Dto'
+      required:
+      - id
+      - assetId
+      - osVersion
+      - serialNumber
+      - model
+      - macAddress
+      - lastCheckedAt
+      - sourceType
+      - createdAt
+      - updatedAt
+      - deletedAt
+      - appsCount
+      - screenLockTime
+      - screenLockExplanation
+      - antivirusEnabled
+      - antivirusExplanation
+      - autoUpdateEnabled
+      - autoUpdateExplanation
+      - passwordManagerEnabled
+      - passwordManagerExplanation
+      - encryptionEnabled
+      - encryptionExplanation
+      - firewallEnabled
+      - firewallExplanation
+      - personnelId
+      - externalId
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    AgentPlatformEnum:
+      type: string
+      enum:
+      - MACOS
+      - WINDOWS
+      - LINUX
+      - UNIX
+      - ANDROID
+    DeviceComplianceCheckResponsePublicV2Dto:
+      type: object
+      properties:
+        checkFrequency:
+          example: DAILY
+          description: How often should this check be run for Compliance
+          allOf:
+          - $ref: '#/components/schemas/CheckFrequencyEnum'
+        completionDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the user completed the Compliance Check
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check creation timestamp
+        expiresAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When this Compliance Check is due for a re-verification
+        id:
+          type: number
+          example: 1
+          description: Device Compliance Check ID
+        lastCheckedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check last checked timestamp
+        status:
+          example: PASS
+          description: Denotes actual Compliance Check status
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
+        type:
+          example: PASSWORD_MANAGER
+          description: The Compliance Check type
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check updated timestamp
+      required:
+      - checkFrequency
+      - completionDate
+      - createdAt
+      - expiresAt
+      - id
+      - lastCheckedAt
+      - status
+      - type
+      - updatedAt
+    MobileDeviceManagementSourceTypeEnum:
+      type: string
+      enum:
+      - AGENT
+      - JAMF
+      - INTUNE
+      - KANDJI
+      - JUMPCLOUD
+      - HEXNODE_UEM
+      - UNKNOWN
+      - RIPPLING
+      - WORKSPACE_ONE
+      - KOLIDE
+      - CUSTOM
+      - INTUNE_GCC_HIGH
+      - CUSTOM_XFA
+      - NINJAONE
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

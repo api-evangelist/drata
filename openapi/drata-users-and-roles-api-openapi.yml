@@ -1,24 +1,24 @@
 openapi: 3.2.0
 info:
-  title: Drata Assets API
+  title: Drata Users and Roles API
   version: V2
   contact: {}
-  description: 'Operations tagged Assets across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+  description: 'Operations tagged Users and Roles across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
-- name: Assets
-  description: Assets let you build an inventory of policies, personnel and computer infrastructure. The [help docs](https://help.drata.com/en/collections/10485424) have more information.
+- name: Users and Roles
+  description: "**Users** are are people with access to the Drata platform.  \n**Roles** grant permissions to Users. The [help docs](https://help.drata.com/en/collections/5993507) have more information on the default Roles."
 paths:
-  /assets:
+  /roles:
     get:
-      description: 'Find Assets by search terms and filters.
+      description: 'Find Roles matching the provided filters.
 
 
-        🔒 Requires **Assets: List Assets** permission.'
-      operationId: AssetsPublicV2Controller_listAssets
+        🔒 Requires **Roles: List Roles** permission.'
+      operationId: RolesPublicV2Controller_listRoles
       parameters:
       - name: cursor
         required: false
@@ -62,99 +62,14 @@ paths:
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/AssetExpandEnum'
-      - name: assetClassType
-        required: false
-        in: query
-        description: Filter assets by class type. This filter is only supported in conjunction with expand[]=assetClassTypes.
-        schema:
-          $ref: '#/components/schemas/AssetClassTypeEnum'
-      - name: assetType
-        required: false
-        in: query
-        description: Filter assets by type
-        schema:
-          $ref: '#/components/schemas/AssetTypeEnum'
-      - name: assetProvider
-        required: false
-        in: query
-        description: Filter assets by provider
-        schema:
-          $ref: '#/components/schemas/AssetProviderEnum'
-      - name: userId
-        required: false
-        in: query
-        description: Filter data by user ID associated to the Assets
-        schema:
-          maximum: 1000000000
-          example: 1
-          type: number
-      - name: employmentStatus
-        required: false
-        in: query
-        description: Filter data by personnel of this employment status
-        schema:
-          $ref: '#/components/schemas/EmploymentStatusEnum'
+            $ref: '#/components/schemas/RoleExpandEnum'
       responses:
         '200':
           description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssetsResponsePublicV2Dto'
-        '401':
-          description: Invalid Authorization
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-        '403':
-          description: You are not allowed to perform this action
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-        '412':
-          description: You must accept the Drata terms and conditions to use the API
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-      security:
-      - bearer: []
-      summary: List Assets
-      tags:
-      - Assets
-      x-drata-permissions:
-      - assets-get
-      x-product-area:
-      - ASSETS_PAGE
-    post:
-      description: 'Manually add a new Asset to the Account.
-
-
-        🔒 Requires **Assets: Create Asset** permission.'
-      operationId: AssetsPublicV2Controller_createAsset
-      parameters: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AssetCreateRequestPublicV2Dto'
-      responses:
-        '201':
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AssetResponsePublicV2Dto'
+                $ref: '#/components/schemas/RolesResponsePublicV2Dto'
         '400':
           description: Malformed data and/or validation errors
           content:
@@ -173,24 +88,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExceptionResponseDto'
-        '404':
-          description: Not Found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
         '412':
           description: You must accept the Drata terms and conditions to use the API
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ExceptionResponseDto'
-        '422':
-          description: Unprocessable Entity
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
         '500':
           description: Internal server error
           content:
@@ -199,26 +102,25 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponseDto'
       security:
       - bearer: []
-      summary: Create Asset
+      summary: List Roles
       tags:
-      - Assets
+      - Users and Roles
       x-drata-permissions:
-      - assets-post
+      - roles-get
       x-product-area:
-      - ASSETS_PAGE
+      - RBAC
     servers:
     - url: https://public-api.drata.com/public/v2
     - url: https://public-api.eu.drata.com/public/v2
     - url: https://public-api.apac.drata.com/public/v2
-  /assets/{assetId}:
+  /roles/{roleId}:
     get:
-      operationId: AssetsPublicV2Controller_getAsset
+      description: 'Get the full detail of a Role record.
+
+
+        🔒 Requires **Roles: Get Role** permission.'
+      operationId: RolesPublicV2Controller_getRole
       parameters:
-      - name: assetId
-        required: true
-        in: path
-        schema:
-          type: number
       - name: expand[]
         required: false
         in: query
@@ -226,75 +128,24 @@ paths:
         schema:
           type: array
           items:
-            $ref: '#/components/schemas/AssetExpandEnum'
-      responses:
-        '200':
-          description: Successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AssetResponsePublicV2Dto'
-        '401':
-          description: Invalid Authorization
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-        '403':
-          description: You are not allowed to perform this action
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-        '412':
-          description: You must accept the Drata terms and conditions to use the API
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExceptionResponseDto'
-      security:
-      - bearer: []
-      summary: Get Asset
-      tags:
-      - Assets
-      x-drata-permissions:
-      - assets-get
-      x-product-area:
-      - ASSETS_PAGE
-      description: '🔒 Requires **Assets: List Assets** permission.'
-    put:
-      description: 'Update Asset
-
-
-        🔒 Requires **Assets: Update Asset** permission.'
-      operationId: AssetsPublicV2Controller_updateAsset
-      parameters:
-      - name: assetId
+            $ref: '#/components/schemas/RoleExpandEnum'
+      - name: roleId
         required: true
         in: path
+        description: An integer Role ID or name prefixed with `role:`
         schema:
-          type: number
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AssetModifyRequestPublicV2Dto'
+          oneOf:
+          - type: number
+            description: Role ID
+          - type: string
+            description: Role name, prefixed with 'role:' e.g. `role:ADMIN`
       responses:
         '200':
           description: Successful
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssetResponsePublicV2Dto'
-        '204':
-          description: No Content
+                $ref: '#/components/schemas/RoleResponsePublicV2Dto'
         '400':
           description: Malformed data and/or validation errors
           content:
@@ -333,28 +184,99 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponseDto'
       security:
       - bearer: []
-      summary: Update Asset
+      summary: Get Role
       tags:
-      - Assets
+      - Users and Roles
       x-drata-permissions:
-      - assets-put
+      - role-get
       x-product-area:
-      - ASSETS_PAGE
-    delete:
-      description: 'Remove a virtual or manually-added Asset. This is an unrecoverable operation.
+      - RBAC
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /roles/{roleId}/users:
+    get:
+      description: 'List all Users that have a specific Role assigned.
 
 
-        🔒 Requires **Assets: Delete Asset** permission.'
-      operationId: AssetsPublicV2Controller_deleteAsset
+        🔒 Requires **Users: List Users** permission.'
+      operationId: RolesPublicV2Controller_listUsers
       parameters:
-      - name: assetId
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserExpandEnum'
+      - name: firstName
+        required: false
+        in: query
+        description: Filter users whose first name starts with the provided value (prefix match). For example, `firstName=John` matches users named John, Johnathan, Johnny, etc.
+        schema:
+          example: John
+          type: string
+      - name: lastName
+        required: false
+        in: query
+        description: Filter users whose last name starts with the provided value (prefix match). For example, `lastName=Sm` matches users named Smith, Smithson, etc.
+        schema:
+          example: Doe
+          type: string
+      - name: roleId
         required: true
         in: path
+        description: An integer Role ID or name prefixed with `role:`
         schema:
-          type: number
+          oneOf:
+          - type: number
+            description: Role ID
+          - type: string
+            description: Role name, prefixed with 'role:' e.g. `role:ADMIN`
       responses:
-        '204':
-          description: No Content
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersResponsePublicV2Dto'
         '400':
           description: Malformed data and/or validation errors
           content:
@@ -393,133 +315,208 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponseDto'
       security:
       - bearer: []
-      summary: Remove Asset
+      summary: List Users with Role
       tags:
-      - Assets
+      - Users and Roles
       x-drata-permissions:
-      - assets-delete
+      - users-get
       x-product-area:
-      - ASSETS_PAGE
+      - RBAC
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /users:
+    get:
+      description: 'Find Users matching the provided filters.
+
+
+        🔒 Requires **Users: List Users** permission.'
+      operationId: UsersPublicV2Controller_listUsers
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserExpandEnum'
+      - name: firstName
+        required: false
+        in: query
+        description: Filter users whose first name starts with the provided value (prefix match). For example, `firstName=John` matches users named John, Johnathan, Johnny, etc.
+        schema:
+          example: John
+          type: string
+      - name: lastName
+        required: false
+        in: query
+        description: Filter users whose last name starts with the provided value (prefix match). For example, `lastName=Sm` matches users named Smith, Smithson, etc.
+        schema:
+          example: Doe
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Users
+      tags:
+      - Users and Roles
+      x-drata-permissions:
+      - users-get
+      x-product-area:
+      - TBD
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /users/{userId}:
+    get:
+      description: 'Get the full detail of a User record.
+
+
+        🔒 Requires **Users: Get User** permission.'
+      operationId: UsersPublicV2Controller_getUser
+      parameters:
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserExpandEnum'
+      - name: userId
+        required: true
+        in: path
+        description: A Drata integer ID or an email address of the form 'email:value'.
+        schema:
+          oneOf:
+          - type: number
+          - type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get User
+      tags:
+      - Users and Roles
+      x-drata-permissions:
+      - user-get
+      x-product-area:
+      - TBD
     servers:
     - url: https://public-api.drata.com/public/v2
     - url: https://public-api.eu.drata.com/public/v2
     - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
-    DeviceDocumentResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Device document ID
-        type:
-          type: string
-          example: PASSWORD_MANAGER_EVIDENCE
-          description: The device document type
-        name:
-          type: string
-          example: Password Manager Evidence
-          description: The document name
-        fileUrl:
-          type:
-          - string
-          - 'null'
-          example: http://localhost:5000/download/device-documents/1
-          description: The secure URL to the device document
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Device document created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Device document updated date timestamp
-        downloadUrl:
-          description: The signed URL to download the Device Document, only returned when `expand[]=downloadUrl` is passed.
-          allOf:
-          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
-      required:
-      - id
-      - type
-      - name
-      - fileUrl
-      - createdAt
-      - updatedAt
-    AssetExpandEnum:
-      type: string
-      enum:
-      - device
-      - assetClassTypes
-      - complianceChecks
-      - customFields
-      - identifiers
-      - owner
-    AssetModifyRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          description: The Asset name
-        description:
-          type: string
-          maxLength: 191
-          description: The Asset description
-        notes:
-          type: string
-          maxLength: 191
-          description: The Asset notes
-        ownerId:
-          type: number
-          description: The ID of the user to set as Asset owner
-        assetClassTypes:
-          type: array
-          items:
-            type: string
-            enum:
-            - HARDWARE
-            - POLICY
-            - DOCUMENT
-            - PERSONNEL
-            - SOFTWARE
-            - CODE
-            - CONTAINER
-            - COMPUTE
-            - NETWORKING
-            - DATABASE
-            - STORAGE
-          example:
-          - HARDWARE
-          - PERSONNEL
-          description: The Asset class types
-        assetType:
-          enum:
-          - PHYSICAL
-          - VIRTUAL
-          type: string
-          example: PHYSICAL
-          description: The Asset type
-        customFields:
-          description: "Custom Fields for the Asset. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-    AssetsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/AssetResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
     ExceptionResponseDto:
       type: object
       properties:
@@ -545,15 +542,6 @@ components:
       - statusCode
       - message
       - code
-    AssetReferenceTypeEnum:
-      type: string
-      enum:
-      - PERSONNEL
-      - WORKSTATION
-      - REPORT
-      - POLICY
-      - OTHER
-      - VIRTUAL
     UserResponsePublicV2Dto:
       type: object
       properties:
@@ -1010,474 +998,144 @@ components:
       - connectedAt
       - failedAt
       - deletedAt
-    ComplianceCheckStatusEnum:
+    RoleResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Role ID
+        role:
+          example: ADMIN
+          description: Role type
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Role created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Role last updated at
+        permissions:
+          description: Permissions associated with this Role, only returned when `expand[]=permissions` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionResponsePublicV2Dto'
+      required:
+      - id
+      - role
+      - createdAt
+      - updatedAt
+    PermissionResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type:
+          - number
+          - 'null'
+          deprecated: true
+          example: null
+          description: 'Deprecated: no longer provided. Always returns `null`.'
+        action:
+          example: READ
+          description: Permission action
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+        subject:
+          example: Asset
+          description: Permission subject
+          allOf:
+          - $ref: '#/components/schemas/SubjectEnum'
+        createdAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          deprecated: true
+          description: 'Deprecated: no longer provided. Always returns `null`.'
+      required:
+      - action
+      - subject
+    ActionEnum:
       type: string
       enum:
-      - MISCONFIGURED
-      - PASS
-      - FAIL
-      - EXCLUDED
-    DeviceIdentifierResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Device identifier Id
-        type:
-          type: string
-          example: SERIAL_NUMBER
-          description: The identifier type
-        identifier:
-          type: string
-          example: C02CG123DC79
-          description: The identifier value
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Identifier createdAt timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Identifier updatedAt timestamp
-      required:
-      - id
-      - type
-      - identifier
-      - createdAt
-      - updatedAt
-    ComplianceCheckTypeEnum:
+      - READ
+      - MANAGE
+      - CREATE
+      - UPDATE
+      - DELETE
+    RoleEnum:
       type: string
       enum:
-      - FULL_COMPLIANCE
-      - ACCEPTED_POLICIES
-      - IDENTITY_MFA
-      - BG_CHECK
-      - AGENT_INSTALLED
-      - PASSWORD_MANAGER
-      - HDD_ENCRYPTION
-      - ANTIVIRUS
-      - AUTO_UPDATES
-      - LOCK_SCREEN
-      - SECURITY_TRAINING
-      - LOCATION_SERVICES
-      - HIPAA_TRAINING
-      - OFFBOARDING
-      - NIST_AI_TRAINING
-    DeviceResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Device Id
-        assetId:
-          type:
-          - number
-          - 'null'
-          example: 123
-          description: Asset Id
-        osVersion:
-          type:
-          - string
-          - 'null'
-          example: MacOS 10.15.6
-          description: The device operating system version
-        serialNumber:
-          type:
-          - string
-          - 'null'
-          example: C02T6CDJGTFL
-          description: The device serial number
-        model:
-          type:
-          - string
-          - 'null'
-          example: MacBook Pro
-          description: The device model
-        macAddress:
-          type:
-          - string
-          - 'null'
-          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
-          description: The device MAC address
-        lastCheckedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Last time device data checked by the source
-        sourceType:
-          example: AGENT
-          description: The device source type
-          allOf:
-          - $ref: '#/components/schemas/MobileDeviceManagementSourceTypeEnum'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The device created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The device updated date timestamp
-        deletedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The device deleted date timestamp
-        appsCount:
-          type:
-          - number
-          - 'null'
-          example: 20
-          description: The number of applications installed
-        isDeviceCompliant:
-          type: boolean
-          example: false
-          description: Indicates whether the Device meets all compliance requirements, only returned when `expand[]=complianceChecks` is passed.
-        complianceChecks:
-          example: []
-          description: The Device compliance checks list, only returned when `expand[]=complianceChecks` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceComplianceCheckResponsePublicV2Dto'
-        identifiers:
-          example: []
-          description: The Device identifiers list, only returned when `expand[]=identifiers` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceIdentifierResponsePublicV2Dto'
-        documents:
-          example: []
-          description: The Device documents list, only returned when `expand[]=documents` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
-        screenLockTime:
-          type:
-          - number
-          - 'null'
-          example: 30
-          description: Denotes device actual screenLock time
-        screenLockExplanation:
-          type:
-          - object
-          - 'null'
-          example:
-            minutesIdleBeforeSleep: '2'
-            minutesSleepingBeforePasswordIsRequired: '2'
-          description: Screen lock explanation
-        antivirusEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual antivirus status
-        antivirusExplanation:
-          type:
-          - object
-          - 'null'
-          example: No matching app was found
-          description: Antivirus explanation
-        autoUpdateEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual auto-update status
-        autoUpdateExplanation:
-          type:
-          - object
-          - 'null'
-          example: No compliances found
-          description: Auto update explanation
-        passwordManagerEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual password manager status
-        passwordManagerExplanation:
-          type:
-          - object
-          - 'null'
-          example:
-            passwordManagerApps:
-            - 1password 7
-          description: Password manager explanation
-        encryptionEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: false
-          description: Denotes device actual encryption status
-        encryptionExplanation:
-          type:
-          - object
-          - 'null'
-          example: No encryption provided
-          description: Encryption explanation
-        firewallEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual firewall status
-        firewallExplanation:
-          type:
-          - object
-          - 'null'
-          example: '{}'
-          description: Firewall explanation
-        asset:
-          description: The Asset associated with this Device, only returned when `expand[]=asset` is passed.
-          allOf:
-          - $ref: '#/components/schemas/AssetCompactResponsePublicV2Dto'
-        userId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: User Id
-        personnelId:
-          type: number
-          example: 1
-          description: Personnel Id
-        externalId:
-          type:
-          - string
-          - 'null'
-          maxLength: 191
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: Unique identifier for the device in the external system where it originated
-      required:
-      - id
-      - assetId
-      - osVersion
-      - serialNumber
-      - model
-      - macAddress
-      - lastCheckedAt
-      - sourceType
-      - createdAt
-      - updatedAt
-      - deletedAt
-      - appsCount
-      - screenLockTime
-      - screenLockExplanation
-      - antivirusEnabled
-      - antivirusExplanation
-      - autoUpdateEnabled
-      - autoUpdateExplanation
-      - passwordManagerEnabled
-      - passwordManagerExplanation
-      - encryptionEnabled
-      - encryptionExplanation
-      - firewallEnabled
-      - firewallExplanation
-      - personnelId
-      - externalId
-    AssetResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Asset ID
-        name:
-          type: string
-          example: MacBook Pro 16-inch
-          description: The name of the asset
-        description:
-          type: string
-          example: MacBook Pro 16-inch with 14-Core CPU 32-Core GPU 36GB Unified Memory 1TB SSD Storage
-          description: The description of the asset
-        assetType:
-          example: PHYSICAL
-          description: The Asset type
-          allOf:
-          - $ref: '#/components/schemas/AssetTypeEnum'
-        assetProvider:
-          example: AGENT
-          description: The Asset source provider
-          allOf:
-          - $ref: '#/components/schemas/AssetProviderEnum'
-        removedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the Asset stopped being tracked
-        assetClassTypes:
-          example: AssetClassTypeResponsePublicV2Dto[]
-          description: Asset class types associated with this Asset.  This field is only returned when `expand[]=assetClassTypes` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/AssetClassTypeResponsePublicV2Dto'
-        owner:
-          description: The User that owns the Asset, only returned when `expand[]=owner` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserResponsePublicV2Dto'
-        notes:
-          type:
-          - string
-          - 'null'
-          description: The Asset notes
-        assetReferenceType:
-          example: PERSONNEL
-          description: The Asset reference type
-          allOf:
-          - $ref: '#/components/schemas/AssetReferenceTypeEnum'
-        associatedId:
-          type:
-          - string
-          - 'null'
-          example: C02T6CDJGTFL
-          description: An ID associated with this Asset
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Asset created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Asset updated timestamp
-        device:
-          description: The Device associated to this Asset, only returned when `expand[]=device`, `expand[]=complianceChecks`, or `expand[]=identifiers` is passed.
-          allOf:
-          - $ref: '#/components/schemas/DeviceResponsePublicV2Dto'
-        externalId:
-          type:
-          - string
-          - 'null'
-          example: i-0c844e3b433e4e3f
-          description: An externally sourced unique identifier for a virtual Asset
-        externalOwnerId:
-          type:
-          - string
-          - 'null'
-          example: account-353
-          description: Used to track the source of virtual assets, typically an account id.
-        customFields:
-          description: "Custom Fields, only returned when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
-      required:
-      - id
-      - name
-      - description
-      - assetType
-      - assetProvider
-      - removedAt
-      - notes
-      - assetReferenceType
-      - associatedId
-      - createdAt
-      - updatedAt
-      - device
-      - externalId
+      - EMPLOYEE
+      - TECHGOV
+      - AUDITOR
+      - ADMIN
+      - ACT_AS_READ_ONLY
+      - APP
+      - RISK_MANAGER
+      - WORKSPACE_ADMINISTRATOR
+      - SERVICE_USER
+      - REVIEWER
+      - CONTROL_MANAGER
+      - PEOPLE_OPS
+      - POLICY_MANAGER
+      - DEVOPS_ENGINEER
+      - KNOWLEDGE_BASE
+      - TRUST_CENTER_MANAGER
+      - TRUST_CENTER_REVIEWER
+      - RISK_REGISTER_OWNER
+      - INTERNAL_AUDITOR
+      - RESTRICTED_CONTROL_MANAGER
+      - RESTRICTED_RISK_MANAGER
+      - READONLY_ADMIN
+      - READONLY_TECHGOV
+      - READONLY_RISK_MANAGER
+      - READONLY_CONTROL_MANAGER
+      - READONLY_POLICY_MANAGER
+      - READONLY_PEOPLE_OPS
+      - READONLY_WORKSPACE_ADMINISTRATOR
+      - READONLY_RESTRICTED_CONTROL_MANAGER
+      - READONLY_RESTRICTED_RISK_MANAGER
+      - READONLY_RISK_REGISTER_OWNER
+      - READONLY_REVIEWER
+      - READONLY_DEVOPS_ENGINEER
+      - READONLY_TRUST_CENTER_MANAGER
+      - TRUST_USER
+    UserExpandEnum:
+      type: string
+      enum:
+      - backgroundChecks
+      - documents
+      - personnel
+      - identities
+      - roles
     SortDirectionEnum:
       type: string
       enum:
       - ASC
       - DESC
-    AssetCreateRequestPublicV2Dto:
+    UsersResponsePublicV2Dto:
       type: object
       properties:
-        name:
-          type: string
-          maxLength: 191
-          description: The Asset name
-        description:
-          type: string
-          maxLength: 191
-          description: The Asset description
-        notes:
-          type: string
-          maxLength: 191
-          description: The Asset notes
-        assetClassTypes:
+        data:
+          description: Data set based on the pagination limits
           type: array
           items:
-            $ref: '#/components/schemas/AssetClassTypeEnum'
-          example:
-          - HARDWARE
-          - PERSONNEL
-          description: The Asset class types
-        assetType:
-          example: PHYSICAL
-          description: The Asset type
-          allOf:
-          - $ref: '#/components/schemas/AssetTypeEnum'
-        ownerId:
-          type: number
-          example: 1
-          description: The owner ID
-        associatedId:
-          type: string
-          example: C02T6CDJGTFL
-          description: An ID associated with this Asset
-        removedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Asset was removed
-        externalId:
-          type: string
-          example: i-0c844e3b433e4e3f
-          description: An externally sourced unique identifier for a virtual Asset
-        externalOwnerId:
-          type: string
-          example: account-353
-          description: Used to track the source of virtual Assets, typically an account ID
-        customFields:
-          description: "Custom Fields for the Asset. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+            $ref: '#/components/schemas/UserResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - name
-      - description
-      - assetClassTypes
-      - assetType
-      - ownerId
-    CheckFrequencyEnum:
+      - data
+      - pagination
+    RoleExpandEnum:
       type: string
       enum:
-      - ONCE
-      - HOURLY
-      - QID
-      - DAILY
-      - WEEKLY
-      - BIWEEKLY
-      - MONTHLY
-      - QUARTERLY
-      - YEARLY
-    AssetClassTypeEnum:
-      type: string
-      enum:
-      - HARDWARE
-      - POLICY
-      - DOCUMENT
-      - PERSONNEL
-      - SOFTWARE
-      - CODE
-      - CONTAINER
-      - COMPUTE
-      - NETWORKING
-      - DATABASE
-      - STORAGE
+      - permissions
     SignedUrlResponsePublicV2Dto:
       type: object
       properties:
@@ -1502,90 +1160,6 @@ components:
       - signedUrl
       - fileBuffer
       - fileName
-    AssetCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Assessment ID
-        name:
-          type: string
-          example: MacBook Pro - Space Black 16-inch
-          description: The name of the asset
-        description:
-          type: string
-          example: MacBook Pro Space Black - with 16-inch Liquid Retina XDR display
-          description: The description of the asset
-        assetType:
-          type: string
-          example: PHYSICAL
-          description: The asset type
-        assetProvider:
-          type: string
-          example: AGENT
-          description: The asset source provider
-        approvedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the asset was approved (if applicable)
-        removedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the asset stopped being tracked
-        company:
-          type: string
-          example: Acme, Inc
-          description: The owning company of the asset
-        notes:
-          type:
-          - string
-          - 'null'
-          description: The asset notes
-        assetReferenceType:
-          type:
-          - string
-          - 'null'
-          example: PERSONNEL
-          description: The asset reference type
-        uniqueId:
-          type: string
-          example: C02T6CDJGTFL
-          description: Unique Id associated with this asset
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset update timestamp
-        externalId:
-          type: string
-          example: i-0c844e3b433e4e3f
-          description: An externally sourced unique identifier for a virtual asset
-        externalOwnerId:
-          type: string
-          example: account-353
-          description: Used to track the source of virtual assets, typically an account id.
-      required:
-      - id
-      - name
-      - description
-      - assetType
-      - assetProvider
-      - approvedAt
-      - company
-      - assetReferenceType
-      - uniqueId
-      - createdAt
-      - updatedAt
     UserDocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -1783,25 +1357,126 @@ components:
       - linkedAt
       - createdAt
       - updatedAt
-    CustomFieldSubmitRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: The ID of the Custom Field. Either this or the name must be provided.
-        name:
-          type: string
-          example: Compliance Status
-          description: The name of the Custom Field. Either this or the ID must be provided.
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
-      required:
-      - value
+    SubjectEnum:
+      type: string
+      enum:
+      - AdminOnboarding
+      - Asset
+      - AuditHub
+      - Company
+      - CompanyDocument
+      - Connection
+      - Control
+      - ControlTestInstance
+      - CustomerRequest
+      - CustomTask
+      - Event
+      - Framework
+      - Personnel
+      - Policy
+      - PublicApiKey
+      - QuestionnairesVendors
+      - Report
+      - Risk
+      - RiskAssessment
+      - ServiceUser
+      - Ticket
+      - TrustCenter
+      - ListAllUsers
+      - UserIdentity
+      - UserIdentityInfrastructure
+      - UserIdentityVersionControl
+      - UsersRoles
+      - Vendor
+      - Vulnerability
+      - Note
+      - UserFeature
+      - Monitors
+      - Dashboard
+      - UserDocument
+      - Autopilot
+      - MonitorInstanceExclusion
+      - Workspace
+      - InternalSecurity
+      - ComplianceCheckExclusion
+      - UserLanguage
+      - SecurityReport
+      - Resync
+      - UserIdentityObservability
+      - SignIn
+      - FeatureAnnouncement
+      - Wysiwyg
+      - RemoteAccess
+      - EmployeeOnboarding
+      - UserIdentitiesAccess
+      - TicketManagement
+      - HumanResources
+      - UserControls
+      - TasksDetails
+      - ControlList
+      - ControlTicket
+      - RiskManagementTicket
+      - MonitorTicket
+      - CreateTicket
+      - DeleteTask
+      - UpdateTask
+      - CreateTask
+      - AssociateRequirements
+      - GetGroups
+      - WorkspaceConnections
+      - TrustCenterInfo
+      - GlobalConnection
+      - RiskTask
+      - GeneralTask
+      - ControlTask
+      - EvidenceTask
+      - PolicyTask
+      - VendorTask
+      - AccessReview
+      - RiskSettings
+      - Scan
+      - RiskDocument
+      - ViewAllControls
+      - ViewAllRisks
+      - ControlTemplate
+      - FrameworkMappingReset
+      - ActivateFramework
+      - CustomFields
+      - CaCConfiguration
+      - CaCMonitoring
+      - AccessReviewTicket
+      - SecurityQuestionnaire
+      - Findings
+      - ExceptionManagement
+      - CustomWorkflows
+      - VulnerabilityReport
+      - CustomConnections
+      - UserSettings
+      - KnowledgeBase
+      - TrustCenterRequest
+      - BulkImportRisk
+      - TestLibrary
+      - RiskRegisters
+      - BulkImportControl
+      - BulkImportTraining
+      - BulkImportBackgroundCheck
+      - BulkImportVendor
+      - RiskCategory
+      - Audit
+      - GroupRoleManagement
+      - BulkImportCustomTask
+      - UserIdentityHris
+      - Requirements
+      - BulkImportPolicyAcknowledgment
+      - BulkImportAsset
+      - Groups
+      - Task
+      - ExecutiveDashboard
+      - PolicyLanguage
+      - BulkImportEvidence
+      - Webhooks
+      - ALL
+      - DenyControl
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -1976,26 +1651,6 @@ components:
       - managerName
       - createdAt
       - updatedAt
-    CustomFieldResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field
-        name:
-          type: string
-          example: Stakeholders
-          description: The name of the Custom Field
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field
-      required:
-      - customFieldId
-      - name
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -2011,177 +1666,24 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    AssetTypeEnum:
-      type: string
-      enum:
-      - PHYSICAL
-      - VIRTUAL
-    EmploymentStatusEnum:
-      type: string
-      enum:
-      - CURRENT_EMPLOYEE
-      - FORMER_EMPLOYEE
-      - CURRENT_CONTRACTOR
-      - FORMER_CONTRACTOR
-      - OUT_OF_SCOPE
-      - UNKNOWN
-      - SPECIAL_FORMER_EMPLOYEE
-      - SPECIAL_FORMER_CONTRACTOR
-      - FUTURE_HIRE
-      - SERVICE_ACCOUNT
-      x-enumDescriptions:
-        CURRENT_EMPLOYEE: Current Employee
-        FORMER_EMPLOYEE: Former Employee
-        CURRENT_CONTRACTOR: Current Contractor
-        FORMER_CONTRACTOR: Former Contractor
-        FUTURE_HIRE: Future Hire – Based on the HRIS data
-        UNKNOWN: Unknown – The personnel did not match an HRIS record
-        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
-        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
-        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
-        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
+    RolesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    DeviceComplianceCheckResponsePublicV2Dto:
-      type: object
-      properties:
-        checkFrequency:
-          example: DAILY
-          description: How often should this check be run for Compliance
-          allOf:
-          - $ref: '#/components/schemas/CheckFrequencyEnum'
-        completionDate:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the user completed the Compliance Check
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check creation timestamp
-        expiresAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When this Compliance Check is due for a re-verification
-        id:
-          type: number
-          example: 1
-          description: Device Compliance Check ID
-        lastCheckedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check last checked timestamp
-        status:
-          example: PASS
-          description: Denotes actual Compliance Check status
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
-        type:
-          example: PASSWORD_MANAGER
-          description: The Compliance Check type
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check updated timestamp
-      required:
-      - checkFrequency
-      - completionDate
-      - createdAt
-      - expiresAt
-      - id
-      - lastCheckedAt
-      - status
-      - type
-      - updatedAt
-    AssetProviderEnum:
-      type: string
-      enum:
-      - DRATA_DEV
-      - AGENT
-      - DRATA
-      - GOOGLE
-      - MICROSOFT_365
-      - JAMF
-      - INTUNE
-      - OKTA_IDENTITY
-      - KANDJI
-      - JUMPCLOUD
-      - HEXNODE_UEM
-      - RIPPLING
-      - AWS
-      - MERGEDEV_ONELOGIN
-      - MERGEDEV_JUMPCLOUD
-      - WORKSPACE_ONE
-      - CSV_IDP
-      - AWS_GOV_CLOUD
-      - AZURE
-      - GCP
-      - MICROSOFT_365_GCC_HIGH
-      - MERGEDEV_CYBERARK
-      - KOLIDE
-      - MERGEDEV_PINGONE
-      - AWS_ORG_UNITS
-      - INTUNE_GCC_HIGH
-      - CUSTOM_XFA
-      - NINJAONE
-    AssetClassTypeResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Asset class type ID
-        assetClassType:
-          type: string
-          example: DOCUMENT
-          description: The string enum asset class type
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset class type created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset class type update timestamp
-      required:
-      - id
-      - assetClassType
-      - createdAt
-      - updatedAt
-    MobileDeviceManagementSourceTypeEnum:
-      type: string
-      enum:
-      - AGENT
-      - JAMF
-      - INTUNE
-      - KANDJI
-      - JUMPCLOUD
-      - HEXNODE_UEM
-      - UNKNOWN
-      - RIPPLING
-      - WORKSPACE_ONE
-      - KOLIDE
-      - CUSTOM
-      - INTUNE_GCC_HIGH
-      - CUSTOM_XFA
-      - NINJAONE
   securitySchemes:
     bearer:
       scheme: bearer

@@ -1,0 +1,676 @@
+openapi: 3.2.0
+info:
+  title: Drata Risk Notes API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Risk Notes across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Risk Notes
+  description: Risk Notes allow you to provide additional information about Risks.
+paths:
+  /risk-registers/{riskRegisterId}/risks/{riskId}/notes:
+    get:
+      description: 'Find Risk Notes matching the provided filters.
+
+
+        🔒 Requires **Risk Management: Get Risk Note** permission.'
+      operationId: RiskNotesPublicV2Controller_getRiskNotes
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskNotesExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskNotesResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Risk Notes
+      tags:
+      - Risk Notes
+      x-drata-permissions:
+      - risk-notes-get
+      x-product-area:
+      - RISK_MANAGEMENT
+    post:
+      description: 'Create a new Note for a specific Risk.
+
+
+        🔒 Requires **Risk Management: Create Risk Note** permission.'
+      operationId: RiskNotesPublicV2Controller_createRiskNote
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID.
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskNoteWriteRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Risk Note
+      tags:
+      - Risk Notes
+      x-drata-permissions:
+      - risk-notes-post
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /risk-registers/{riskRegisterId}/risks/{riskId}/notes/{noteId}:
+    get:
+      description: 'Get a Note associated with a given Risk.
+
+
+        🔒 Requires **Risk Management: Get Risk Note** permission.'
+      operationId: RiskNotesPublicV2Controller_getRiskNote
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID.
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      - name: noteId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskNotesExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Risk Note
+      tags:
+      - Risk Notes
+      x-drata-permissions:
+      - risk-notes-get
+      x-product-area:
+      - RISK_MANAGEMENT
+    put:
+      description: 'Update a specific Risk Note using the provided Note ID.
+
+
+        🔒 Requires **Risk Management: Update Risk Note** permission.'
+      operationId: RiskNotesPublicV2Controller_updateRiskNote
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      - name: noteId
+        required: true
+        in: path
+        description: The Note ID
+        schema:
+          example: 123
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskNoteWriteRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Risk Note
+      tags:
+      - Risk Notes
+      x-drata-permissions:
+      - risk-notes-put
+      x-product-area:
+      - RISK_MANAGEMENT
+    delete:
+      description: 'Delete a specific Risk Note using the provided Note ID.
+
+
+        🔒 Requires **Risk Management: Delete Risk Note** permission.'
+      operationId: RiskNotesPublicV2Controller_deleteRiskNote
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      - name: noteId
+        required: true
+        in: path
+        description: The Note ID
+        schema:
+          example: 123
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Risk Note
+      tags:
+      - Risk Notes
+      x-drata-permissions:
+      - risk-notes-delete
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    RiskNoteWriteRequestPublicV2Dto:
+      type: object
+      properties:
+        comment:
+          type: string
+          maxLength: 768
+          example: This is a note about the risk assessment findings.
+          description: The comment content for the note
+      required:
+      - comment
+    RiskNoteResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: Note ID
+        comment:
+          type: string
+          description: The Note comment
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note updated date timestamp
+        owner:
+          description: The User that created the Note, only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - id
+      - comment
+      - createdAt
+      - updatedAt
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    RiskNotesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    RiskNotesExpandEnum:
+      type: string
+      enum:
+      - owner
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

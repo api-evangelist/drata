@@ -1,0 +1,649 @@
+openapi: 3.2.0
+info:
+  title: Drata Control Notes API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Control Notes across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Control Notes
+  description: Control Notes allow you to provide additional information about Controls.
+paths:
+  /workspaces/{workspaceId}/controls/{controlId}/notes:
+    get:
+      description: 'Find Control Notes matching the provided filters.
+
+
+        🔒 Requires **Controls: Get Control Note** permission.'
+      operationId: ControlNotesPublicV2Controller_getControlNotes
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: excludeIds
+        required: false
+        in: query
+        description: Exclude Control Notes by IDs
+        schema:
+          example: []
+          type: array
+          items:
+            type: string
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlNotesExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlNotesResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Control Notes
+      tags:
+      - Control Notes
+      x-drata-permissions:
+      - controls-notes-get
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    post:
+      description: 'Create a Note for a given Control.
+
+
+        🔒 Requires **Controls: Create Control Note** permission.'
+      operationId: ControlNotesPublicV2Controller_createControlNote
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlNoteCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Control Note
+      tags:
+      - Control Notes
+      x-drata-permissions:
+      - controls-notes-post
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/controls/{controlId}/notes/{noteId}:
+    get:
+      description: 'Get a Note associated with a given Control.
+
+
+        🔒 Requires **Controls: Get Control Note** permission.'
+      operationId: ControlNotesPublicV2Controller_getControlNote
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: noteId
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlNotesExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Control Note
+      tags:
+      - Control Notes
+      x-drata-permissions:
+      - controls-notes-get
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    put:
+      description: 'Update a Note for a given Control.
+
+
+        🔒 Requires **Controls: Update Control Note** permission.'
+      operationId: ControlNotesPublicV2Controller_updateNote
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: noteId
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequestPublicDto'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Control Note
+      tags:
+      - Control Notes
+      x-drata-permissions:
+      - controls-notes-put
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    delete:
+      description: 'Delete a Note for a given Control.
+
+
+        🔒 Requires **Controls: Delete Control Note** permission.'
+      operationId: ControlNotesPublicV2Controller_deleteNote
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: noteId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Control Note
+      tags:
+      - Control Notes
+      x-drata-permissions:
+      - controls-notes-delete
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ControlNotesExpandEnum:
+      type: string
+      enum:
+      - owner
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    ControlNotesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ControlNoteCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        comment:
+          type: string
+          maxLength: 191
+          description: The text of the Note
+      required:
+      - comment
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    NoteRequestPublicDto:
+      type: object
+      properties:
+        comment:
+          type: string
+          maxLength: 191
+          example: Note comment
+          description: The text of the note
+      required:
+      - comment
+    ControlNoteResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Note ID
+        ownerId:
+          type: number
+          example: 60
+          description: Note Owner ID
+        comment:
+          type: string
+          description: The main comment of the Note
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note updated date timestamp
+        owner:
+          description: The User that created the Note, only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - id
+      - ownerId
+      - comment
+      - createdAt
+      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

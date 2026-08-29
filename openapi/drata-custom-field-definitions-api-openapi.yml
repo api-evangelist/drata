@@ -1,0 +1,529 @@
+openapi: 3.2.0
+info:
+  title: Drata Custom Field Definitions API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Custom Field Definitions across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Custom Field Definitions
+  description: Custom Field Definitions describe the schema - name, required, type, options, entity placements, and framework scope - of the Custom Fields configured on your account. Use them to discover the option IDs required to write OPTIONS values via the API.
+paths:
+  /custom-field-definitions:
+    get:
+      description: 'Returns the Custom Field Definitions configured for this account.
+
+
+        🔒 Requires **Custom Field Definitions: Get Custom Field Definitions** permission.
+
+
+        💎 Requires your account have the **Custom Fields and Formulas** feature. Contact your CSM for help upgrading.'
+      operationId: CustomFieldDefinitionsPublicV2Controller_listCustomFieldDefinitions
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: entityType
+        required: false
+        in: query
+        description: Filter to Custom Field Definitions placed on this resource type. When omitted, definitions across all resource types are returned.
+        schema:
+          $ref: '#/components/schemas/CustomFieldsEntityTypeEnum'
+      - name: isHidden
+        required: false
+        in: query
+        description: Filter by hidden state. When omitted, both hidden and non-hidden Custom Field Definitions are returned. When `true`, only hidden definitions are returned; when `false`, only non-hidden.
+        schema:
+          example: false
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldDefinitionsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Custom Field Definitions
+      tags:
+      - Custom Field Definitions
+      x-drata-entitlement:
+      - CUSTOM_FIELDS_AND_FORMULAS
+      x-drata-permissions:
+      - custom-field-definition-get
+      x-product-area:
+      - CUSTOM_FIELDS_ENGINE
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-field-definitions/{customFieldId}:
+    get:
+      description: 'Returns a single Custom Field Definition. The path parameter accepts either the numeric `customFieldId` or the field name prefixed with `name:` (e.g. `name:Regulatory%20Owner`). For durable integrations, store the numeric `customFieldId` from a previous response and address by ID — names may change if an admin renames the field. The `name:` form is a convenience for exploratory use and when you only know the name from the admin UI.
+
+
+        🔒 Requires **Custom Field Definitions: Get Custom Field Definitions** permission.
+
+
+        💎 Requires your account have the **Custom Fields and Formulas** feature. Contact your CSM for help upgrading.'
+      operationId: CustomFieldDefinitionsPublicV2Controller_getCustomFieldDefinition
+      parameters:
+      - name: customFieldId
+        required: true
+        in: path
+        description: An integer Custom Field Definition ID or the field name prefixed with `name:` (e.g. `name:Regulatory Owner`).
+        schema:
+          oneOf:
+          - type: number
+            description: Integer Custom Field Definition ID
+          - type: string
+            description: Custom Field name prefixed with `name:`, e.g. `name:Regulatory Owner`
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomFieldDefinitionResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: Multiple Custom Field Definitions match the provided name. Use the numeric ID.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Custom Field Definition
+      tags:
+      - Custom Field Definitions
+      x-drata-entitlement:
+      - CUSTOM_FIELDS_AND_FORMULAS
+      x-drata-permissions:
+      - custom-field-definition-get
+      x-product-area:
+      - CUSTOM_FIELDS_ENGINE
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    CustomFieldTypeEnum:
+      type: string
+      enum:
+      - TEXT
+      - NUMBER
+      - CURRENCY
+      - OPTIONS
+      - FORMULA
+      - OPTIONS_NUMERIC
+      - LONG_TEXT
+      - URL
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
+    CustomFieldDefinitionFrameworkScopeResponsePublicV2Dto:
+      type: object
+      properties:
+        frameworkTags:
+          type: array
+          description: Built-in framework tags this Custom Field Definition applies to. Empty array when the field is not scoped by built-in framework tags.
+          items:
+            $ref: '#/components/schemas/FrameworkTagEnum'
+        frameworkIds:
+          description: Custom Framework IDs this Custom Field Definition applies to. Empty array when the field is not scoped by custom frameworks.
+          type: array
+          items:
+            type: number
+      required:
+      - frameworkTags
+      - frameworkIds
+    CustomFieldsEntityTypeEnum:
+      type: string
+      enum:
+      - RISK
+      - CONTROL
+      - ASSET
+      - PERSONNEL
+      - VENDOR
+      - FRAMEWORK_REQUIREMENTS
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    CustomFieldDefinitionOptionResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldOptionId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field Option. Use this value when writing OPTIONS or OPTIONS_NUMERIC values on resources.
+        value:
+          oneOf:
+          - type: string
+          - type: number
+          example: Security & IT
+          description: The display value of this option. For OPTIONS fields this is a string; for OPTIONS_NUMERIC fields this is a number.
+      required:
+      - customFieldOptionId
+      - value
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    CustomFieldDefinitionResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 42
+          description: The ID of the Custom Field Definition
+        name:
+          type: string
+          example: Regulatory Owner
+          description: The name of the Custom Field Definition
+        description:
+          type:
+          - string
+          - 'null'
+          example: Team accountable for the item
+          description: The description of the Custom Field Definition
+        type:
+          example: OPTIONS
+          description: The data type of the Custom Field Definition
+          allOf:
+          - $ref: '#/components/schemas/CustomFieldTypeEnum'
+        isRequired:
+          type: boolean
+          example: true
+          description: Whether the Custom Field must be provided when creating (POST) a resource it is placed on. Not enforced on update, except when explicitly setting the value to null. For FRAMEWORK_REQUIREMENTS, only enforced on requirements whose framework is in scope (see frameworkScope).
+        isHidden:
+          type: boolean
+          example: false
+          description: Whether the Custom Field is hidden. Hidden fields remain writable via the API but are typically excluded from the UI. Use the list endpoint's `isHidden` query parameter to filter results.
+        readOnly:
+          type: boolean
+          example: false
+          description: Whether values for this Custom Field cannot be written via the API. True for FORMULA fields, whose values are computed by the platform.
+        entityTypes:
+          type: array
+          description: The resource types this Custom Field can be set on. Derived from the placements configured for this definition.
+          items:
+            $ref: '#/components/schemas/CustomFieldsEntityTypeEnum'
+        currencyCode:
+          example: USD
+          description: Currency code, present only when type is CURRENCY. Informational — used for display formatting.
+          allOf:
+          - $ref: '#/components/schemas/CustomFieldCurrencyCodeEnum'
+        frameworkScope:
+          description: Present only when FRAMEWORK_REQUIREMENTS is in entityTypes AND the placement is scoped to specific frameworks. Absent when the field applies to all frameworks or when FRAMEWORK_REQUIREMENTS is not a placement. When present, at least one of `frameworkTags` and `frameworkIds` is non-empty; the other may be `[]` when only one scoping dimension is used.
+          allOf:
+          - $ref: '#/components/schemas/CustomFieldDefinitionFrameworkScopeResponsePublicV2Dto'
+        options:
+          description: The available options for OPTIONS and OPTIONS_NUMERIC fields, returned in the order configured by the admin. Absent for all other field types. Hidden options are excluded.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldDefinitionOptionResponsePublicV2Dto'
+      required:
+      - customFieldId
+      - name
+      - description
+      - type
+      - isRequired
+      - isHidden
+      - readOnly
+      - entityTypes
+    CustomFieldCurrencyCodeEnum:
+      type: string
+      enum:
+      - BWP
+      - CAD
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CZK
+      - DKK
+      - DOP
+      - EEK
+      - EUR
+      - GBP
+      - GHS
+      - GTQ
+      - HKD
+      - HRK
+      - HUF
+      - IDR
+      - ILS
+      - IMP
+      - INR
+      - ISK
+      - JPY
+      - KES
+      - KRW
+      - KYD
+      - LKR
+      - LUF
+      - LVL
+      - MTL
+      - MUR
+      - MXN
+      - MYR
+      - NGN
+      - NOK
+      - NZD
+      - PAB
+      - PEN
+      - PHP
+      - PLN
+      - RON
+      - RUB
+      - SEK
+      - SGD
+      - SOS
+      - TOP
+      - TRY
+      - UAH
+      - USD
+      - UYU
+      - ZAR
+    CustomFieldDefinitionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldDefinitionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

@@ -1,0 +1,341 @@
+openapi: 3.2.0
+info:
+  description: SafeBase API documentation.
+  version: 1.4.1
+  title: SafeBase API documentation Portals API
+  contact:
+    email: support@safebase.io
+servers:
+- url: https://app.safebase.io/api/ext/v1/rest
+security:
+- apiKey: []
+tags:
+- name: Portals
+paths:
+  /portals/default/products:
+    get:
+      tags:
+      - Portals
+      summary: Get All Products
+      description: Gets all the products that make up a given portal. This endpoint will default to only pulling in the data that has been made public
+      operationId: getPortal
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    allOf:
+                    - type: object
+                      properties:
+                        id:
+                          type: string
+                          example: default
+                          description: The ID of the product
+                        name:
+                          type: string
+                          example: default
+                          description: The name of the product
+                        show:
+                          type: boolean
+                          example: true
+                          description: Shows whether the product is visible in the portal or not
+                    - type: object
+                      properties:
+                        cards:
+                          type: object
+                          description: Object that contains data on the meta data of a specific card
+                          properties:
+                            items:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  cardType:
+                                    type: string
+                                    description: The type of card that data is grouped under
+                                  title:
+                                    type: string
+                                    description: The display text for that card type
+                              description: List of cards
+                            count:
+                              type: number
+                              description: Number of cards in the list
+                        data:
+                          type: object
+                          description: Data about the specfic items that make up the product
+                          properties:
+                            items:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: string
+                                    format: uuid
+                                    description: The unique id corresponding to that piece of data
+                                  explanation:
+                                    type: string
+                                    description: Text describing the data item
+                                  maturity:
+                                    type: string
+                                    description: Field to communicate if the state of the items
+                                    enum:
+                                    - na
+                                    - in_progress
+                                    - full
+                                  href:
+                                    type: string
+                                    format: url
+                                    description: A link out to an external resource if necessary
+                                  choice:
+                                    type: string
+                                    description: A string for risk profile items to communicate out the risk
+                                    enum:
+                                    - public
+                                    - internal
+                                    - restricted
+                                    - low
+                                    - moderate
+                                    - substantial
+                                    - severe
+                                    - 'yes'
+                                    - 'no'
+                                    - hours_12
+                                    - hours_24
+                                    - hours_24_48
+                                    - hours_48_72
+                                    - days_4_7
+                                    - days_8
+                                    - major_cloud
+                                    - on_premise
+                                    - combination
+                                  recurrence:
+                                    type: string
+                                    description: How often the these are review/assessed
+                                    enum:
+                                    - na
+                                    - months_3
+                                    - months_6
+                                    - years_1
+                                  publicAccess:
+                                    type: boolean
+                                  cardType:
+                                    type: string
+                                    description: The cardType it is associated with from the cards array
+                                  title:
+                                    type: string
+                                    description: Headline to explain what the data is quickly
+                                  listOfEntries:
+                                    type: array
+                                    items:
+                                      type: object
+                                      properties:
+                                        logo:
+                                          type: string
+                                        domain:
+                                          type: string
+                                        name:
+                                          type: string
+                                        url:
+                                          type: string
+                                        grade:
+                                          type: string
+                                        label:
+                                          type: string
+                                        description:
+                                          type: string
+                                    description: Used to communicate out subprocessors and the company they are
+                                  hasFiles:
+                                    type: boolean
+                                  bridgeLetter:
+                                    type: object
+                              description: List of data that make up the product
+                            count:
+                              type: number
+                              description: Number of data entries
+                    example:
+                    - id: default
+                      name: default
+                      show: true
+                      cards:
+                        items:
+                        - cardType: product_features
+                          title: Product Security
+                        - cardType: security_grades
+                          title: Security Grades
+                        - cardType: reports
+                          title: Reports
+                        - cardType: overview
+                          title: Overview
+                        - cardType: legal
+                          title: Legal
+                        - cardType: risk_profile
+                          title: Risk Profile
+                        - cardType: data_security
+                          title: Data Security
+                        count: 7
+                      data:
+                        items:
+                        - maturity: na
+                          explanation: We are working on setting up role based control
+                          id: 26715457-a875-4de9-a848-a586aa08e8d9
+                          title: Role-Based Access Control
+                          cardType: product_features
+                        - listEntries:
+                          - url: https://www.ssllabs.com/ssltest/analyze.html?d=app.safebase.io
+                            grade: A
+                            label: API Endpoint
+                            description: Great API
+                          id: 2a8c3762-0970-4a72-88cd-a86b29f9ef12
+                          title: Qualys SSL Labs
+                          cardType: security_grades
+                        - maturity: in_progress
+                          recurrence: months_6
+                          id: 382f924d-54f3-43a8-a9df-c39e6c959958
+                          title: Security Whitepaper
+                          cardType: reports
+                        - explanation: 'We
+
+                            have
+
+                            really
+
+                            very
+
+                            good
+
+                            security
+
+
+                            Your security is our #1 priority and we take it seriously. At our company, we handle critical financial data of your business. These include information about your processes, revenue, payment gateway information and merchant information. During these processes, we know the security of our system should be air-tight to provide you with a hassle-free experience. Our teams take preventive measures, adheres and keep up with the latest security and compliance practices across the globe.'
+                          id: 4f5e1d9d-df3a-4fe4-9642-30ecbd6de704
+                          title: Body
+                          cardType: overview
+                        - href: https://drata.com/privacy
+                          id: 63f59def-eb18-4135-95a1-addeb7463801
+                          title: Privacy Notice
+                          cardType: legal
+                        - choice: internal
+                          id: 68637b86-1e8f-4f90-bc0a-16c57d4894ca
+                          title: Data Access Level
+                          cardType: risk_profile
+                        - maturity: na
+                          explanation: We set up dashboards to track who is running db queries
+                          id: 92ff33fd-666e-49f9-8cc7-c8a3ba9fd4d7
+                          title: Access Monitoring
+                          cardType: data_security
+                        - maturity: na
+                          explanation: We have detailed audit logs
+                          id: a5bb6b4d-c23b-4d4f-9da1-bedf5dc74ff5
+                          title: Audit Logging
+                          cardType: product_features
+                        - maturity: full
+                          explanation: We do weekly backups
+                          id: b05bcec1-da7e-4885-9603-a39fd73a1cdc
+                          title: Backups Enabled
+                          cardType: data_security
+                        - listEntries:
+                          - company:
+                              logo: https://logo.clearbit.com/safebase.io
+                              name: SafeBase
+                              domain: safebase.io
+                            createdAt: '2022-08-15T13:40:54.458Z'
+                          - company:
+                              logo: https://logo.clearbit.com/amazon.com
+                              name: Amazon
+                              domain: amazon.com
+                            createdAt: '2022-08-15T13:40:54.458Z'
+                          id: e3fae2ca-94a9-416b-b577-5c90e382df57
+                          title: Subprocessors
+                          cardType: legal
+                        - explanation: We are working on our SOC 2
+                          id: f4951085-df2e-4fac-9d43-60b796478b2e
+                          title: SOC 2 Report
+                          cardType: reports
+                        count: 11
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - organization:view
+components:
+  schemas:
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
+  responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: x-sb-api-key
+      in: header

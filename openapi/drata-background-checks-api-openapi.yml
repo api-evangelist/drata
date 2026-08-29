@@ -1,0 +1,239 @@
+openapi: 3.2.0
+info:
+  title: Drata Background Checks API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Background Checks across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Background Checks
+  description: Background checks verify a person’s identity, history, and qualifications to ensure they meet legal, regulatory, or policy standards. The [help docs](https://help.drata.com/en/articles/5833999-background-check-management) have more information.
+paths:
+  /background-checks:
+    post:
+      description: 'Create a Background Check record and mark the user as compliant for Background Check requirements.
+
+
+        🔒 Requires **Personnel: Create Background Check** permission.'
+      operationId: BackgroundChecksPublicV2Controller_createBackgroundCheck
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BackgroundCheckCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonCompactResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '409':
+          description: There is a conflict in the business rules with this request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Manual Background Check
+      tags:
+      - Background Checks
+      x-drata-permissions:
+      - background-check-post
+      x-product-area:
+      - BACKGROUND_CHECK_SYNC
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    EmploymentStatusEnum:
+      type: string
+      enum:
+      - CURRENT_EMPLOYEE
+      - FORMER_EMPLOYEE
+      - CURRENT_CONTRACTOR
+      - FORMER_CONTRACTOR
+      - OUT_OF_SCOPE
+      - UNKNOWN
+      - SPECIAL_FORMER_EMPLOYEE
+      - SPECIAL_FORMER_CONTRACTOR
+      - FUTURE_HIRE
+      - SERVICE_ACCOUNT
+      x-enumDescriptions:
+        CURRENT_EMPLOYEE: Current Employee
+        FORMER_EMPLOYEE: Former Employee
+        CURRENT_CONTRACTOR: Current Contractor
+        FORMER_CONTRACTOR: Former Contractor
+        FUTURE_HIRE: Future Hire – Based on the HRIS data
+        UNKNOWN: Unknown – The personnel did not match an HRIS record
+        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
+        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
+        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
+        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    BackgroundCheckCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        userId:
+          type: number
+          example: 1
+          description: The ID of the User for whom the Background Check is being uploaded
+        url:
+          type: string
+          maxLength: 768
+          format: uri
+          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: The URL of the Background Check document or report. Provide EITHER `url` or `fileKey`, never both. A `url` is recorded as-is — Drata does not fetch or scan it.
+        fileKey:
+          type: string
+          maxLength: 191
+          example: a1b2c3d4-.../background-check-evidence/9f8e.../report.pdf
+          description: The `objectKey` returned by `POST /upload-urls` with `purpose=background_check`, after the file has been PUT to the presigned URL. The check is created but does NOT count toward the Background Check requirement until an antivirus scan clears the file; an infected, oversized, or never-uploaded file is quarantined and never credited.
+        filedAt:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: The date when this Background Check data was completed.
+      required:
+      - userId
+      - filedAt
+    PersonCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Personnel ID
+        employmentStatus:
+          description: The employment status of the Personnel
+          allOf:
+          - $ref: '#/components/schemas/EmploymentStatusEnum'
+        userId:
+          type: number
+          example: 1
+          description: User ID associated with this Personnel
+        email:
+          type: string
+          example: john.doe@example.com
+          description: Email of the user associated with this Personnel
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: Personnel created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: Personnel updated date timestamp
+      required:
+      - id
+      - employmentStatus
+      - userId
+      - email
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

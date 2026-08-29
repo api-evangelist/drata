@@ -1,0 +1,199 @@
+openapi: 3.2.0
+info:
+  description: SafeBase API documentation.
+  version: 1.4.1
+  title: SafeBase API documentation Questionnaires API
+  contact:
+    email: support@safebase.io
+servers:
+- url: https://app.safebase.io/api/ext/v1/rest
+security:
+- apiKey: []
+tags:
+- name: Questionnaires
+paths:
+  /questionnaires/:
+    post:
+      tags:
+      - Questionnaires
+      summary: Upload Questionnaire
+      description: "Submits a new questionnaire file to SafeBase\n\n The following params must be sent as **form data** key pair values: \n\n- qnr \n\n- accountId \n\n- productId (optional for single-product orgs, required for multi-product orgs) \n\n The following form data fields are optional: \n\n- dueDate \n\n\n\n **Supported file formats**: xlsx, .pdf, .docx, .csv, .json and plain text (not exhaustive, please check latest support docs) "
+      operationId: submitQnrFile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - qnr
+              - accountId
+              properties:
+                qnr:
+                  type: string
+                  format: binary
+                  description: The questionnaire file to upload. Supported format include .xlsx, .pdf, .docx, .csv, .json and plain text.
+                accountId:
+                  type: string
+                  format: uuid
+                  description: The accountId to associate the questionnaire file with.
+                productId:
+                  type: string
+                  description: The productId to associate the QNR file with. Product ID is strictly required for multi product organizations.
+                dueDate:
+                  type: string
+                  format: date-time
+                  description: ISO 8601 datetime string, e.g., '2024-12-31T23:59:59Z'.
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    type: object
+                    properties:
+                      qnrId:
+                        type: string
+                        format: uuid
+                      fileId:
+                        type: string
+                      accountId:
+                        type: string
+                        format: uuid
+                      productId:
+                        type: string
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - accounts:edit
+  /questionnaires/{id}/:
+    get:
+      tags:
+      - Questionnaires
+      summary: Get completed questionnaire
+      description: 'Gets a signed URL for a completed questionnaire by ID.
+
+
+        The URL can be used to download the completed questionnaire file.
+
+
+        The URL is valid for 60 minutes.'
+      operationId: getCompletedQuestionnaireUrl
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          description: The target questionnaire ID
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    type: object
+                    properties:
+                      url:
+                        type: string
+                        example: https://FILE_URL.com
+                        description: Signed URL for the completed questionnaire
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - automated-questionnaires:view
+components:
+  schemas:
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
+  responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: x-sb-api-key
+      in: header

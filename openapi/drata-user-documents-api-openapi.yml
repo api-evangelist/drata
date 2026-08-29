@@ -1,0 +1,593 @@
+openapi: 3.2.0
+info:
+  title: Drata User Documents API
+  version: V2
+  contact: {}
+  description: 'Operations tagged User Documents across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: User Documents
+  description: User Documents allow you to provide manual evidence of User and Personnel compliance.
+paths:
+  /users/{userId}/documents:
+    get:
+      description: 'Find User Documents matching the provided filters.
+
+
+        🔒 Requires **Users: List User Documents** permission.'
+      operationId: UserDocumentsPublicV2Controller_listUserDocuments
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDocumentExpandEnum'
+      - name: name
+        required: false
+        in: query
+        description: Filter documents by name
+        schema:
+          example: Security training
+          type: string
+      - name: type
+        required: false
+        in: query
+        description: Filter documents by their type
+        schema:
+          example: SEC_TRAINING
+          enum:
+          - SEC_TRAINING
+          - PASSWORD_MANAGER_EVIDENCE
+          - AUTO_UPDATES_EVIDENCE
+          - HARD_DRIVE_ENCRYPTION_EVIDENCE
+          - ANTIVIRUS_EVIDENCE
+          - LOCK_SCREEN_EVIDENCE
+          - MFA_EVIDENCE
+          - HIPAA_TRAINING_EVIDENCE
+          - OFFBOARDING_EVIDENCE
+          - NIST_AI_TRAINING_EVIDENCE
+          type: string
+      - name: userId
+        required: true
+        in: path
+        description: A Drata integer ID or an email address of the form 'email:value'.
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDocumentsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List User Documents
+      tags:
+      - User Documents
+      x-drata-permissions:
+      - users-get-documents
+      x-product-area:
+      - PERSONNEL_COMPLIANCE
+    post:
+      description: 'Upload a User Document.
+
+
+        🔒 Requires **Users: Create User Document** permission.'
+      operationId: UserDocumentsPublicV2Controller_uploadUserDocument
+      parameters:
+      - name: userId
+        required: true
+        in: path
+        description: A Drata integer ID or an email address of the form 'email:value'.
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserDocumentCreateRequestPublicV2Dto'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDocumentCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '413':
+          description: The file was too large to upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '503':
+          description: Third party system was unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+      security:
+      - bearer: []
+      summary: Upload User Document
+      tags:
+      - User Documents
+      x-drata-permissions:
+      - users-post-document
+      x-product-area:
+      - PERSONNEL_COMPLIANCE
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /users/{userId}/documents/{documentId}:
+    get:
+      description: 'Get the full detail of a User Document.
+
+
+        🔒 Requires **Users: List User Documents** permission.'
+      operationId: UserDocumentsPublicV2Controller_getUserDocument
+      parameters:
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDocumentExpandEnum'
+      - name: documentId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: userId
+        required: true
+        in: path
+        description: A Drata integer ID or an email address of the form 'email:value'.
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get User Document
+      tags:
+      - User Documents
+      x-drata-permissions:
+      - users-get-documents
+      x-product-area:
+      - PERSONNEL_COMPLIANCE
+    delete:
+      operationId: UserDocumentsPublicV2Controller_deleteUserDocument
+      parameters:
+      - name: documentId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: userId
+        required: true
+        in: path
+        description: A Drata integer ID or an email address of the form 'email:value'
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete User Document
+      tags:
+      - User Documents
+      x-drata-permissions:
+      - users-delete-document
+      x-product-area:
+      - PERSONNEL_COMPLIANCE
+      description: '🔒 Requires **Users: Delete User Document** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SignedUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+      required:
+      - signedUrl
+      - fileBuffer
+      - fileName
+    UserDocumentsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Full list of user documents
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    UserDocumentExpandEnum:
+      type: string
+      enum:
+      - downloadUrl
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    UserDocumentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User document ID
+        userId:
+          type: number
+          description: The User ID the Document belongs to
+        downloadUrl:
+          description: The signed URL to download the User Document, only returned when `expand[]=downloadUrl` is passed.
+          allOf:
+          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
+        name:
+          type: string
+          example: Security Training
+          description: The name the file
+        type:
+          type: string
+          enum:
+          - SEC_TRAINING
+          - PASSWORD_MANAGER_EVIDENCE
+          - AUTO_UPDATES_EVIDENCE
+          - HARD_DRIVE_ENCRYPTION_EVIDENCE
+          - ANTIVIRUS_EVIDENCE
+          - LOCK_SCREEN_EVIDENCE
+          - MFA_EVIDENCE
+          - HIPAA_TRAINING_EVIDENCE
+          - OFFBOARDING_EVIDENCE
+          - NIST_AI_TRAINING_EVIDENCE
+          example: SEC_TRAINING
+          description: The User Document type
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          example: http://localhost:5000/download/documents/1
+          description: The secure URL to the user document
+        renewalDate:
+          type: string
+          format: date
+          example: '2026-10-27'
+          description: Document's renewal date, after which the document is no longer consider valid evidence
+        createdAt:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: Document created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: Document updated at
+      required:
+      - id
+      - userId
+      - name
+      - type
+      - fileUrl
+      - renewalDate
+      - createdAt
+      - updatedAt
+    UserDocumentCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        type:
+          enum:
+          - MFA_EVIDENCE
+          - SEC_TRAINING
+          - HIPAA_TRAINING_EVIDENCE
+          - OFFBOARDING_EVIDENCE
+          type: string
+          example: SEC_TRAINING
+          description: The user document type
+        file:
+          type: string
+          format: binary
+          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png'
+        base64File:
+          type: string
+          example:
+            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
+            filename: excellent-filename
+          description: JSON string with external evidence in Base64 format.
+        completionDate:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: The date when the compliance was completed
+      required:
+      - type
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

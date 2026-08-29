@@ -1,0 +1,556 @@
+openapi: 3.2.0
+info:
+  title: Drata Control Owners API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Control Owners across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Control Owners
+  description: Control Owners are the Users responsible for Controls. They ensure the right evidence is associated, that any automated tests are passing, and help prepare for an audit.
+paths:
+  /workspaces/{workspaceId}/controls/{controlId}/owners:
+    get:
+      description: 'Find Control Owners matching the provided filters.
+
+
+        🔒 Requires **Controls: Get Control** permission.'
+      operationId: ControlOwnersPublicV2Controller_getControlOwnersForAControl
+      parameters:
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: frameworkSlug
+        required: false
+        in: query
+        description: Filter data by Users associated with this Control Requirement Framework slug
+        schema:
+          example: soc2
+          type: string
+      - name: includeUserIds[]
+        required: false
+        in: query
+        description: User IDs of the Control Owners to return
+        schema:
+          minItems: 1
+          maxItems: 300
+          example:
+          - 1
+          - 2
+          - 3
+          type:
+          - array
+          - 'null'
+          items:
+            type: number
+      - name: excludeUserIds
+        required: false
+        in: query
+        description: User IDs of the Control Owners to exclude
+        schema:
+          example: []
+          type: array
+          items:
+            type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlOwnersResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Control Owners
+      tags:
+      - Control Owners
+      x-drata-permissions:
+      - controls-get-control
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    post:
+      operationId: ControlOwnersPublicV2Controller_createControlOwner
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlOwnerCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Add Control Owner
+      tags:
+      - Control Owners
+      x-drata-permissions:
+      - controls-put-owners
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+      description: '🔒 Requires **Controls: Manage Control Owners** permission.'
+    put:
+      description: 'Modify all Owners for a given Control
+
+
+        🔒 Requires **Controls: Manage Control Owners** permission.'
+      operationId: ControlOwnersPublicV2Controller_modifyControlOwners
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlOwnerModifyRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlOwnersModifyResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Modify Control Owners
+      tags:
+      - Control Owners
+      x-drata-permissions:
+      - controls-put-owners
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/controls/{controlId}/owners/{ownerId}:
+    delete:
+      operationId: ControlOwnersPublicV2Controller_deleteControlOwner
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: ownerId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlOwnersResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Control Owner
+      tags:
+      - Control Owners
+      x-drata-permissions:
+      - controls-delete-owners
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+      description: '🔒 Requires **Controls: Manage Control Owners** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    ControlOwnerCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        ownerId:
+          type: number
+          example: 56
+          description: Owner ID
+      required:
+      - ownerId
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ControlOwnersModifyResponsePublicV2Dto:
+      type: object
+      properties:
+        ownerIds:
+          description: User IDs of the Control's owners
+          type: array
+          items:
+            type: number
+      required:
+      - ownerIds
+    ControlOwnersResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ControlOwnerModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        ownerUserIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: User IDs of the Control's owners
+          type: array
+          items:
+            type: number
+      required:
+      - ownerUserIds
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

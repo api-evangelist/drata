@@ -1,0 +1,738 @@
+openapi: 3.2.0
+info:
+  title: Drata Risk Registers API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Risk Registers across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Risk Registers
+  description: Risk Registers are a collection of Risks. They are used to organize and manage Risks.
+paths:
+  /risk-registers:
+    get:
+      description: 'Retrieve all Risk Registers associated with the account.
+
+
+        🔒 Requires **Risk Management: List Risk Registers** permission.'
+      operationId: RiskRegisterPublicV2Controller_listRiskRegisters
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: name
+        required: false
+        in: query
+        description: Search query for Register name
+        schema:
+          maxLength: 191
+          example: security
+          type: string
+      - name: ownerIds[]
+        required: false
+        in: query
+        description: User IDs of the Register Owners to filter by
+        schema:
+          maxItems: 300
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      - name: workspaceIds[]
+        required: false
+        in: query
+        description: Workspace IDs to filter Risk Registers by
+        schema:
+          maxItems: 300
+          example:
+          - 1
+          - 2
+          type: array
+          items:
+            type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskRegisterExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskRegistersResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Risk Registers
+      tags:
+      - Risk Registers
+      x-drata-permissions:
+      - risk-registers-list
+      x-product-area:
+      - RISK_MANAGEMENT
+    post:
+      description: 'Create Risk Register.
+
+
+        🔒 Requires **Risk Management: Create Risk Register** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskRegisterPublicV2Controller_createRiskRegister
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskRegisterCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskRegisterResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Risk Register
+      tags:
+      - Risk Registers
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-registers-post
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /risk-registers/{riskRegisterId}:
+    get:
+      description: 'Get Risk Register details
+
+
+        🔒 Requires **Risk Management: Get Risk Register** permission.'
+      operationId: RiskRegisterPublicV2Controller_getRiskRegister
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskRegisterResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Risk Register
+      tags:
+      - Risk Registers
+      x-drata-permissions:
+      - risk-registers-get
+      x-product-area:
+      - RISK_MANAGEMENT
+    put:
+      description: 'Update the Risk Register details
+
+
+        🔒 Requires **Risk Management: Update Risk Register** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskRegisterPublicV2Controller_updateRiskRegister
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskRegisterUpdatePublicV2RequestDto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskRegisterResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Risk Register
+      tags:
+      - Risk Registers
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-registers-put
+      x-product-area:
+      - RISK_MANAGEMENT
+    delete:
+      description: 'Deletes a Risk Register
+
+
+        🔒 Requires **Risk Management: Delete Risk Register** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskRegisterPublicV2Controller_deleteRiskRegister
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Risk Register
+      tags:
+      - Risk Registers
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-registers-delete
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    RiskRegisterCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Default Register
+          description: Unique name for the Risk Register
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 60000
+          example: Register for all Risks
+          description: Description for the Risk Register
+        ownerIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of User ids to be assigned to the Risk Register as owners
+          type: array
+          items:
+            type: number
+            minimum: 1
+        workspaceIds:
+          example:
+          - 1
+          - 2
+          description: List of Workspace IDs to associate with the Risk Register
+          type: array
+          items:
+            type: number
+            minimum: 1
+      required:
+      - name
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    RiskRegisterWorkspaceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Workspace ID
+        name:
+          type: string
+          example: Drata
+          description: Workspace name
+      required:
+      - id
+      - name
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    RiskRegisterUpdatePublicV2RequestDto:
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 60000
+          example: Register for all Risks
+          description: Description for the Risk Register
+        ownerIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of User ids to be assigned to the Risk Register as owners
+          type: array
+          items:
+            type: number
+            minimum: 1
+        workspaceIds:
+          example:
+          - 1
+          - 2
+          description: List of Workspace IDs to associate with the Risk Register
+          type: array
+          items:
+            type: number
+            minimum: 1
+        name:
+          type: string
+          maxLength: 191
+          example: Default Register
+          description: Unique name for the Risk Register
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    RiskRegisterExpandEnum:
+      type: string
+      enum:
+      - workspaces
+    RiskRegistersResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          example: []
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskRegisterResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    RiskRegisterResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique internal identifier for the Risk Register
+        name:
+          type: string
+          example: Default Register
+          description: Name of the Risk Register
+        description:
+          type:
+          - string
+          - 'null'
+          example: Default Register for all Risks
+          description: Description of the Risk Register
+        owners:
+          description: Users assigned as Risk Register owners
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        workspaces:
+          description: Workspaces associated with the Risk Register
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskRegisterWorkspaceResponsePublicV2Dto'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Risk Register created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Risk Register last updated at
+      required:
+      - id
+      - name
+      - description
+      - owners
+      - workspaces
+      - createdAt
+      - updatedAt
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

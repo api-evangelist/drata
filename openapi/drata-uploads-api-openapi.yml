@@ -1,0 +1,267 @@
+openapi: 3.2.0
+info:
+  title: Drata Uploads API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Uploads across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Uploads
+  description: Uploads let you request a pre-signed S3 URL to upload a file for a given purpose (e.g. Evidence), then reference the resulting object key when creating the associated resource.
+paths:
+  /upload-urls:
+    post:
+      description: 'Generate a pre-signed S3 URL to upload a file for the given `purpose`. PUT the file directly to `presignedUrl` with a `Content-Type` header matching the `contentType` sent in this request (or the auto-derived type if omitted), then use the returned `objectKey` per the semantics of that `purpose`.
+
+
+        🔒 Requires **Evidence Library: Create Evidence** permission.'
+      operationId: UploadsPublicV2Controller_requestUploadUrl
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UploadUrlRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadUrlResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Request Upload URL
+      tags:
+      - Uploads
+      x-drata-permissions:
+      - evidence-post
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    UploadUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        presignedUrl:
+          type: string
+          example: https://s3.amazonaws.com/drata-bucket/account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf?X-Amz-Algorithm=...
+          description: Full pre-signed AWS S3 URL to perform the HTTP PUT operation against to upload the file.
+        objectKey:
+          type: string
+          example: account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf
+          description: The S3 object key the uploaded file will be stored under. Reference this value per the semantics of the request `purpose` (e.g. as the `fileKey` when creating the Evidence item).
+        expiresAt:
+          type: string
+          example: '2026-07-08T15:04:05.000Z'
+          description: ISO-8601 timestamp indicating when the pre-signed URL expires.
+        webUploadUrl:
+          type: string
+          example: https://api.drata.com/upload/abc123XYZ_-
+          description: 'Browser-facing upload URL. Present only when the request included `includeWebUploadUrl: true`. Point a user at this URL to upload the file via a drag-and-drop page; the URL expires alongside `presignedUrl`.'
+      required:
+      - presignedUrl
+      - objectKey
+      - expiresAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    UploadPurposeEnum:
+      type: string
+      enum:
+      - evidence
+      - background_check
+    UploadUrlRequestPublicV2Dto:
+      type: object
+      properties:
+        purpose:
+          example: evidence
+          description: What the uploaded file will be attached to. Determines authorization, storage prefix, and workspace requirements.
+          allOf:
+          - $ref: '#/components/schemas/UploadPurposeEnum'
+        workspaceId:
+          type: number
+          example: 11
+          description: 'Required when `purpose` is workspace-scoped (currently: `evidence`). Omit for account-global purposes.'
+        fileName:
+          type: string
+          maxLength: 191
+          example: My Security Training.pdf
+          description: 'The original filename of the file that will be uploaded. When provided, it is used to build the human-readable segment of the S3 object key. Optional for browser-driven uploads (`includeWebUploadUrl: true`) where the user picks the file after the URL is minted — in that case the actual filename lands on the evidence artifact once the browser PUT completes.'
+        contentType:
+          type: string
+          example: application/pdf
+          description: The MIME type of the file being uploaded. When provided, sent back as the `Content-Type` on the pre-signed URL, so the client's PUT must send a matching `Content-Type` header. When omitted, the URL is signed WITHOUT binding a Content-Type — the client can PUT any mime (useful for browser flows where the mime is not known at mint time).
+        includeWebUploadUrl:
+          type: boolean
+          example: true
+          description: When `true`, the response additionally includes a `webUploadUrl` — a short-lived, browser-facing URL that hosts a drag-and-drop upload page backed by this pre-signed URL. Intended for surfaces (e.g., MCP tools in Claude Desktop) that want to hand the user a clickable link rather than a curl command. Defaults to `false`.
+        existingArtifactId:
+          type: number
+          example: 42
+          description: 'When set, the browser upload session is bound as a REPLACE of the referenced artifact. When the user completes the upload, the API bumps the existing artifact chain (same artifact ID, new version, previous version archived) instead of creating a new artifact. If the user abandons the upload, no changes to the evidence occur -- the previous version stays current. Validated at mint time to ensure the artifact exists, belongs to the caller, and is a current S3_FILE. Only meaningful with `includeWebUploadUrl: true` (browser flow).'
+        addToEvidenceId:
+          type: number
+          example: 258
+          description: 'When set, the browser upload session is bound as an ADD of a new artifact to the referenced evidence. When the user completes the upload, the API attaches a new S3_FILE artifact to the evidence -- no artifact row is created at mint time. If the user abandons the upload, no artifact appears on the evidence (no phantom placeholder). Validated at mint time to ensure the evidence exists and belongs to the workspace. Mutually exclusive with `existingArtifactId`. Only meaningful with `includeWebUploadUrl: true` (browser flow).'
+        multiArtifact:
+          type: boolean
+          example: true
+          description: 'When `true`, the browser upload session renders the multi-artifact cart page (drag N files + add N URLs, then Confirm) instead of the single-file page. Requires `includeWebUploadUrl: true`. Incompatible with `existingArtifactId` (REPLACE is single-file only). Must be paired with either `addToEvidenceId` (add-many to existing evidence) or `createEvidence` (create new evidence with N artifacts).'
+        createEvidence:
+          description: 'Evidence-level metadata for CREATE-with-N. Required when `multiArtifact: true` and `addToEvidenceId` is omitted; forbidden otherwise. Stashed on the session at mint time and consumed at commit time to drive `POST /evidence-library`.'
+          allOf:
+          - $ref: '#/components/schemas/MultiArtifactCreateEvidencePublicV2Dto'
+      required:
+      - purpose
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    MultiArtifactCreateEvidencePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Q4 Penetration Test Report
+          description: Evidence Library Item name.
+        description:
+          type: string
+          maxLength: 30000
+          example: Third-party pen-test findings, remediations, and evidence
+          description: Evidence Library Item description.
+        ownerId:
+          type: number
+          example: 1
+          description: 'User ID of the Evidence Library Item owner. Required: the multi-artifact CREATE flow always attaches artifacts at commit time, and the sibling single-artifact create endpoint requires owner + renewal schedule whenever any artifact source is provided. Enforcing the same rule at mint fails-fast rather than 500-ing at commit when the downstream service builds an artifact chain with no owner.'
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: 'Artifact renewal schedule type. Required: see `ownerId` for the same rationale. Use CUSTOM to set a specific renewal date via `renewalDate`.'
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Artifact renewal date. Required only when `renewalScheduleType` is CUSTOM. For other schedule types the renewal date is calculated from each artifact's `filedAt`, and supplying `renewalDate` alongside a non-CUSTOM schedule is rejected.
+        implementationGuidance:
+          type: string
+          maxLength: 30000
+          example: Follow the internal pen-test playbook and attach every artifact per section.
+          description: Implementation guidance for this Evidence Library Item.
+        controlIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of control IDs to associate with this Evidence Library Item.
+          type: array
+          items:
+            type: number
+      required:
+      - name
+      - ownerId
+      - renewalScheduleType
+    RenewalScheduleTypeEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+      - CUSTOM
+      - NONE
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

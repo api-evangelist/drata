@@ -1,0 +1,1899 @@
+openapi: 3.2.0
+info:
+  title: Drata Evidence API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Evidence across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Evidence
+  description: Evidence items hold one or more artifacts, the files, URLs, or ticket references that demonstrate a control is operating. <br/>Use the evidence-files endpoint to pre-upload a file, then reference the returned fileKey when creating or updating an Evidence item.
+paths:
+  /workspaces/{workspaceId}/evidence:
+    get:
+      description: 'List evidence items with pagination, filtering, and optional expand.
+
+
+        🔒 Requires **Evidence Library: List Evidence** permission.'
+      operationId: EvidencePublicV2Controller_listEvidence
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceExpandEnum'
+      - name: name
+        required: false
+        in: query
+        description: Filter evidence items by name (prefix match)
+        schema:
+          maxLength: 191
+          example: SOC2 Evidence
+          type: string
+      - name: ownerIds[]
+        required: false
+        in: query
+        description: IDs of the users that own the evidence current version.
+        schema:
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      - name: frameworkIds[]
+        required: false
+        in: query
+        description: Array of Ids of frameworks to be used as filters
+        schema:
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      - name: evidenceStatuses[]
+        required: false
+        in: query
+        description: Filter evidence items by statuses
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ComputedEvidenceStatusEnum'
+      - name: artifactTypes[]
+        required: false
+        in: query
+        description: Filter evidence items by artifact types
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtifactTypeEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceListResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Evidence Items
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-get
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    post:
+      description: 'Create a new Evidence item with one or more artifacts. File artifacts must be pre-uploaded via the evidence-files endpoint and referenced by `fileKey`.
+
+
+        🔒 Requires **Evidence Library: Create Evidence** permission.'
+      operationId: EvidencePublicV2Controller_createEvidence
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvidenceCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceMutationResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Evidence
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-post
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/evidence-files:
+    post:
+      description: 'Pre-upload a file to be used as an evidence artifact. Provide the binary as either a multipart `file` or a Base64-encoded `base64File`; exactly one is required. Returns a `fileKey` that can be referenced in the create/update Evidence endpoints.
+
+
+        🔒 Requires **Evidence Library: Create Evidence** permission.'
+      operationId: EvidencePublicV2Controller_uploadArtifactFile
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/EvidenceArtifactUploadRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceArtifactUploadResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Upload Evidence Artifact File
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-post
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/evidence/{evidenceId}:
+    get:
+      description: 'Get a specific evidence item by ID with optional expand.
+
+
+        🔒 Requires **Evidence Library: List Evidence** permission.'
+      operationId: EvidencePublicV2Controller_getEvidence
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: evidenceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Evidence Item
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-get
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    put:
+      description: 'Update an existing Evidence item. Supports multi-artifact operations: add new artifacts, archive artifacts (past), restore artifacts (current), and replace artifacts.
+
+
+        🔒 Requires **Evidence Library: Update Evidence** permission.'
+      operationId: EvidencePublicV2Controller_updateEvidence
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: evidenceId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvidenceUpdateRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceMutationResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Evidence
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-put
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    delete:
+      description: 'Permanently delete an Evidence item and all of its artifacts. To delete a single artifact and leave the Evidence item in place, use the delete artifact endpoint.
+
+
+        🔒 Requires **Evidence Library: Delete Evidence** permission.'
+      operationId: EvidencePublicV2Controller_deleteEvidence
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: evidenceId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Evidence
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-delete
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/evidence/{evidenceId}/artifacts:
+    get:
+      description: 'List the artifacts of a single evidence item. Returns one entry per artifact, not one per artifact version, so each `id` is stable across replacements and is the ID accepted by the other artifact endpoints.
+
+
+        🔒 Requires **Evidence Library: List Evidence** permission.'
+      operationId: EvidencePublicV2Controller_listEvidenceArtifacts
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: evidenceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: name
+        required: false
+        in: query
+        description: Filter artifacts by name (prefix match)
+        schema:
+          maxLength: 191
+          example: Q4-2024-Security-Audit
+          type: string
+      - name: artifactTypes[]
+        required: false
+        in: query
+        description: Filter artifacts by type
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ArtifactType'
+      - name: isArchived
+        required: false
+        in: query
+        description: True returns only archived (past) artifacts, false only active ones. Omit to return both.
+        schema:
+          example: false
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceArtifactsListResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Evidence Artifacts
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-get
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/evidence/{evidenceId}/artifacts/{artifactId}:
+    put:
+      description: 'Partially update an existing artifact''s `artifactName` and/or `filedAt` in place on its current version. To replace the artifact''s actual source (file/URL/ticket), use `replaceArtifacts` on the update Evidence endpoint instead.
+
+
+        🔒 Requires **Evidence Library: Update Evidence** permission.'
+      operationId: EvidencePublicV2Controller_updateEvidenceArtifact
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: evidenceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: artifactId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvidenceArtifactUpdateRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Evidence Artifact
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-put
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    delete:
+      description: 'Permanently delete a single artifact from an evidence item, including its full version history. To move an artifact to past artifacts instead, pass its ID in `pastArtifacts` on the update Evidence endpoint.
+
+
+        🔒 Requires **Evidence Library: Delete Evidence** permission.'
+      operationId: EvidencePublicV2Controller_deleteEvidenceArtifact
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: evidenceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: artifactId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Evidence Artifact
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-delete
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/evidence/{evidenceId}/artifacts/{artifactId}/actions:
+    post:
+      description: 'Archive an artifact (move it to past artifacts) or restore it (move it back to current artifacts). Both are reversible and leave the version history intact.
+
+
+        🔒 Requires **Evidence Library: Update Evidence** permission.'
+      operationId: EvidencePublicV2Controller_createEvidenceArtifactAction
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: evidenceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: artifactId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EvidenceArtifactActionRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Perform Evidence Artifact Action
+      tags:
+      - Evidence
+      x-drata-permissions:
+      - evidence-put
+      x-product-area:
+      - EVIDENCE_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    EvidenceArtifactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Evidence artifact ID. Stable across artifact versions, and the ID accepted by the artifact endpoints and by the `pastArtifacts`, `currentArtifacts`, and `replaceArtifacts` fields on the update Evidence endpoint.
+        artifactName:
+          type:
+          - string
+          - 'null'
+          example: Q4-2024-Security-Audit.pdf
+          description: Artifact name (user-provided or auto-generated from file)
+        extension:
+          type:
+          - string
+          - 'null'
+          example: pdf
+          description: File extension of the artifact. Null for non-file artifact types (URLs, tickets, etc.).
+        artifactVersion:
+          type: number
+          example: 1
+          description: The version the artifact is currently on.
+        source:
+          type: string
+          example: https://example.com/evidence/document.pdf
+          description: Source location for the artifact. For file-type artifacts, this is a signed URL. For URLs, this is the original URL. For ticket providers, this is the ticket URL.
+        artifactSafeBasesyncStatus:
+          type:
+          - string
+          - 'null'
+          example: COMPLETE
+          description: SafeBase sync status
+          enum:
+          - NOT_SYNCED
+          - PENDING
+          - COMPLETE
+          - ERROR
+        artifactType:
+          example: S3_FILE
+          description: Artifact storage type indicating where and how the artifact is stored (S3, cloud storage providers, URLs, ticket systems, test results, etc.)
+          allOf:
+          - $ref: '#/components/schemas/ArtifactTypeEnum'
+        filedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the artifact was filed/effective. May differ from createdAt for backdated evidence.
+        archivedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the artifact was archived. Null means the artifact is active (not archived).
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the artifact was created
+      required:
+      - id
+      - artifactName
+      - extension
+      - artifactVersion
+      - source
+      - artifactType
+      - filedAt
+      - archivedAt
+      - createdAt
+    EvidenceArtifactUploadRequestPublicV2Dto:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: 'Artifact source as a file. Provide exactly one of `file` or `base64File`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
+        base64File:
+          type: string
+          example:
+            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
+            filename: security-certificate.pdf
+          description: Artifact source as a Base64-encoded file in data URL format (alternative to `file`). Provide exactly one of `file` or `base64File`.
+    EvidenceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Evidence ID
+        name:
+          type: string
+          example: Security Policy Document
+          description: Evidence name
+        description:
+          type:
+          - string
+          - 'null'
+          example: This document outlines our security policies and procedures.
+          description: Evidence description. May contain %s placeholders replaced with company name.
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          example: Follow the company security training guidelines and ensure all employees complete the training within 30 days of onboarding.
+          description: Implementation guidance for this evidence. May contain %s placeholders replaced with company name.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence last updated date timestamp
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: Date when the evidence is due for renewal
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: The interval the evidence should be renewed on
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        status:
+          example: READY
+          description: 'Computed status of the evidence. Values: NEEDS_ARTIFACT, ERROR, EXPIRED, EXPIRING_SOON, READY'
+          allOf:
+          - $ref: '#/components/schemas/EvidenceStatusEnum'
+        safeBaseSyncStatus:
+          type:
+          - string
+          - 'null'
+          example: COMPLETE
+          description: SafeBase sync status
+          enum:
+          - NOT_SYNCED
+          - PENDING
+          - COMPLETE
+          - ERROR
+        owners:
+          description: Evidence owners with total count. Returned when `expand[]=owners` is passed.
+          allOf:
+          - $ref: '#/components/schemas/OwnersSubcollectionResponsePublicV2Dto'
+        artifacts:
+          description: Evidence artifacts with total count. Returned when `expand[]=artifacts` is passed.
+          allOf:
+          - $ref: '#/components/schemas/EvidenceArtifactsSubcollectionResponsePublicV2Dto'
+        controls:
+          description: Controls linked to this evidence with total count. Returned when `expand[]=controls` is passed.
+          allOf:
+          - $ref: '#/components/schemas/EvidenceControlsSubcollectionResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - implementationGuidance
+      - createdAt
+      - updatedAt
+      - renewalDate
+      - renewalScheduleType
+      - status
+    ControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: AC-1
+          description: Control code
+        name:
+          type: string
+          example: Access Control
+          description: Control name
+        description:
+          type:
+          - string
+          - 'null'
+          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
+          description: Control description
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was last updated
+      required:
+      - id
+      - code
+      - name
+      - description
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    EvidenceArtifactMetadataPublicV2Dto:
+      type: object
+      properties:
+        originalFileName:
+          type: string
+          example: security-policy.pdf
+          description: Original file name
+        mimeType:
+          type: string
+          example: application/pdf
+          description: MIME type of the artifact
+        extension:
+          type: string
+          example: pdf
+          description: File extension
+    EvidenceControlsSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of controls. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all controls for this evidence item.
+      required:
+      - data
+      - totalCount
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    EvidenceArtifactAddRequestPublicV2Dto:
+      type: object
+      properties:
+        artifactName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Q4 Security Review
+          description: Custom name for the artifact
+        artifactType:
+          example: URL
+          description: The type of artifact. Use S3_FILE for uploaded files, URL for web links, TICKET_PROVIDER for ticket references.
+          allOf:
+          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
+        fileKey:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/TestReport.pdf
+          description: Drata S3 file key from the evidence-files endpoint. Required when artifactType is S3_FILE. Must belong to the authenticated account.
+        url:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://example.com/policy.pdf
+          description: The URL for URL type artifacts
+        ticketUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://jira.example.com/browse/SEC-123
+          description: The ticket URL for TICKET_PROVIDER type artifacts
+        filedAt:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-05'
+          description: The date when the artifact was originally filed/created (ISO 8601 format)
+      required:
+      - artifactType
+      - filedAt
+    EvidenceArtifactReplaceRequestPublicV2Dto:
+      type: object
+      properties:
+        artifactName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Q4 Security Review
+          description: Custom name for the artifact
+        artifactType:
+          example: URL
+          description: The type of artifact. Use S3_FILE for uploaded files, URL for web links, TICKET_PROVIDER for ticket references.
+          allOf:
+          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
+        fileKey:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/TestReport.pdf
+          description: Drata S3 file key from the evidence-files endpoint. Required when artifactType is S3_FILE. Must belong to the authenticated account.
+        url:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://example.com/policy.pdf
+          description: The URL for URL type artifacts
+        ticketUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://jira.example.com/browse/SEC-123
+          description: The ticket URL for TICKET_PROVIDER type artifacts
+        filedAt:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-05'
+          description: The date when the artifact was originally filed/created (ISO 8601 format)
+        existingArtifactId:
+          type: number
+          description: The ID of the existing artifact (LibraryDocumentVersion) to add a new version to
+      required:
+      - artifactType
+      - filedAt
+      - existingArtifactId
+    EvidenceCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Security Training
+          description: Evidence name
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Security Training completed evidence
+          description: Evidence description
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Example of architectural diagram www.drata/arch-diagram-example.com
+          description: Guidance for implementing evidence
+        stepsToReproduce:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Steps to reproduce the issue or evidence collection process
+          description: Steps to reproduce or collect this evidence
+        artifacts:
+          description: Array of artifacts to create for this evidence. Each artifact should reference a pre-uploaded file (via fileKey) or a URL.
+          example:
+          - type: S3_FILE
+            artifactName: Security Policy v2.pdf
+            fileKey: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/policy.pdf
+            filedAt: '2020-07-06'
+          - type: URL
+            artifactName: External Documentation
+            url: https://example.com/docs
+            filedAt: '2020-07-06'
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceArtifactRequestPublicV2Dto'
+        ownerId:
+          type: number
+          example: 1
+          description: Owner user ID
+        controlIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of control IDs to link to this evidence
+          type:
+          - array
+          - 'null'
+          items:
+            type: number
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: Evidence renewal date. Optional - if not provided and renewalScheduleType is set, it may be auto-calculated by the backend based on the schedule type.
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: Evidence renewal schedule type
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+      required:
+      - name
+      - artifacts
+    EvidenceArtifactActionEnum:
+      type: string
+      enum:
+      - archive
+      - restore
+    ComputedEvidenceStatusEnum:
+      type: string
+      enum:
+      - NEEDS_ARTIFACT
+      - EXPIRED
+      - EXPIRING_SOON
+      - TEST_ERROR
+      - TEST_FAILED
+      - READY
+      - TEST_PASSED
+      - TEST_UNUSED
+      - TEST_DISABLED
+      - TEST_DELETED
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    EvidenceMutationArtifactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Artifact ID
+        source:
+          type: string
+          example: document.pdf
+          description: Artifact source (file path, URL, etc.)
+        artifactName:
+          type:
+          - string
+          - 'null'
+          example: document.pdf
+          description: Artifact name
+        type:
+          example: S3_FILE
+          description: Type of artifact
+          allOf:
+          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
+        artifactVersion:
+          type: number
+          example: 1
+          description: Version number of this artifact
+        filedAt:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: The user selected creation date for the artifact
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the artifact was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the artifact was last updated
+        metadata:
+          description: Metadata information for the artifact (file name, extension, etc.)
+          allOf:
+          - $ref: '#/components/schemas/EvidenceArtifactMetadataPublicV2Dto'
+        ticketUrl:
+          type:
+          - string
+          - 'null'
+          description: Original user-provided ticket URL for TICKET_PROVIDER artifacts. Null for non-ticket artifacts.
+      required:
+      - id
+      - source
+      - artifactName
+      - type
+      - artifactVersion
+      - filedAt
+      - createdAt
+      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    EvidenceArtifactUploadResponsePublicV2Dto:
+      type: object
+      properties:
+        fileKey:
+          type: string
+          example: account-id/evidence-library/uuid/file.pdf
+          description: The S3 key for the uploaded file
+        originalFilename:
+          type: string
+          example: My Security Training (v2).pdf
+          description: The original filename before sanitization
+        mimeType:
+          type: string
+          example: application/pdf
+          description: The MIME type of the uploaded file
+        fileSize:
+          type: number
+          example: 1024
+          description: The size of the uploaded file in bytes
+      required:
+      - fileKey
+      - originalFilename
+      - mimeType
+      - fileSize
+    EvidenceStatusEnum:
+      type: string
+      enum:
+      - NEEDS_ARTIFACT
+      - ERROR
+      - READY
+      - EXPIRING_SOON
+      - EXPIRED
+      - NEEDS_SOURCE
+      - NEEDS_ATTENTION
+    EvidenceLinkedWorkspaceCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Workspace id
+        name:
+          type: string
+          example: Drata
+          description: Workspace name
+      required:
+      - id
+      - name
+    EvidenceArtifactActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: 'Action to execute: `archive` moves the artifact to past artifacts, `restore` moves it back to current artifacts. Both are reversible; to remove an artifact and its version history permanently, use the delete artifact endpoint instead.'
+          example: archive
+          allOf:
+          - $ref: '#/components/schemas/EvidenceArtifactActionEnum'
+      required:
+      - action
+    ArtifactType:
+      type: string
+      enum:
+      - URL
+      - S3_FILE
+      - TICKET_PROVIDER
+      - NONE
+      - GOOGLE_DRIVE
+      - ONE_DRIVE
+      - BOX
+      - DROPBOX
+      - SHARE_POINT
+      - TEST_RESULT
+    EvidenceListResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of evidence items
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    EvidenceArtifactsListResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of artifacts belonging to the evidence item
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    EvidenceMutationResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Evidence ID
+        name:
+          type: string
+          example: Security Policy Document
+          description: Evidence name
+        description:
+          type:
+          - string
+          - 'null'
+          example: This document outlines our security policies and procedures.
+          description: Evidence description
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          example: Follow the company security training guidelines and ensure all employees complete the training within 30 days of onboarding.
+          description: Implementation guidance for this evidence
+        evidenceTemplateCode:
+          type:
+          - string
+          - 'null'
+          example: REQ-12
+          description: Unique code identifying the system-generated evidence template this item is based on; null for user-created custom evidence.
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: Date when the evidence is due for renewal
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: The interval the evidence should be renewed on
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence last updated date timestamp
+        artifactsRequested:
+          type: number
+          example: 3
+          description: Total number of artifacts in the request
+        artifactsCreated:
+          type: number
+          example: 2
+          description: Number of artifacts that were created successfully. When less than artifactsRequested, some artifact uploads failed but the evidence row was still created.
+        controls:
+          description: Controls linked to this evidence
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
+        linkedWorkspaces:
+          description: Workspaces mapped to the controls of this evidence
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceLinkedWorkspaceCompactResponsePublicV2Dto'
+        artifacts:
+          description: Artifacts for this evidence
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceMutationArtifactResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - implementationGuidance
+      - evidenceTemplateCode
+      - renewalDate
+      - renewalScheduleType
+      - createdAt
+      - updatedAt
+      - artifactsRequested
+      - artifactsCreated
+      - controls
+      - linkedWorkspaces
+      - artifacts
+    OwnersSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of owners. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all owners for this control.
+      required:
+      - data
+      - totalCount
+    EvidenceExpandEnum:
+      type: string
+      enum:
+      - owners
+      - artifacts
+      - controls
+    EvidenceArtifactUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        artifactName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Q4 Security Review
+          description: Custom name for the artifact. Omit to leave unchanged; send null to clear it.
+        filedAt:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: The date when the artifact was filed/effective. Omit to leave unchanged; send null to clear it.
+    EvidenceUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Updated Security Training
+          description: Evidence name
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Security Training completed evidence
+          description: Evidence description
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Example of architectural diagram www.drata/arch-diagram-example.com
+          description: 'Guidance for implementing evidence. Partial-update: omit to leave the current value unchanged; send null to clear it.'
+        stepsToReproduce:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Steps to reproduce the issue or evidence collection process
+          description: 'Steps to reproduce or collect this evidence. Partial-update: omit to leave the current value unchanged; send null to clear it.'
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: Renewal date (ISO 8601 format, required if renewalScheduleType is not NONE)
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: Renewal schedule type for the evidence
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        ownerId:
+          type: number
+          example: 789
+          description: Evidence owner user ID
+        controlIds:
+          example:
+          - 101
+          - 102
+          description: List of control IDs to link (additions only, cannot remove existing links)
+          type:
+          - array
+          - 'null'
+          items:
+            type: number
+        newArtifacts:
+          example:
+          - artifactType: URL
+            url: https://example.com/policy.pdf
+            filedAt: '2020-07-06'
+            artifactName: Policy Document
+          description: New artifacts to add to the evidence
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceArtifactAddRequestPublicV2Dto'
+        pastArtifacts:
+          example:
+          - 1
+          - 2
+          description: List of artifact IDs to archive (move to past)
+          type:
+          - array
+          - 'null'
+          items:
+            type: number
+        currentArtifacts:
+          example:
+          - 3
+          description: List of artifact IDs to restore (move to current)
+          type:
+          - array
+          - 'null'
+          items:
+            type: number
+        replaceArtifacts:
+          example:
+          - existingArtifactId: 1
+            artifactType: URL
+            url: https://example.com/new-policy.pdf
+            filedAt: '2020-07-06'
+            artifactName: Updated Policy Document
+          description: Artifacts to replace by adding a new version to an existing artifact chain. Preserves the artifact ID across versions.
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceArtifactReplaceRequestPublicV2Dto'
+    RenewalScheduleTypeEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+      - CUSTOM
+      - NONE
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    EvidenceArtifactsSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of artifacts. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all artifacts for this evidence item.
+      required:
+      - data
+      - totalCount
+    LibraryDocumentVersionTypeEnum:
+      type: string
+      enum:
+      - URL
+      - S3_FILE
+      - TICKET_PROVIDER
+      - NONE
+      - GOOGLE_DRIVE
+      - ONE_DRIVE
+      - BOX
+      - DROPBOX
+      - SHARE_POINT
+      - TEST_RESULT
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    EvidenceArtifactRequestPublicV2Dto:
+      type: object
+      properties:
+        type:
+          example: S3_FILE
+          description: The type of artifact. Use S3_FILE for uploaded files, URL for links, etc.
+          allOf:
+          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
+        artifactName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Security Policy Document
+          description: Display name for this artifact
+        url:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://example.com/security-policy
+          description: URL for URL-type artifacts. Required when type is URL.
+        fileKey:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/policy.pdf
+          description: S3 file key for a pre-uploaded file, as returned by the evidence-files endpoint. Required when type is S3_FILE. Must belong to the authenticated account.
+        ticketUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://acme.atlassian.net/browse/ISSUE-1234
+          description: The ticket URL for TICKET_PROVIDER type artifacts
+        filedAt:
+          type: string
+          example: '2020-07-06'
+          description: Library artifact creation date
+      required:
+      - type
+      - filedAt
+    ArtifactTypeEnum:
+      type: string
+      enum:
+      - URL
+      - S3_FILE
+      - TICKET_PROVIDER
+      - NONE
+      - GOOGLE_DRIVE
+      - ONE_DRIVE
+      - BOX
+      - DROPBOX
+      - SHARE_POINT
+      - TEST_RESULT
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

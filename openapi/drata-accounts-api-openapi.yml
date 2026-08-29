@@ -1,0 +1,500 @@
+openapi: 3.2.0
+info:
+  description: SafeBase API documentation.
+  version: 1.4.1
+  title: SafeBase API documentation Accounts API
+  contact:
+    email: support@safebase.io
+servers:
+- url: https://app.safebase.io/api/ext/v1/rest
+security:
+- apiKey: []
+tags:
+- name: Accounts
+paths:
+  /accounts:
+    get:
+      tags:
+      - Accounts
+      summary: Get accounts
+      description: "Gets all accounts that match the given criteria. \n\nFive filter query parameters can be sent and they work with an 'AND' relationship:\n 1. Account name\n 2. Member email\n 3. Domain name\n 4. Sfdc Account Id\n 5. Review Status\n \nThe following query parameters are optional and can be used to control the sorting and pagination of the results:\n - Sort Field\n - Sort Direction\n - Page Number\n - Page Size\n"
+      operationId: getAccounts
+      parameters:
+      - in: query
+        name: name
+        description: This parameter will search for an account that has the given name.
+        schema:
+          type: string
+      - in: query
+        name: member
+        description: This parameter will search for all accounts that contain a given member email.
+        schema:
+          type: string
+      - in: query
+        name: domain
+        description: "This parameter will search for all accounts that contain at least one member email with the given domain name.\n\n Domain examples: safebase.io, example.com"
+        schema:
+          type: string
+      - in: query
+        name: sfdcAccountId
+        description: Salesforce Account Id to verify and get account
+        schema:
+          type: string
+      - in: query
+        name: reviewStatus
+        description: One or more review statuses to filter accounts by.
+        schema:
+          type: string
+          examples:
+            singleStatus:
+              value: in_progress
+              summary: Single status
+            multipleStatuses:
+              value: in_progress,completed
+              summary: This will allow any account with any status here to be returned
+      - in: query
+        name: sortField
+        description: The field to sort the results by.
+        schema:
+          type: string
+          enum:
+          - lastSeen
+      - in: query
+        name: sortDirection
+        description: The direction to sort the results by.
+        schema:
+          type: string
+          enum:
+          - asc
+          - desc
+      - in: query
+        name: pageNumber
+        description: The page number to retrieve.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 500
+          example: 1
+      - in: query
+        name: pageSize
+        description: The number of results to return per page.
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 10
+      responses:
+        '200':
+          description: Successful operation.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    type: array
+                    items:
+                      type: object
+                      $ref: '#/components/schemas/AccountOutput'
+                  pagination:
+                    type: object
+                    properties:
+                      pageNumber:
+                        type: number
+                        description: Current page number
+                      pageSize:
+                        type: number
+                        description: Number of items returned
+                      totalCount:
+                        type: number
+                        description: The total number of items
+                      totalPages:
+                        type: number
+                        description: The total number of pages
+                      maxPages:
+                        type: number
+                        description: Max number of pages
+                      maxSizes:
+                        type: number
+                        description: Max number of items returned
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - accounts:view
+    post:
+      tags:
+      - Accounts
+      summary: Create account
+      description: Adds a new account to SafeBase
+      operationId: addAccount
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - input
+              properties:
+                input:
+                  type: object
+                  required:
+                  - name
+                  properties:
+                    name:
+                      type: string
+                      example: SafeBase Inc
+                    description:
+                      type: string
+                      example: 'Customer #3'
+                      description: A description of the account. Set to null to remove the current value.
+                    domains:
+                      type: array
+                      description: An array of domains associated with the account.
+                      maxItems: 100
+                      example:
+                      - example.com
+                      items:
+                        type: string
+                    sfdcAccountId:
+                      type: string
+                      description: The Salesforce Account Id this SafeBase Account is associated with. Set to null to remove the current value.
+                    permissionProfileId:
+                      description: Id of the permission profile applicable to this account, mutually exclusive with permissionProfileIds
+                      type: string
+                      deprecated: true
+                    permissionProfileIds:
+                      description: Array of permission profile ids applicable to this account, mutually exclusive with permissionProfileId
+                      type: array
+                      example:
+                      - 80c6ae03-27a6-4fa0-8c53-be854ad9b402
+                      - 2f1fc9a1-3cb2-4380-82ee-8d286e71c25c
+                      items:
+                        type: string
+                    reviewStatus:
+                      description: Status of the where the account is in the review process
+                      type: string
+                      enum:
+                      - not_started
+                      - in_progress
+                      - completed
+                      - other
+                      - inactive
+                    accessExpiresAt:
+                      type: string
+                      format: date-time
+                      example: '2023-01-01T00:00:00.000Z'
+                      description: Set an expiration date for the account. If omitted, the organization default setting will be used.
+                      oneOf:
+                      - type: string
+                        description: A date-time in ISO-8601 format. If provided, this date must be in the future.
+                      - type: 'null'
+                        description: If null is provided, the account will never expire.
+                    ndaProvider:
+                      $ref: '#/components/schemas/NdaProvider'
+                    ndaDocusign:
+                      description: This field is only required and should only be used if the ndaProvider field is set to 'docusign'
+                      type: object
+                      required:
+                      - ndaRecipientFirstName
+                      - ndaRecipientLastName
+                      - ndaRecipientEmail
+                      properties:
+                        ndaRecipientFirstName:
+                          type: string
+                          example: Safe
+                        ndaRecipientLastName:
+                          type: string
+                          example: Base
+                        ndaRecipientEmail:
+                          type: string
+                          example: user@safebase.io
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/AccountOutput'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - accounts:edit
+  /accounts/{id}:
+    get:
+      tags:
+      - Accounts
+      summary: Get account by ID
+      description: Gets an account by ID
+      operationId: getAccount
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/AccountOutput'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - accounts:view
+    delete:
+      tags:
+      - Accounts
+      summary: Delete account by ID
+      description: Deletes an account by ID
+      operationId: deleteAccount
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - accounts:edit
+    patch:
+      tags:
+      - Accounts
+      summary: Edit account
+      description: "Edits an existing account on SafeBase \n\nOne query parameter must be sent\n 1. accountId\n \n\nFive parameters can be sent in the body\n 1. name\n 2. description\n 2. sfdcAccountId\n 3. ndaProvider\n 4. ndaDocusign\n"
+      operationId: ''
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Account object that needs to be sent to SafeBase to update
+              properties:
+                $ref: '#/paths/~1accounts/post/requestBody/content/application~1json/schema/properties/input/properties'
+                accessExpiresAt:
+                  type: string
+                  format: date-time
+                  example: '2023-01-01T00:00:00.000Z'
+                  description: Set an expiration date for the account. Provide a current or past date to revoke access for the account. If omitted, the expiration date will remain unchanged.
+                  oneOf:
+                  - type: string
+                    description: A date-time in ISO-8601 format.
+                  - type: 'null'
+                    description: If null is provided, the account will never expire.
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/AccountOutput'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - accounts:edit
+  /accounts/{id}/url:
+    get:
+      tags:
+      - Accounts
+      summary: Get account page URL
+      description: Gets an account's private page URL
+      operationId: getAccountPageUrl
+      parameters:
+      - $ref: '#/components/parameters/accountId'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    type: string
+                    example: https://safebase.io/accounts/{id}/share
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - accounts:view
+components:
+  schemas:
+    AccountOutput:
+      type: object
+      properties:
+        $ref: '#/paths/~1accounts/post/requestBody/content/application~1json/schema/properties/input/properties'
+        id:
+          type: string
+          example: fe732619-4e7a-469b-b34a-d8bc4aaabfa9
+        createdAt:
+          type: string
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        numMembers:
+          type: integer
+          example: 4
+        isNdaDone:
+          description: Whether the NDA has been agreed to or not
+          type: boolean
+        lastSeen:
+          description: The last time an account member has interacted with the Trust Center
+          type: string | null
+          format: date-time
+          example: '2022-01-01T12:00:00Z'
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
+    NdaProvider:
+      type: string
+      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
+      enum:
+      - none
+      - clickwrap
+      - docusign
+      - override
+  responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+  parameters:
+    accountId:
+      name: id
+      in: path
+      required: true
+      schema:
+        description: The target account ID
+        type: string
+        format: uuid
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: x-sb-api-key
+      in: header

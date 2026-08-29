@@ -1,0 +1,786 @@
+openapi: 3.2.0
+info:
+  title: Drata Custom Connections API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Custom Connections across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Custom Connections
+  description: Custom Connections allow users to integrate external systems with Drata. CUSTOM connections push arbitrary JSON evidence records using a user-defined schema. MDM and HRIS connections use a fixed common model for device management and HR identity data respectively. The [help docs for custom connections and tests](https://help.drata.com/en/articles/11995676-part-1-custom-connections-and-tests) and [custom device connections](https://help.drata.com/en/articles/12014143-custom-device-connections) have more information.
+paths:
+  /custom-connections:
+    get:
+      description: 'Find Custom Connections matching the provided filters.
+
+
+        🔒 Requires **Custom Connections Management: List Custom Connections** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomConnectionsPublicV2Controller_listCustomConnections
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomConnectionExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomConnectionsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Custom Connections
+      tags:
+      - Custom Connections
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-get
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    post:
+      description: 'Create a new Custom Connection. Supported provider types: CUSTOM, MDM, HRIS. CUSTOM connections require `schema` or `sampleData` and `displayNameKey`. MDM and HRIS connections use a fixed common model — `schema`, `sampleData`, and `displayNameKey` must not be provided.
+
+
+        🔒 Requires **Custom Connections Management: Create Custom Connection** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomConnectionsPublicV2Controller_createCustomConnection
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomConnectionCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Custom Connection
+      tags:
+      - Custom Connections
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-post
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}:
+    get:
+      operationId: CustomConnectionsPublicV2Controller_getCustomConnection
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of sub-collections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomConnectionExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Custom Connection
+      tags:
+      - Custom Connections
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-get
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+      description: '🔒 Requires **Custom Connections Management: List Custom Connections** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+    put:
+      description: 'Update Custom Connection details
+
+
+        🔒 Requires **Custom Connections Management: Update Custom Connection** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomConnectionsPublicV2Controller_updateCustomConnection
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomConnectionUpdateRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Custom Connection
+      tags:
+      - Custom Connections
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-put
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    delete:
+      operationId: CustomConnectionsPublicV2Controller_deleteCustomConnection
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Custom Connection
+      tags:
+      - Custom Connections
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-delete
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+      description: '🔒 Requires **Custom Connections Management: Delete Custom Connection** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    CustomConnectionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Connections based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CustomConnectionCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: My Custom Connection
+          description: Name for the Custom Connection
+        providerTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - CUSTOM
+            - MDM
+            - HRIS
+          example:
+          - CUSTOM
+          description: 'Provider types for the Custom Connection. Supported types: CUSTOM, MDM, HRIS. CUSTOM connections require a schema. MDM and HRIS use a fixed common model and do not accept schema fields.'
+        workspaceIds:
+          items:
+            type: number
+          example:
+          - 1
+          description: Required for `CUSTOM` connections. IDs of the Workspaces to associate with this Custom Connection. Not applicable for `MDM` or `HRIS` connections, which are global.
+          type: array
+        schema:
+          type: object
+          additionalProperties: true
+          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.The JSON Schema definition for the data records this Custom Connection will store. Provide either `schema` (a valid JSON Schema object) or `sampleData` (a representative record) — not both. When `sampleData` is provided, the schema will be inferred automatically.
+          example:
+            type: object
+            properties:
+              employeeId:
+                type: string
+              name:
+                type: string
+              department:
+                type: string
+              startDate:
+                type: string
+              isActive:
+                type: boolean
+              metadata:
+                type: object
+                properties:
+                  lastReview:
+                    type: string
+                additionalProperties: true
+            additionalProperties: true
+        sampleData:
+          type: object
+          additionalProperties: true
+          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.A sample JSON object representing a single data record. The structure will be used to infer the JSON Schema for this Custom Connection resource. Provide either `sampleData` or `schema` — not both.
+          example:
+            employeeId: EMP-001
+            name: Jane Smith
+            department: Engineering
+            startDate: '2024-01-15T00:00:00Z'
+            isActive: true
+            metadata:
+              lastReview: '2025-03-01T00:00:00Z'
+        description:
+          type:
+          - string
+          - 'null'
+          example: A connection for syncing employee records from our internal HRIS.
+          description: Optional description for the Custom Connection resource.
+        displayNameKey:
+          type: string
+          example: name
+          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.The key from the schema that identifies which field should be used as the human-readable display name for each record. For example, if your schema has `name`, `employeeId`, and `department` fields and you set `displayNameKey` to `"name"`, records will be labeled by their `name` value wherever they appear in the Drata UI. Must be a top-level key present in `schema.properties`.
+      required:
+      - name
+      - providerTypes
+    CustomConnectionUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        clientAlias:
+          type:
+          - string
+          - 'null'
+          example: My Updated Custom Connection
+          description: Alias for the Custom Connection
+        description:
+          type: string
+          example: Updated description for Custom Connection
+          description: Description for Custom Connection
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    CustomConnectionResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Custom Connection ID
+        clientAlias:
+          type:
+          - string
+          - 'null'
+          example: My Custom Connection
+          description: Alias for the Custom Connection
+        description:
+          type:
+          - string
+          - 'null'
+          example: Custom connection for managing Employee Data
+          description: Description of the Custom Connection
+        providerTypes:
+          type: array
+          example:
+          - MDM
+          description: Provider types associated with the Custom Connection
+          items:
+            type: string
+            enum:
+            - IDENTITY
+            - INFRASTRUCTURE
+            - VERSION_CONTROL
+            - TICKETING
+            - HRIS
+            - BACKGROUND_CHECK
+            - SINGLE_SIGN_ON
+            - ENTERPRISE_SSO
+            - MDM
+            - SECURITY_TRAINING
+            - OBSERVABILITY
+            - COMMUNICATION
+            - DIGITAL_SIGNATURE
+            - EXTERNAL_POLICY
+            - VULNERABILITY
+            - EDR
+            - USER_ACCESS_REVIEW
+            - CSPM
+            - CODEBASE
+            - CYBER_INSURANCE
+            - CRM
+            - CUSTOM
+            - AUTOMATION_TOOLS
+            - SECURITY_REVIEWS
+            - PROCUREMENT
+            - AUDITS
+            - MFA
+            - PRIVACY
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When this Custom Connection was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When this Custom Connection was last updated
+        createdById:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: The user or API key ID that established the Custom Connection
+        customResources:
+          description: Custom Resources associated with the Custom Connection. Only included when expand=customResources is specified in the request.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomConnectionResourceResponsePublicV2Dto'
+        createdByUser:
+          description: The User or API key that established the Custom Connection. Only included when expand=createdByUser is specified in the request.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - id
+      - clientAlias
+      - description
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    CustomConnectionExpandEnum:
+      type: string
+      enum:
+      - createdByUser
+      - customResources
+    CustomConnectionResourceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: The unique identifier for the Custom Resource
+        name:
+          type: string
+          example: Employees
+          description: The name of the Custom Resource
+        description:
+          type:
+          - string
+          - 'null'
+          example: Employee records for compliance tracking
+          description: A description of the Custom Resource and its purpose
+        schema:
+          type: object
+          description: The JSON schema that defines the structure and validation rules for Custom Data records in this Custom Resource
+          additionalProperties: true
+          example:
+            id: string
+            type: object
+            properties:
+              name:
+                type: string
+            required:
+            - name
+            additionalProperties: false
+            selfRequired: true
+            $schema: http://json-schema.org/draft-07/schema#
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was last updated
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was soft-deleted
+      required:
+      - id
+      - name
+      - schema
+      - createdAt
+      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

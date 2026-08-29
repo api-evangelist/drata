@@ -1,0 +1,718 @@
+openapi: 3.2.0
+info:
+  title: Drata Policy Languages API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Policy Languages across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Policy Languages
+  description: Policy Languages let an organization publish the same Policy Version in several languages. Settings endpoints expose the languages an organization has configured and which one is the default; Policy Language Versions expose the per-language variants of a Policy Version, including which content formats are available for each.
+paths:
+  /policy-language-settings:
+    get:
+      description: 'List the organization''s configured Policy languages and which one is the default. Returns an empty list when the Policy languages feature is disabled for the organization.
+
+
+        🔒 Requires **Policies: List Policies** permission.'
+      operationId: PolicyLanguagesPublicV2Controller_listPolicyLanguageSettings
+      parameters: []
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyLanguageSettingsResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Policy Language Settings
+      tags:
+      - Policy Languages
+      x-drata-permissions:
+      - policies-get-policies
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policy-language-versions:
+    get:
+      description: 'List Policy Version language variants. Narrow to a single Policy Version with `policyVersionId`, or to every Version of a Policy with `policyId`. Scope to the parent Version status with `statuses[]` — `statuses[]=PUBLISHED` excludes variants attached to draft Versions. One row per language variant, so a Policy Version with several languages does not multiply rows in other collections. This is the endpoint to use when you need languages across multiple Policy Versions — the policy-version list endpoint does not expand them. Returns an empty list when the Policy languages feature is disabled for the organization.
+
+
+        🔒 Requires **Policies: List Policies** permission.'
+      operationId: PolicyLanguagesPublicV2Controller_listPolicyLanguageVersions
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: policyVersionId
+        required: false
+        in: query
+        description: Filter to the language variants belonging to a single Policy Version. Omit to list every language variant in the organization.
+        schema:
+          example: 1
+          type: number
+      - name: policyId
+        required: false
+        in: query
+        description: Filter to the language variants across every Version of a single Policy. Use this to retrieve languages for a whole Policy in one call rather than one request per Policy Version.
+        schema:
+          example: 1
+          type: number
+      - name: statuses[]
+        required: false
+        in: query
+        description: Filter to the language variants whose parent Policy Version has one of these statuses. Use `statuses[]=PUBLISHED` to scope to published Versions only — the collection is otherwise unfiltered by status and includes variants attached to draft Versions.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersionStatusEnum'
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyLanguageVersionExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyLanguageVersionsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Policy Language Versions
+      tags:
+      - Policy Languages
+      x-drata-permissions:
+      - policies-get-policies
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policy-language-versions/{policyLanguageVersionId}:
+    get:
+      description: 'Get a single Policy Version language variant by its identifier, as returned in the `id` of a `/policy-language-versions` row. Supports the same expands as the collection. Returns `404` when the identifier is unknown, when the variant has been deleted, and when the Policy languages feature is disabled for the organization — the collection degrades to an empty list in that case, and an item endpoint has no equivalent empty success to return. The four are deliberately indistinguishable.
+
+
+        🔒 Requires **Policies: List Policies** permission.'
+      operationId: PolicyLanguagesPublicV2Controller_getPolicyLanguageVersion
+      parameters:
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyLanguageVersionExpandEnum'
+      - name: policyLanguageVersionId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyLanguageVersionResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Policy Language Version
+      tags:
+      - Policy Languages
+      x-drata-permissions:
+      - policies-get-policies
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    PolicyLanguageCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        language:
+          example: en-US
+          description: Policy language, as a BCP-47 locale code
+          allOf:
+          - $ref: '#/components/schemas/PolicyLanguageEnum'
+        default:
+          type: boolean
+          example: true
+          description: Whether this is the organization default Policy language
+      required:
+      - language
+      - default
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PolicyVersionCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Version ID
+        version:
+          type: number
+          example: 1
+          description: The Policy Version
+        current:
+          type: boolean
+          example: true
+          description: Indicates if is this the current Policy
+        type:
+          example: UPLOADED
+          description: The Policy Version type
+          allOf:
+          - $ref: '#/components/schemas/PolicyTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy Version created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy Version last updated date timestamp
+        renewalDate:
+          type: string
+          example: '2025-07-01T16:45:55.246Z'
+          description: "Policy renewal date. At the renewal date the administrator needs to review the policy and decide if\n         re-acceptance is necessary."
+        subVersion:
+          type: number
+          example: 1
+          description: The Policy sub-version
+        description:
+          type:
+          - string
+          - 'null'
+          description: The Policy Version description
+        approvedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy Version approved at date timestamp
+        changesExplanation:
+          type:
+          - string
+          - 'null'
+          description: The description of the changes done in this update
+        publishedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy Version published at date timestamp
+        requiresAcknowledgment:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Indicates if acknowledgment is required
+      required:
+      - id
+      - version
+      - current
+      - type
+      - createdAt
+      - updatedAt
+      - renewalDate
+      - subVersion
+      - description
+      - approvedAt
+      - changesExplanation
+      - publishedAt
+      - requiresAcknowledgment
+    PolicyLanguageSettingsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: The organization's configured Policy languages, alphabetized by locale code. Empty when the Policy languages feature is disabled or none are configured.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyLanguageCompactResponsePublicV2Dto'
+      required:
+      - data
+    PolicyLanguageVersionResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Version Language ID. Pass this to `GET /policy-language-versions/{policyLanguageVersionId}` to retrieve this specific language variant.
+        language:
+          example: en-US
+          description: The language of this variant, as a BCP-47 locale code
+          allOf:
+          - $ref: '#/components/schemas/PolicyLanguageEnum'
+        default:
+          type: boolean
+          example: false
+          description: 'Whether this variant is the default language for its Policy Version, as recorded on the version rather than the organization default as it stands today. Reserved: no current flow records a per-version default, so this is `false` for every variant until per-version defaults are written. Do not branch on it yet.'
+        hasFile:
+          type: boolean
+          example: true
+          description: Whether this language variant has an uploaded file available for download in its original format
+        hasPdf:
+          type: boolean
+          example: true
+          description: Whether this language variant has a PDF rendering available for download
+        hasHtml:
+          type: boolean
+          example: false
+          description: Whether this language variant has authored HTML content
+        originalFileName:
+          type:
+          - string
+          - 'null'
+          example: information-security-policy-es.pdf
+          description: Original file name of the uploaded document for this language variant
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
+        policyVersion:
+          description: The Policy Version this language variant belongs to. Only returned when `expand[]=policyVersion` is passed.
+          allOf:
+          - $ref: '#/components/schemas/PolicyVersionCompactResponsePublicV2Dto'
+        policy:
+          description: The Policy owning the parent Policy Version. Only returned when `expand[]=policy` is passed.
+          allOf:
+          - $ref: '#/components/schemas/PolicyCompactResponsePublicV2Dto'
+      required:
+      - id
+      - language
+      - default
+      - hasFile
+      - hasPdf
+      - hasHtml
+      - originalFileName
+      - createdAt
+      - updatedAt
+    PolicyLanguageVersionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyLanguageVersionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    PolicyLanguageEnum:
+      type: string
+      enum:
+      - en-US
+      - es-LA
+      - de-DE
+      - fr-FR
+      - it-IT
+      - nl
+      - af-ZA
+      - sq-AL
+      - ar-SA
+      - hy-AM
+      - as-IN
+      - az-AZ
+      - eu-ES
+      - bn-BD
+      - bs-BA
+      - bg-BG
+      - my-MM
+      - ca-ES
+      - ceb-PH
+      - zh-CN
+      - zh-TW
+      - hr-HR
+      - cs-CZ
+      - da-DK
+      - et-EE
+      - fi-FI
+      - ff-SN
+      - gl-ES
+      - ka-GE
+      - el-GR
+      - gu-IN
+      - ht-HT
+      - ha-NG
+      - he-IL
+      - hi-IN
+      - hu-HU
+      - is-IS
+      - ig-NG
+      - id-ID
+      - ja-JP
+      - jv-ID
+      - kn-IN
+      - kk-KZ
+      - km-KH
+      - ko-KR
+      - ku-TR
+      - ky-KG
+      - lv-LV
+      - lt-LT
+      - mk-MK
+      - mai-IN
+      - mg-MG
+      - ms-MY
+      - ml-IN
+      - mi-NZ
+      - mr-IN
+      - mn-MN
+      - ne-NP
+      - no-NO
+      - om-ET
+      - fa-IR
+      - pl-PL
+      - pt-PT
+      - pa-IN
+      - ro-RO
+      - ru-RU
+      - sr-RS
+      - sn-ZW
+      - sd-IN
+      - si-LK
+      - sk-SK
+      - sl-SI
+      - so-SO
+      - su-ID
+      - sw-KE
+      - sv-SE
+      - tl-PH
+      - ta-IN
+      - te-IN
+      - th-TH
+      - tr-TR
+      - uk-UA
+      - ur-PK
+      - uz-UZ
+      - vi-VN
+      - cy-GB
+      - wo-SN
+      - xh-ZA
+      - yo-NG
+      - zu-ZA
+      - xx-LS
+      - en-XA
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    PolicyLanguageVersionExpandEnum:
+      type: string
+      enum:
+      - policyVersion
+      - policy
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PolicyTypeEnum:
+      type: string
+      enum:
+      - BUILDER
+      - UPLOADED
+      - EXTERNAL
+    PolicyCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy ID
+        name:
+          type: string
+          example: Acceptable Use Policy
+          description: The Policy name
+        description:
+          type: string
+          description: The Policy description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy last updated date timestamp
+        assignedTo:
+          example: ALL
+          description: The scope of Users the Policy is assigned to
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        policyStatus:
+          example: ACTIVE
+          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyStatusEnum'
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy renewal date
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - policyStatus
+      - renewalDate
+    PolicyStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    PolicyScopeEnum:
+      type: string
+      enum:
+      - ALL
+      - GROUP
+      - NONE
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    PolicyVersionStatusEnum:
+      type: string
+      enum:
+      - NEEDS_APPROVAL
+      - APPROVED
+      - PUBLISHED
+      - DRAFT
+      - DISCARDED
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

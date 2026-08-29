@@ -1,0 +1,601 @@
+openapi: 3.2.0
+info:
+  description: SafeBase API documentation.
+  version: 1.4.1
+  title: SafeBase API documentation Trust Center Updates API
+  contact:
+    email: support@safebase.io
+servers:
+- url: https://app.safebase.io/api/ext/v1/rest
+security:
+- apiKey: []
+tags:
+- name: Trust Center Updates
+paths:
+  /tcu/topics/:
+    post:
+      tags:
+      - Trust Center Updates
+      summary: Create topic
+      description: Create a top-level Trust Center Update topic
+      operationId: createTopic
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - subject
+              - category
+              properties:
+                subject:
+                  type: string
+                  example: New topic
+                category:
+                  type: string
+                  enum:
+                  - compliance
+                  - vulnerabilities
+                  - incidents
+                  - subprocessors
+                  - general
+                  example: compliance
+                hidden:
+                  type: boolean
+                  default: false
+                  example: false
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/TrustCenterTopicResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:edit
+    get:
+      tags:
+      - Trust Center Updates
+      summary: List topics
+      description: List top-level Trust Center Update topics
+      operationId: listTopics
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/TrustCenterTopicResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:view
+  /tcu/topics/{topicId}:
+    patch:
+      tags:
+      - Trust Center Updates
+      summary: Update topic
+      description: Update a Trust Center topic
+      operationId: updateTrustCenterTopic
+      parameters:
+      - name: topicId
+        in: path
+        required: true
+        schema:
+          description: The id of the topic to update
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                $ref: '#/paths/~1tcu~1topics~1/post/requestBody/content/application~1json/schema/properties'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/TrustCenterTopicResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:edit
+    delete:
+      tags:
+      - Trust Center Updates
+      summary: Delete topic
+      description: Delete a Trust Center topic
+      operationId: deleteTrustCenterTopic
+      parameters:
+      - name: topicId
+        in: path
+        required: true
+        schema:
+          description: The parent topic id
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:edit
+    get:
+      tags:
+      - Trust Center Updates
+      summary: Get topic by ID
+      description: Get a Trust Center topic
+      operationId: getTrustCenterTopic
+      parameters:
+      - name: topicId
+        in: path
+        required: true
+        schema:
+          description: The topic id
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/TrustCenterTopicResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:view
+  /tcu/topics/{topicId}/updates:
+    post:
+      tags:
+      - Trust Center Updates
+      summary: Create update
+      description: Create a Trust Center Update
+      operationId: createTrustCenterUpdate
+      parameters:
+      - name: topicId
+        in: path
+        required: true
+        schema:
+          description: The parent topic id
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - message
+              - channels
+              properties:
+                message:
+                  type: string
+                  example: We are investigating any potential effects of the MegaCorp breach on our systems.
+                channels:
+                  type: object
+                  description: The channel(s) to publish the update to. At least one channel must be specified. You must provide either statusPage OR email (with subscribers or audience).
+                  properties:
+                    statusPage:
+                      type: boolean
+                      default: false
+                      description: Publish the update on the Trust Center Updates Card. This is considered a channel.
+                    statusPageAudience:
+                      type: string
+                      enum:
+                      - public
+                      - private
+                      default: public
+                      example: public
+                      description: If statusPage is true, this is the audience to publish the update to. Choose "public" for all users or "private" for account members only.
+                    email:
+                      type: object
+                      description: 'Email channel configuration. Must specify at least one of: subscribers or audience. Both can be provided together.'
+                      properties:
+                        subscribers:
+                          type: boolean
+                          example: true
+                          description: Whether to send the update to the subscribers channel. This is considered a channel.
+                        audience:
+                          type: object
+                          description: A list of emails the update should be sent to. This is considered a channel.
+                          properties:
+                            emails:
+                              type: array
+                              items:
+                                type: string
+                                format: email
+                              minItems: 1
+                  anyOf:
+                  - required:
+                    - statusPage
+                    properties:
+                      statusPage:
+                        const: true
+                  - required:
+                    - email
+                    properties:
+                      email:
+                        anyOf:
+                        - required:
+                          - subscribers
+                          properties:
+                            subscribers:
+                              const: true
+                        - required:
+                          - audience
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/TrustCenterUpdateResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:edit
+  /tcu/topics/{topicId}/updates/{updateId}:
+    get:
+      tags:
+      - Trust Center Updates
+      summary: Get update by ID
+      description: Get a Trust Center Update by ID
+      operationId: getTrustCenterUpdateById
+      parameters:
+      - name: topicId
+        in: path
+        required: true
+        schema:
+          description: The parent topic id
+          type: string
+      - name: updateId
+        in: path
+        required: true
+        schema:
+          description: The update id
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/TrustCenterUpdateResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:read
+    patch:
+      tags:
+      - Trust Center Updates
+      summary: Edit update
+      description: Edit a Trust Center Update
+      operationId: updateTrustCenterUpdate
+      parameters:
+      - name: topicId
+        in: path
+        required: true
+        schema:
+          description: The parent topic id
+          type: string
+      - name: updateId
+        in: path
+        required: true
+        schema:
+          description: The update id
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                message:
+                  type: string
+                  description: The new message for the Trust Center Update
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    $ref: '#/components/schemas/TrustCenterUpdateResponse'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:edit
+    delete:
+      tags:
+      - Trust Center Updates
+      summary: Delete update
+      description: Delete a Trust Center Update
+      operationId: deleteTrustCenterUpdate
+      parameters:
+      - name: topicId
+        in: path
+        required: true
+        schema:
+          description: The parent topic id
+          type: string
+      - name: updateId
+        in: path
+        required: true
+        schema:
+          description: The update id
+          type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - tcupdates:edit
+components:
+  schemas:
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
+    TrustCenterUpdateResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        message:
+          type: string
+          example: Trust center updated
+        createdAt:
+          type: string
+          format: date-time
+          example: '2020-01-01T00:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2020-01-01T00:00:00.000Z'
+        topicId:
+          type: string
+          format: uuid
+    TrustCenterTopicResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: d9692768-cdbd-4fa9-988b-b33f37286f1b
+        subject:
+          type: string
+          example: New topic
+        category:
+          type: string
+          enum:
+          - compliance
+          - vulnerabilities
+          - incidents
+          - subprocessors
+          - general
+          example: compliance
+        hidden:
+          type: boolean
+          example: false
+        createdAt:
+          type: string
+          format: date-time
+          example: '2020-01-01T00:00:00.000Z'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2020-01-01T00:00:00.000Z'
+        updates:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+              message:
+                type: string
+                example: Trust center updated
+              createdAt:
+                type: string
+                format: date-time
+                example: '2020-01-01T00:00:00.000Z'
+              updatedAt:
+                type: string
+                format: date-time
+                example: '2020-01-01T00:00:00.000Z'
+              topicId:
+                type: string
+                format: uuid
+  responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: x-sb-api-key
+      in: header

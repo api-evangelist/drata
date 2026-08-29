@@ -1,0 +1,591 @@
+openapi: 3.2.0
+info:
+  title: Drata Risk Documents API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Risk Documents across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Risk Documents
+  description: Risk Documents are supporting documents, evidence, or other materials that are associated with a risk.
+paths:
+  /risk-registers/{riskRegisterId}/risks/{riskId}/documents:
+    get:
+      description: 'Retrieve all Documents associated with a specific Risk.
+
+
+        🔒 Requires **Risk Management: Get Risk Documents** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskDocumentsPublicV2Controller_listRiskDocuments
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskDocumentsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Risk Documents
+      tags:
+      - Risk Documents
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-documents-get
+      x-product-area:
+      - RISK_MANAGEMENT
+    post:
+      description: 'Upload one or more Documents for a given Risk.
+
+
+        🔒 Requires **Risk Management: Upload Risk Document** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskDocumentsPublicV2Controller_uploadRiskDocuments
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      requestBody:
+        required: true
+        description: Upload one or more Documents for the Risk
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                files:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: Document files to upload (max 10 files, 25MB each)
+              required:
+              - files
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskDocumentsUploadResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '413':
+          description: The file was too large to upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '503':
+          description: Third party system was unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+      security:
+      - bearer: []
+      summary: Upload Risk Documents
+      tags:
+      - Risk Documents
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-documents-post
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /risk-registers/{riskRegisterId}/risks/{riskId}/documents/{documentId}:
+    get:
+      description: 'Retrieve a specific Risk Document by its ID.
+
+
+        🔒 Requires **Risk Management: Get Risk Documents** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskDocumentsPublicV2Controller_getRiskDocument
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      - name: documentId
+        required: true
+        in: path
+        description: The Document ID
+        schema:
+          example: 123
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Risk Document
+      tags:
+      - Risk Documents
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-documents-get
+      x-product-area:
+      - RISK_MANAGEMENT
+    delete:
+      description: 'Delete a specific Risk Document using the provided Document ID.
+
+
+        🔒 Requires **Risk Management: Delete Risk Document** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskDocumentsPublicV2Controller_deleteRiskDocument
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: riskId
+        required: true
+        in: path
+        description: An integer Risk ID or string risk identifier (e.g., "RISK-001")
+        schema:
+          oneOf:
+          - type: number
+            description: Risk ID
+            example: 123
+          - type: string
+            description: Risk identifier
+            example: RISK-001
+      - name: documentId
+        required: true
+        in: path
+        description: The Document ID
+        schema:
+          example: 123
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Risk Document
+      tags:
+      - Risk Documents
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-documents-delete
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    RiskDocumentsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    RiskDocumentsUploadResponsePublicV2Dto:
+      type: object
+      properties:
+        documents:
+          description: List of uploaded Risk Documents
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
+      required:
+      - documents
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    DocumentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Document ID
+        name:
+          type: string
+          example: Risk Assessment Document.pdf
+          description: The name of the Document file
+        downloadUrl:
+          type:
+          - string
+          - 'null'
+          example: http://localhost:5000/download/risk/1/document
+          description: The secure URL to download the Document
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Document created date timestamp
+      required:
+      - id
+      - name
+      - downloadUrl
+      - createdAt
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

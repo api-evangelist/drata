@@ -1,32 +1,1787 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Drata Public API v2 Assets Frameworks API
-  version: 2.0.0
-  description: Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.
-  contact:
-    name: API Evangelist
-    email: kin@apievangelist.com
-    url: https://developers.drata.com/openapi/reference/v2/overview/
+  title: Drata Frameworks API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Frameworks across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
-  description: Drata Public API v2
-security:
-- bearerAuth: []
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Frameworks
+  description: Frameworks are collections of controls that are used to assess compliance with specific standards or regulations. The [help docs](https://help.drata.com/en/articles/5329593-frameworks) have more information.
 paths:
-  /frameworks:
+  /workspaces/{workspaceId}/frameworks:
     get:
-      tags:
-      - Frameworks
-      summary: List frameworks (SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR, etc.)
-      operationId: listFrameworks
+      description: 'Find Frameworks matching the provided filters.
+
+
+        🔒 Requires **Frameworks: List Frameworks** permission.'
+      operationId: FrameworksPublicV2Controller_getFrameworks
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: name
+        required: false
+        in: query
+        description: Filter Frameworks by name (partial match)
+        schema:
+          example: SOC 2
+          type: string
+      - name: excludeIds
+        required: false
+        in: query
+        description: Array of Framework IDs to exclude from results
+        schema:
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      - name: isReady
+        required: false
+        in: query
+        description: Filter Frameworks by ready state
+        schema:
+          example: true
+          type: boolean
+      - name: isEnabled
+        required: false
+        in: query
+        description: Filter Frameworks by enabled state
+        schema:
+          example: true
+          type: boolean
       responses:
         '200':
-          description: A page of frameworks
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworksResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Frameworks
+      tags:
+      - Frameworks
+      x-drata-permissions:
+      - workspaces-get-frameworks
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    post:
+      description: 'Create a new custom compliance Framework.
+
+
+        🔒 Requires **workspaces-post-framework** permission.
+
+
+        💎 Requires your account have the **Custom Frameworks** feature. Contact your CSM for help upgrading.'
+      operationId: FrameworksPublicV2Controller_createFramework
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrameworkCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: The required account entitlement is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Custom Framework
+      tags:
+      - Frameworks
+      x-drata-entitlement:
+      - CUSTOM_FRAMEWORKS
+      x-drata-permissions:
+      - workspaces-post-framework
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/framework-requirements:
+    get:
+      description: 'Use `GET /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements` instead.
+
+
+        Find Framework Requirements matching the provided filters. Use `expand[]=controls` to include a limited subcollection of controls for each requirement. Use `expand[]=customFields` to include custom field values for each requirement.
+
+
+        🔒 Requires **Frameworks: List Framework Requirements** permission.'
+      operationId: FrameworksPublicV2Controller_getFrameworkRequirementsLegacy
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkRequirementsExpandEnum'
+      - name: isReady
+        required: false
+        in: query
+        description: Filter Requirements that are or are not ready
+        schema:
+          example: false
+          type: boolean
+      - name: isInScope
+        required: false
+        in: query
+        description: Filter Requirements that are or are not in scope (not archived)
+        schema:
+          example: true
+          type: boolean
+      - name: frameworkTag
+        required: false
+        in: query
+        description: Filter data by Requirements associated with these framework tags
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkTagEnum'
+      - name: excludeIds
+        required: false
+        in: query
+        description: Exclude Requirements by array of IDs
+        schema:
+          example: []
+          type: array
+          items:
+            type: number
+      - name: frameworkSlug
+        required: false
+        in: query
+        description: Filter data by Requirements associated with these framework slugs. This parameter is intended to be used only for custom frameworks
+        schema:
+          example: slug
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkRequirementsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Framework Requirements
+      tags:
+      - Frameworks
+      x-drata-permissions:
+      - get-frameworks-requirements
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/framework-requirements/{frameworkRequirementId}:
+    put:
+      description: 'Use `PUT /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}` instead. The replacement endpoint supports both Custom Field and structural-field updates.
+
+
+        🔒 Requires **Frameworks: Update Framework Requirement** permission.
+
+
+        💎 Requires your account have the **Custom Fields and Formulas** feature. Contact your CSM for help upgrading.'
+      operationId: FrameworksPublicV2Controller_updateFrameworkRequirementLegacy
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: frameworkRequirementId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrameworkRequirementModifyRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkRequirementResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: The required account entitlement is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Framework Requirement
+      tags:
+      - Frameworks
+      x-drata-entitlement:
+      - CUSTOM_FIELDS_AND_FORMULAS
+      x-drata-permissions:
+      - framework-requirement-put
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements:
+    get:
+      description: 'List Requirements scoped to the specified Framework.
+
+
+        🔒 Requires **Frameworks: List Framework Requirements** permission.'
+      operationId: FrameworksPublicV2Controller_listFrameworkRequirements
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: frameworkId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand. `controls` includes a limited subcollection of Controls mapped to each Requirement. `customFields` includes Custom Field values for each Requirement. `framework` includes a compact Framework object on each Requirement.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkRequirementsExpandEnum'
+      - name: isReady
+        required: false
+        in: query
+        description: Filter Requirements that are or are not ready
+        schema:
+          example: false
+          type: boolean
+      - name: isInScope
+        required: false
+        in: query
+        description: Filter Requirements that are or are not in scope (not archived)
+        schema:
+          example: true
+          type: boolean
+      - name: excludeIds
+        required: false
+        in: query
+        description: Exclude Requirements by array of IDs
+        schema:
+          example: []
+          type: array
+          items:
+            type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkRequirementsListResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Framework Requirements
+      tags:
+      - Frameworks
+      x-drata-permissions:
+      - get-frameworks-requirements
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    post:
+      description: 'Create or update one or more Requirements on a custom Framework. Duplicate codes within a batch and unknown Control IDs cause the entire request to fail.
+
+
+        🔒 Requires **workspaces-post-framework-requirements** permission.
+
+
+        💎 Requires your account have the **Custom Frameworks** feature. Contact your CSM for help upgrading.'
+      operationId: FrameworksPublicV2Controller_createFrameworkRequirements
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: frameworkId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateFrameworkRequirementsRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkRequirementsBulkResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: The required account entitlement is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Framework Requirements
+      tags:
+      - Frameworks
+      x-drata-entitlement:
+      - CUSTOM_FRAMEWORKS
+      x-drata-permissions:
+      - workspaces-post-framework-requirements
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}/controls:
+    get:
+      description: 'Retrieve a cursor-paginated list of all Controls mapped to the specified Framework Requirement. This is the full, paginated companion to the capped `expand[]=controls` subcollection returned by the Requirements list endpoints. Note: results are ordered by Control ID, which differs from the `expand[]=controls` preview ordering (isReady, then controlNumber).
+
+
+        🔒 Requires **Frameworks: List Framework Requirements** permission.'
+      operationId: FrameworksPublicV2Controller_listFrameworkRequirementControls
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: frameworkId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: requirementId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkRequirementControlsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Controls for a Framework Requirement
+      tags:
+      - Frameworks
+      x-drata-permissions:
+      - get-frameworks-requirements
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}:
+    put:
+      description: 'Update a custom Framework Requirement, including core fields, control mappings, and Custom Field values.
+
+
+        🔒 Requires **Frameworks: Update Framework Requirement** permission.'
+      operationId: FrameworksPublicV2Controller_updateFrameworkRequirement
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: frameworkId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: requirementId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrameworkRequirementUpdateRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkRequirementPublicV2Dto'
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: The required account entitlement is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Framework Requirement
+      tags:
+      - Frameworks
+      x-drata-permissions:
+      - framework-requirement-put
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/frameworks/{frameworkId}:
+    put:
+      description: 'Update an existing custom compliance Framework.
+
+
+        🔒 Requires **workspaces-put-framework** permission.
+
+
+        💎 Requires your account have the **Custom Frameworks** feature. Contact your CSM for help upgrading.'
+      operationId: FrameworksPublicV2Controller_updateFramework
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: frameworkId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FrameworkUpdateRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FrameworkResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: The required account entitlement is not enabled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Custom Framework
+      tags:
+      - Frameworks
+      x-drata-entitlement:
+      - CUSTOM_FRAMEWORKS
+      x-drata-permissions:
+      - workspaces-put-framework
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
 components:
+  schemas:
+    FrameworkRequirementsBulkResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Framework Requirements
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkRequirementPublicV2Dto'
+      required:
+      - data
+    FrameworkCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: My Custom Framework 2024
+          description: Framework display name
+        shortName:
+          type: string
+          maxLength: 16
+          example: MCF-24
+          description: Short label used as a pill/badge in the UI
+        description:
+          type: string
+          maxLength: 30000
+          example: A custom compliance framework for internal security controls.
+          description: Framework description
+      required:
+      - name
+      - shortName
+      - description
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    FrameworkRequirementsListResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkRequirementPublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    FrameworkRequirementModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        customFields:
+          description: "Custom Fields for the Requirement. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+    ControlForRequirementCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: DCF-1001
+          description: Control code
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the Control is ready for compliance assessment. A Control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all Control components.
+        controlNumber:
+          type: number
+          example: 1
+          description: Control number used for ordering
+        archivedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the control was marked out of scope
+      required:
+      - id
+      - code
+      - isReady
+      - controlNumber
+      - archivedAt
+    ControlsForRequirementSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of Controls mapped to this Requirement. Limited to a maximum of 10 items. Ordered by isReady, then by controlNumber.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlForRequirementCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 47
+          description: Total count of all Controls mapped to this Requirement.
+      required:
+      - data
+      - totalCount
+    FrameworkRequirementsExpandEnum:
+      type: string
+      enum:
+      - controls
+      - customFields
+      - framework
+    FrameworksResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CreateFrameworkRequirementRequestPublicV2Dto:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 191
+          example: A.5.1.1
+          description: Unique code for this Requirement within the Framework
+        name:
+          type: string
+          maxLength: 30000
+          example: Policies for information security
+          description: Human-readable name for this Requirement
+        description:
+          type: string
+          maxLength: 30000
+          example: A set of policies for information security shall be defined, approved, published...
+          description: Detailed description of the Requirement
+        category:
+          type: string
+          maxLength: 191
+          example: General Rules
+          description: Category label for grouping Requirements within the Framework
+        additionalInfo:
+          type: string
+          maxLength: 30000
+          example: Refer to ISO 27001:2022 Annex A.
+          description: Additional information for this Requirement
+        controlIds:
+          example:
+          - 42
+          - 57
+          description: Control IDs to map to this Requirement. All IDs must exist within the workspace. Unknown IDs cause the request to fail.
+          type: array
+          items:
+            type: number
+      required:
+      - code
+      - name
+    FrameworkRequirementsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkRequirementResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    FrameworkRequirementResponsePublicV2Dto:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Requirement was created
+        description:
+          type: string
+          example: The entity demonstrates a commitment to integrity and ethical values.
+          description: Requirement description
+        frameworkName:
+          type: string
+          example: SOC 2
+          description: The framework name this Requirement is associated with
+        frameworkPill:
+          type: string
+          example: SOC 2
+          description: A pill representing the framework
+        frameworkSlug:
+          type: string
+          example: SOC 2
+          description: The framework slug this Requirement is associated with
+        frameworkTag:
+          type: string
+          example: SOC_2
+          description: The framework tag this Requirement is associated with
+        id:
+          type: number
+          example: 58
+          description: Requirement ID
+        name:
+          type: string
+          example: PI1.2
+          description: Requirement name
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Requirement was updated
+        additionalInfo:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to integrity.
+          description: Additional information surrounding the Requirement
+        additionalInfo2:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to ethical values.
+          description: Second additional information surrounding the Requirement
+        additionalInfo3:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to enforcing policies.
+          description: Third additional information surrounding the Requirement
+        archivedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Requirement was marked out of scope
+        externalId:
+          type:
+          - string
+          - 'null'
+          example: SOC 2
+          description: An external ID associated with this Requirement
+        longDescription:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to integrity and ethical values.
+          description: 'A long description of the Requirement '
+        rationale:
+          type:
+          - string
+          - 'null'
+          example: This requirement is not needed.
+          description: Requirement rationale for out of scope.
+        category:
+          type:
+          - string
+          - 'null'
+          example: General Rules
+          description: Category label for grouping Requirements within a custom Framework
+        controls:
+          description: Controls mapped to this Requirement. Only included when `expand[]=controls` is passed.
+          allOf:
+          - $ref: '#/components/schemas/ControlsForRequirementSubcollectionResponsePublicV2Dto'
+        customFields:
+          description: "Custom Fields for this Requirement. Only included when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+      required:
+      - createdAt
+      - description
+      - frameworkName
+      - frameworkPill
+      - frameworkSlug
+      - frameworkTag
+      - id
+      - name
+      - updatedAt
+      - additionalInfo
+      - additionalInfo2
+      - additionalInfo3
+      - archivedAt
+      - externalId
+      - longDescription
+      - rationale
+      - category
+    CreateFrameworkRequirementsRequestPublicV2Dto:
+      type: object
+      properties:
+        data:
+          minItems: 1
+          description: One or more Requirements to create on the Framework. Duplicate codes within a batch and unknown Control IDs cause the entire request to fail.
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateFrameworkRequirementRequestPublicV2Dto'
+      required:
+      - data
+    FrameworkRequirementUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 191
+          example: A.5.1.1
+          description: Unique code for this Requirement within the Framework
+        name:
+          type: string
+          maxLength: 30000
+          example: Policies for information security
+          description: Human-readable name for this Requirement
+        description:
+          type: string
+          maxLength: 30000
+          example: A set of policies for information security shall be defined, approved, published...
+          description: Detailed description of the Requirement
+        category:
+          type: string
+          maxLength: 191
+          example: General Rules
+          description: Category label for grouping Requirements within the Framework
+        additionalInfo:
+          type: string
+          maxLength: 30000
+          example: Refer to ISO 27001:2022 Annex A.
+          description: Additional information for this Requirement
+        controlIds:
+          example:
+          - 42
+          - 57
+          description: Control IDs to map to this Requirement. Providing an empty array clears all mappings. Omitting the field leaves existing mappings unchanged. All IDs must exist within the workspace.
+          type: array
+          items:
+            type: number
+        customFields:
+          description: "Custom Fields for the Requirement. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+    FrameworkResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: Framework ID
+        name:
+          type: string
+          example: SOC 2
+          description: Framework name
+        description:
+          type: string
+          example: Report on controls at a Service Organization
+          description: Framework description
+        slug:
+          type: string
+          example: soc-2
+          description: Framework slug used to identify the Framework. Maps to the Framework's Short Name in the UI (stored as a lowercase URL-friendly variant).
+        tag:
+          type: string
+          example: SOC_2
+          description: Framework tag
+        pill:
+          type: string
+          example: SOC 2
+          description: Framework pill label
+        numInScopeControls:
+          type: number
+          example: 42
+          description: Number of in-scope controls
+        numInScopeRequirements:
+          type: number
+          example: 42
+          description: Number of in-scope Requirements
+        numReadyInScopeRequirements:
+          type: number
+          example: 35
+          description: Number of ready in-scope Requirements
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the Framework is ready for compliance assessment
+        isEnabled:
+          type: boolean
+          example: true
+          description: Indicates if the Framework is enabled
+        color:
+          type: string
+          example: '#174880'
+          description: Framework color
+        bgColor:
+          type: string
+          example: '#E8F4FF'
+          description: Framework background color
+        activeLogo:
+          type:
+          - string
+          - 'null'
+          example: https://cdn.acme.com/frameworks/soc2-active.svg
+          description: URL of the active logo
+        inactiveLogo:
+          type:
+          - string
+          - 'null'
+          example: https://cdn.acme.com/frameworks/soc2-inactive.svg
+          description: URL of the inactive logo
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework last updated date timestamp
+      required:
+      - id
+      - name
+      - description
+      - slug
+      - tag
+      - pill
+      - numInScopeControls
+      - numInScopeRequirements
+      - numReadyInScopeRequirements
+      - isReady
+      - isEnabled
+      - color
+      - bgColor
+      - activeLogo
+      - inactiveLogo
+      - createdAt
+      - updatedAt
+    FrameworkRequirementControlsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlForRequirementCompactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    CustomFieldResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
+      required:
+      - customFieldId
+      - name
+    FrameworkRequirementPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 58
+          description: Framework Requirement ID
+        code:
+          type: string
+          example: A.5.1.1
+          description: Unique code for this Requirement within the Framework
+        name:
+          type: string
+          example: Policies for information security
+          description: Human-readable name for this Requirement
+        description:
+          type:
+          - string
+          - 'null'
+          example: A set of policies for information security shall be defined, approved, published...
+          description: Detailed description of the Requirement
+        category:
+          type:
+          - string
+          - 'null'
+          example: General Rules
+          description: Category label for grouping Requirements within the Framework
+        additionalInfo:
+          type:
+          - string
+          - 'null'
+          example: Refer to ISO 27001:2022 Annex A.
+          description: Additional information for this Requirement
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Requirement was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Requirement was last updated
+        framework:
+          description: Framwork this Requirement belongs to. Only included when `expand[]=framework` is passed.
+          allOf:
+          - $ref: '#/components/schemas/FrameworkDetailsResponsePublicV2Dto'
+        controls:
+          description: Array of Controls mapped to this Requirement. Limited to a maximum of 10 items, ordered by isReady then controlNumber. Only included when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlForRequirementCompactResponsePublicV2Dto'
+        customFields:
+          description: "Custom Field values for this Requirement. Only included when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+      required:
+      - id
+      - code
+      - name
+      - description
+      - category
+      - additionalInfo
+      - createdAt
+      - updatedAt
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    FrameworkDetailsResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 13
+          description: Framework ID
+        name:
+          type: string
+          example: NIST AI RMF
+          description: Framework name
+        description:
+          type: string
+          example: The NIST AI Risk Management Framework (AI RMF) is a set of suggestions and guidelines for incorporating trustworthiness considerations in the design, development, deployment, and use of AI systems.
+          description: Framework description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework updated date timestamp
+        enabledAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the framework was enabled
+        shortName:
+          type: string
+          example: SOC 2
+          description: Framework short name used to identify the Framework. Maps to the Framework's pill (the user-supplied Short Name).
+        tag:
+          type: string
+          example: SOC_2
+          description: Framework tag
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Framework was soft-deleted; null if not deleted
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - enabledAt
+      - shortName
+      - tag
+      - deletedAt
+    FrameworkUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: My Updated Framework 2024
+          description: The title of the Framework
+        shortName:
+          type: string
+          maxLength: 16
+          example: MUF-24
+          description: Short label used as a pill/badge in the UI
+        description:
+          type: string
+          maxLength: 30000
+          example: Updated description for the framework.
+          description: Framework description
   securitySchemes:
-    bearerAuth:
-      type: http
+    bearer:
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

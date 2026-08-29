@@ -1,0 +1,571 @@
+openapi: 3.2.0
+info:
+  title: Drata Audit Requests API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Audit Requests across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Audit Requests
+paths:
+  /workspaces/{workspaceId}/audits/{auditId}/requests:
+    get:
+      operationId: AuditRequestsPublicV2Controller_listAuditRequests
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: status[]
+        required: false
+        in: query
+        description: Filter by audit request status
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomerRequestStatus'
+      - name: userIds[]
+        required: false
+        in: query
+        description: Filter by IDs of users assigned as owners of the audit request
+        schema:
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRequestListExpandEnum'
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: auditId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRequestsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Audit Requests
+      tags:
+      - Audit Requests
+      x-drata-permissions:
+      - customer-request-get-requests
+      x-product-area:
+      - AUDIT_HUB
+      description: '🔒 Requires **Customer Request: Get Customer Request** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/audits/{auditId}/requests/{requestId}:
+    get:
+      operationId: AuditRequestsPublicV2Controller_getAuditRequest
+      parameters:
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRequestExpandEnum'
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: auditId
+        required: true
+        in: path
+        schema:
+          type: string
+      - name: requestId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditRequestGetResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Audit Request
+      tags:
+      - Audit Requests
+      x-drata-permissions:
+      - customer-request-get-requests
+      x-product-area:
+      - AUDIT_HUB
+      description: '🔒 Requires **Customer Request: Get Customer Request** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    CustomerRequestStatus:
+      type: string
+      enum:
+      - OUTSTANDING
+      - IN_REVIEW
+      - ACCEPTED
+      - CHANGES_REQUESTED
+    AuditRequestMessageCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier of the Audit Request Message
+        message:
+          type: string
+          example: Please provide the latest SOC 2 report.
+          description: Message content
+        sentByEmail:
+          type:
+          - string
+          - 'null'
+          format: email
+          example: jane.smith@company.com
+          description: Email of the User who sent the Message, or null for system-generated messages
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the message was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the message was last updated
+      required:
+      - id
+      - message
+      - sentByEmail
+      - createdAt
+      - updatedAt
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    AuditRequestListExpandEnum:
+      type: string
+      enum:
+      - owners
+      - messages
+    AuditRequestsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRequestItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    AuditRequestExpandEnum:
+      type: string
+      enum:
+      - owners
+      - messages
+      - controls
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    AuditControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: DCF-1001
+          description: Control code
+        name:
+          type: string
+          example: Vulnerability Management
+          description: Control name
+        controlNumber:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: Control number used for ordering
+      required:
+      - id
+      - code
+      - name
+      - controlNumber
+    AuditRequestItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier of the Audit Request
+        code:
+          type: string
+          example: REQ-001
+          description: Short identifier code for the Audit Request
+        title:
+          type: string
+          example: Provide SOC 2 report
+          description: Title of the Audit Request
+        description:
+          type:
+          - string
+          - 'null'
+          example: Please provide the latest SOC 2 Type II report.
+          description: Detailed description of the Audit Request
+        status:
+          example: OUTSTANDING
+          description: Current status of the Audit Request
+          allOf:
+          - $ref: '#/components/schemas/CustomerRequestStatusEnum'
+        auditId:
+          type: string
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: ID of the Audit this Request belongs to
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit Request was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit Request was last updated
+        owners:
+          description: Owners of the Request, only returned when `expand[]=owners` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        messages:
+          description: Messages on the Request, only returned when `expand[]=messages` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRequestMessageCompactResponsePublicV2Dto'
+      required:
+      - id
+      - code
+      - title
+      - description
+      - status
+      - auditId
+      - createdAt
+      - updatedAt
+    CustomerRequestStatusEnum:
+      type: string
+      enum:
+      - OUTSTANDING
+      - IN_REVIEW
+      - ACCEPTED
+      - CHANGES_REQUESTED
+    AuditRequestGetResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier of the Audit Request
+        code:
+          type: string
+          example: REQ-001
+          description: Short identifier code for the Audit Request
+        title:
+          type: string
+          example: Provide SOC 2 report
+          description: Title of the Audit Request
+        description:
+          type:
+          - string
+          - 'null'
+          example: Please provide the latest SOC 2 Type II report.
+          description: Detailed description of the Audit Request
+        status:
+          example: OUTSTANDING
+          description: Current status of the Audit Request
+          allOf:
+          - $ref: '#/components/schemas/CustomerRequestStatusEnum'
+        auditId:
+          type: string
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: ID of the Audit this Request belongs to
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit Request was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit Request was last updated
+        owners:
+          description: Owners of the Request, only returned when `expand[]=owners` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        messages:
+          description: Messages on the Request, only returned when `expand[]=messages` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRequestMessageCompactResponsePublicV2Dto'
+        controls:
+          description: Controls associated with this Request, only returned when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditControlCompactResponsePublicV2Dto'
+      required:
+      - id
+      - code
+      - title
+      - description
+      - status
+      - auditId
+      - createdAt
+      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

@@ -1,32 +1,2503 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Drata Public API v2 Assets Policies API
-  version: 2.0.0
-  description: Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.
-  contact:
-    name: API Evangelist
-    email: kin@apievangelist.com
-    url: https://developers.drata.com/openapi/reference/v2/overview/
+  title: Drata Policies API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Policies across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
-  description: Drata Public API v2
-security:
-- bearerAuth: []
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Policies
+  description: A policy is a document that outlines an organization’s commitment to following standards relevant to its operations. The [help docs](https://help.drata.com/en/articles/9202419-policy-center-overview) have more information.
 paths:
   /policies:
     get:
-      tags:
-      - Policies
-      summary: List policies
-      operationId: listPolicies
+      description: 'List published Policies matching the provided filters.
+
+
+        🔒 Requires **Policies: List Policies** permission.'
+      operationId: PoliciesPublicV2Controller_listPolicies
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyListExpandEnum'
+      - name: name
+        required: false
+        in: query
+        description: Filter Policies by name (partial match)
+        schema:
+          maxLength: 191
+          example: Data Protection Policy
+          type: string
+      - name: statuses[]
+        required: false
+        in: query
+        description: Filter Policies by one or more statuses
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyStatusEnum'
+      - name: reviewerUserId
+        required: false
+        in: query
+        description: 'Filter Policies by a reviewer. A Drata integer ID, an email address of the form ''email:value'', or ''me'' to reference the authenticated user.
+
+          Note: ''me'' is only available when authenticating with OAuth 2.1 Authorization Code grant, not with Public API Keys.'
+        schema:
+          example: me
+          type: string
+      - name: reviewerStatus[]
+        required: false
+        in: query
+        description: Filter Policies by the reviewer's review status on an active approval. Typically used with reviewerUserId.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewStatusEnum'
       responses:
         '200':
-          description: A page of policies
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PoliciesResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Policies
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-get-policies
+      x-product-area:
+      - POLICY_CENTER
+    post:
+      description: 'Create a new Policy with an initial draft version. Supports file upload (UPLOADED) or an existing external file reference (EXTERNAL).
+
+
+        🔒 Requires **Policies: Create Policy** permission.'
+      operationId: PoliciesPublicV2Controller_createPolicy
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyRequestPublicV2Dto'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreatePolicyResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Policy
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-post
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policies/{policyId}/policy-versions:
+    get:
+      description: 'List Policy Versions for a specific Policy matching the provided filters. Language variants are not expandable here — `languages` is a one-to-many that would multiply rows inside a paginated result set. Use `GET /policy-language-versions?policyId=` for language variants across a whole Policy, or expand `languages` on the single Policy Version endpoint.
+
+
+        🔒 Requires **Policies: List Policies** permission.'
+      operationId: PoliciesPublicV2Controller_listPolicyVersions
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand. Note `languages` is not expandable here — it is a one-to-many that would multiply rows inside a paginated result set. Use `GET /policy-language-versions?policyVersionId=` for language variants, or expand `languages` on the single Policy Version endpoint.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersionListExpandEnum'
+      - name: version
+        required: false
+        in: query
+        description: Filter Policy Versions by version number
+        schema:
+          example: 1
+          type: number
+      - name: current
+        required: false
+        in: query
+        description: Filter to only current Policy Versions
+        schema:
+          type: boolean
+      - name: statuses[]
+        required: false
+        in: query
+        description: Filter Policy Versions by status
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersionStatusEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyVersionsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Policy Versions
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-get-policies
+      x-product-area:
+      - POLICY_CENTER
+    post:
+      description: 'Create a new version of an existing Policy. Supports file upload (UPLOADED) or an existing external file reference (EXTERNAL). A non-material change that does not require approval is published immediately; otherwise the version is created for approval. A material change always requires approval. The Policy must already have a current published version to base the new version on; if it does not (for example its only version is still a draft or awaiting approval), the request returns 404.
+
+
+        🔒 Requires **Policies: Create Policy Version** permission.'
+      operationId: PoliciesPublicV2Controller_createPolicyVersion
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyVersionRequestPublicV2Dto'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreatePolicyVersionRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyVersionResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Policy Version
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-post-policy-version
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policies/{policyId}:
+    get:
+      description: 'Get a specific published Policy.
+
+
+        🔒 Requires **Policies: List Policies** permission.'
+      operationId: PoliciesPublicV2Controller_getPolicy
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Policy
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-get-policies
+      x-product-area:
+      - POLICY_CENTER
+    put:
+      operationId: PoliciesPublicV2Controller_modifyPolicy
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyModifyRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyResponsePublicV2Dto'
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Modify Policy
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-put
+      x-product-area:
+      - POLICY_CENTER
+      description: '🔒 Requires **Policies: Modify Policy** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policies/{policyId}/owner:
+    put:
+      operationId: PoliciesPublicV2Controller_assignPolicyOwner
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyOwnerModifyRequestPublicV2Dto'
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Assign Policy Owner
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-put-owner
+      x-product-area:
+      - POLICY_CENTER
+      description: '🔒 Requires **Policies: Assign Policy Owner** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policies/{policyId}/approval-configuration:
+    get:
+      operationId: PoliciesPublicV2Controller_getApprovalConfiguration
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyApprovalConfigurationResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Policy Approval Configuration
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-get-approval-configuration
+      x-product-area:
+      - POLICY_CENTER
+      description: '🔒 Requires **Policies: Get Policy Approval Configuration** permission.'
+    post:
+      description: 'Appends a new review group configuration (tier) to the end of the approval sequence. Other tiers are not affected. Maximum of 6 tiers per policy.
+
+
+        🔒 Requires **Policies: Add Policy Review Group Configuration** permission.'
+      operationId: PoliciesPublicV2Controller_addPolicyApprovalConfiguration
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewGroupRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewGroupResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Add Review Group Configuration
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-post-review-group-configuration
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policies/{policyId}/approval-configuration/{approvalConfigurationTier}:
+    put:
+      description: 'Updates a single review group configuration by its tier position (1-based). Other tiers are not affected. Returns 404 if the tier does not exist.
+
+
+        🔒 Requires **Policies: Update Policy Review Group Configuration** permission.'
+      operationId: PoliciesPublicV2Controller_updatePolicyApprovalConfiguration
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: approvalConfigurationTier
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewGroupRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReviewGroupResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Review Group Configuration
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-put-review-group-configuration
+      x-product-area:
+      - POLICY_CENTER
+    delete:
+      description: 'Removes a single review group configuration (tier) by its tier position (1-based). Remaining tiers are renumbered to remain contiguous. Returns 404 if the tier does not exist; returns 400 if removing it would leave zero tiers.
+
+
+        🔒 Requires **Policies: Remove Policy Review Group Configuration** permission.'
+      operationId: PoliciesPublicV2Controller_removePolicyApprovalConfiguration
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: approvalConfigurationTier
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Remove Review Group Configuration
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-delete-review-group-configuration
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policies/{policyId}/actions:
+    get:
+      description: 'List available actions the authenticated user can perform on this Policy based on its current state.
+
+
+        🔒 Requires **Policies: Submit Policy for Approval, Policies: Override Approve Policy, Policies: Publish Policy, Policies: Discard Policy, Policies: Reset Policy to Template** permission.'
+      operationId: PoliciesPublicV2Controller_listPolicyActions
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyActionsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Policy Actions
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-submit-for-approval
+      - policies-override-approve
+      - policies-publish
+      - policies-discard
+      - policies-reset-to-template
+      x-product-area:
+      - POLICY_CENTER
+    post:
+      description: 'Execute an action on a Policy (e.g., submit for approval, approve, request changes, publish, discard).
+
+
+        🔒 Requires **Policies: Submit Policy for Approval, Policies: Override Approve Policy, Policies: Publish Policy, Policies: Discard Policy, Policies: Reset Policy to Template** permission.'
+      operationId: PoliciesPublicV2Controller_performPolicyAction
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PolicyActionRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyActionResultResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Perform Policy Action
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-submit-for-approval
+      - policies-override-approve
+      - policies-publish
+      - policies-discard
+      - policies-reset-to-template
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /policies/{policyId}/policy-versions/{policyVersionId}:
+    get:
+      description: 'Get a specific Policy Version. Returns policy version details (default) or policy version HTML content based on Accept header.
+
+
+        🔒 Requires **Policies: List Policies** permission.'
+      operationId: PoliciesPublicV2Controller_getPolicyVersion
+      parameters:
+      - name: policyId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: policyVersionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersionExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PolicyVersionResponsePublicV2Dto'
+            text/html:
+              schema:
+                $ref: '#/components/schemas/PolicyVersionHtmlResponsePublicV2Dto'
+      security:
+      - bearer: []
+      summary: Get Policy Version
+      tags:
+      - Policies
+      x-drata-permissions:
+      - policies-get-policies
+      x-product-area:
+      - POLICY_CENTER
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
 components:
+  schemas:
+    PolicyVersionExpandEnum:
+      type: string
+      enum:
+      - owner
+      - weekTimeFrameSlas
+      - p3MatrixSlas
+      - gracePeriodSlas
+      - downloadUrl
+      - downloadPdfUrl
+      - languages
+    CreatePolicyResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 99
+          description: Policy ID
+        name:
+          type: string
+          example: Data Backup Policy
+          description: Policy name
+        description:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Policy description
+        ownerId:
+          type: number
+          example: 42
+          description: User ID of the policy owner
+        status:
+          type: string
+          example: ACTIVE
+          description: Top-level policy status
+        requiresAcknowledgement:
+          type: boolean
+          example: true
+          description: Whether this policy requires user acknowledgement
+        assignedTo:
+          type:
+          - string
+          - 'null'
+          example: ALL
+          description: Assignment mode for acknowledgement
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Policy renewal date
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy creation timestamp
+        latestVersion:
+          description: Initial draft version metadata
+          allOf:
+          - $ref: '#/components/schemas/PolicyVersionSummaryResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - ownerId
+      - status
+      - requiresAcknowledgement
+      - assignedTo
+      - renewalDate
+      - createdAt
+      - latestVersion
+    ControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: AC-1
+          description: Control code
+        name:
+          type: string
+          example: Access Control
+          description: Control name
+        description:
+          type:
+          - string
+          - 'null'
+          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
+          description: Control description
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was last updated
+      required:
+      - id
+      - code
+      - name
+      - description
+      - createdAt
+      - updatedAt
+    RenewalScheduleEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+    PolicyWeekTimeFrameSlaCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Week Time Frame SLA ID
+        timeFrame:
+          type: string
+          example: '1'
+          description: Policy Week Time Frame SLA time frame
+        label:
+          type: string
+          example: Weekly Review
+          description: Policy Week Time Frame SLA label
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
+      required:
+      - id
+      - timeFrame
+      - label
+      - createdAt
+      - updatedAt
+    CreatePolicyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Data Backup Policy
+          description: Human-readable policy title shown in Drata
+        ownerId:
+          type: number
+          example: 42
+          description: User ID assigned as the owner of this policy
+        sourceType:
+          example: UPLOADED
+          description: Determines how policy content is sourced. UPLOADED requires a file attachment; EXTERNAL requires externalFileId.
+          allOf:
+          - $ref: '#/components/schemas/CreatePolicySourceTypeEnum'
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Date when the policy is next due for review/renewal. Must be today or a future date.
+        description:
+          type: string
+          maxLength: 30000
+          example: Defines procedures for data backup and recovery.
+          description: Short description of the policy purpose
+        disclaimer:
+          type: string
+          maxLength: 1000
+          example: This policy is subject to change.
+          description: Legal disclaimer text shown with the Policy
+        externalFileId:
+          type: number
+          example: 2055
+          description: ID of an existing external file record in Drata. Required when sourceType is EXTERNAL. Must belong to the caller's tenant.
+        fileName:
+          type: string
+          maxLength: 191
+          example: data-backup-policy.pdf
+          description: Friendly file name for display in the UI
+        file:
+          type: string
+          format: binary
+          description: 'Policy file. Required when `sourceType` is `UPLOADED`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
+        requiresAcknowledgement:
+          type: boolean
+          example: false
+          description: Whether this policy requires user acknowledgement once published
+        assignedTo:
+          example: ALL
+          description: Assignment mode for policy acknowledgement
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        groupIds:
+          minItems: 1
+          example:
+          - 1
+          - 2
+          - 3
+          description: IDs of groups who must acknowledge the policy. Required when assignedTo is GROUP.
+          type: array
+          items:
+            type: number
+      required:
+      - name
+      - ownerId
+      - sourceType
+      - renewalDate
+      - description
+    CreatePolicySourceTypeEnum:
+      type: string
+      enum:
+      - UPLOADED
+      - EXTERNAL
+    PolicyGracePeriodSlaCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Grace Period SLA ID
+        label:
+          type: string
+          example: Grace Period Review
+          description: Policy Grace Period SLA label
+        gracePeriod:
+          type: string
+          example: '1'
+          description: Policy Grace Period SLA time frame
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
+      required:
+      - id
+      - label
+      - gracePeriod
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PolicyActionResultResponsePublicV2Dto:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+          description: Whether the action was successful
+        newStatus:
+          type: string
+          example: NEEDS_APPROVAL
+          description: The new status of the Policy Version after the action
+        message:
+          type: string
+          example: Policy submitted for approval
+          description: A human-readable message about the result
+      required:
+      - success
+      - message
+    PolicyModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: My Custom Policy
+          description: Policy name. Only updatable for custom policies. Drata template policies return 400.
+        description:
+          type: string
+          maxLength: 30000
+          example: This policy covers data backup procedures.
+          description: Policy description.
+        disclaimer:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+          example: This policy is subject to change.
+          description: Legal disclaimer text. Pass null to clear.
+        renewalDate:
+          type: string
+          example: '2020-07-06'
+          description: Policy renewal date. Mutually exclusive with `renewalSchedule`.
+        renewalSchedule:
+          example: ONE_YEAR
+          description: Renewal schedule type. Auto-computes `renewalDate` as today + N months. Mutually exclusive with `renewalDate`.
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleEnum'
+        assignedTo:
+          example: GROUP
+          description: Personnel assignment scope.
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        groupIds:
+          uniqueItems: true
+          minItems: 1
+          example:
+          - 1
+          - 2
+          - 3
+          description: Fully replaces existing group assignments. Required when assignedTo=GROUP. Must not be set when `assignedTo` is not GROUP. Must contain at least one valid group ID.
+          type: array
+          items:
+            type: number
+        notifyGroups:
+          type: boolean
+          example: true
+          description: Notify group members of this Policy. Only valid when assignedTo=GROUP, defaults to false if not provided.
+        controlIds:
+          example:
+          - 10
+          - 20
+          - 30
+          description: Fully replaces existing control assignments. Pass an empty array to remove all.
+          type: array
+          items:
+            type: number
+    ConsensusRulePublicV2:
+      type: string
+      enum:
+      - ALL
+      - ONE_OF
+    PolicyActionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Available actions for the current policy state
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyActionItemResponsePublicV2Dto'
+      required:
+      - data
+    PolicyApprovalAction:
+      type: string
+      enum:
+      - SubmitForApproval
+      - Approve
+      - RequestChanges
+      - OverrideApprove
+      - Publish
+      - Discard
+      - ResetToTemplate
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    PolicyResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy ID
+        name:
+          type: string
+          example: Acceptable Use Policy
+          description: The Policy name
+        description:
+          type:
+          - string
+          - 'null'
+          example: This policy covers acceptable use of company resources.
+          description: The Policy description
+        disclaimer:
+          type:
+          - string
+          - 'null'
+          example: This policy is subject to change.
+          description: Legal disclaimer text for the Policy
+        scope:
+          example: ALL
+          description: The scope of Users the Policy is assigned to
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        notifyGroups:
+          type: boolean
+          example: false
+          description: Whether group members are notified of this Policy
+        status:
+          example: ACTIVE
+          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyStatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy created date timestamp
+        currentVersionId:
+          type:
+          - number
+          - 'null'
+          example: 2
+          description: The current published version ID
+        version:
+          type:
+          - string
+          - 'null'
+          example: '1'
+          description: Policy version
+        subVersion:
+          type:
+          - string
+          - 'null'
+          example: '0'
+          description: Policy sub-version
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy renewal date
+        publishedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy published date timestamp
+        approvedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy approved date timestamp
+        owner:
+          description: The current owner of the Policy, only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        groups:
+          description: Groups associated with this Policy, only returned when `expand[]=groups` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupCompactResponsePublicV2Dto'
+        controls:
+          description: Controls for this Policy, only returned when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
+        weekTimeFrameSlas:
+          description: Week Time Frame SLAs for this Policy, only returned when `expand[]=weekTimeFrameSLAs` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyWeekTimeFrameSlaCompactResponsePublicV2Dto'
+        gracePeriodSlas:
+          description: Grace Period SLAs for this Policy, only returned when `expand[]=gracePeriodSLAs` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyGracePeriodSlaCompactResponsePublicV2Dto'
+        p3MatrixSlas:
+          description: P3 Matrix SLAs for this Policy, only returned when `expand[]=p3MatrixSLAs` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyP3MatrixSlaCompactResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - disclaimer
+      - notifyGroups
+      - status
+      - createdAt
+      - currentVersionId
+      - version
+      - subVersion
+      - renewalDate
+      - publishedAt
+      - approvedAt
+    CreatePolicyVersionRequestPublicV2Dto:
+      type: object
+      properties:
+        sourceType:
+          example: UPLOADED
+          description: Determines how the new version content is sourced. UPLOADED requires a file attachment; EXTERNAL requires externalFileId.
+          allOf:
+          - $ref: '#/components/schemas/CreatePolicySourceTypeEnum'
+        ownerId:
+          type: number
+          example: 42
+          description: User ID assigned as the owner of this Policy Version
+        isMaterialChange:
+          type: boolean
+          example: true
+          description: 'Whether this is a material change: a substantive change to the policy content (as opposed to a typo or formatting fix). A material change bumps the major version (e.g. 1.x → 2.0), always requires approval, and requires every assigned user to re-accept the policy once it is published. A non-material change bumps the minor version (e.g. 1.0 → 1.1) and does not trigger re-acceptance.'
+        requiresApproval:
+          type: boolean
+          example: true
+          description: Whether a non-material version must be approved before it is published. Defaults to `false`, which publishes a non-material change immediately. Ignored when `isMaterialChange` is `true`, since a material change always requires approval.
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Date when this Policy Version is next due for review/renewal. Must be today or a future date.
+        externalFileId:
+          type: number
+          example: 2055
+          description: ID of an existing external file record in Drata. Required when sourceType is EXTERNAL. Must belong to the caller's tenant.
+        fileName:
+          type: string
+          maxLength: 191
+          example: data-backup-policy-v2.pdf
+          description: Friendly file name for display in the UI
+        description:
+          type: string
+          maxLength: 30000
+          example: Defines procedures for data backup and recovery.
+          description: Short description of this Policy Version
+        changeSummary:
+          type: string
+          maxLength: 30000
+          example: Clarified acceptable use for remote access
+          description: A short summary of the changes made in this version
+        changesExplanation:
+          type: string
+          maxLength: 768
+          example: Rewrote section 3 to cover offsite backups.
+          description: Detailed explanation of what changed in this version
+        requiresAcknowledgement:
+          type: boolean
+          example: false
+          description: Whether users must acknowledge this Policy Version once published
+        file:
+          type: string
+          format: binary
+          description: 'Policy file. Required when `sourceType` is `UPLOADED`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
+      required:
+      - sourceType
+      - ownerId
+      - isMaterialChange
+      - renewalDate
+    PolicyStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    PolicyVersionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    PolicyP3MatrixSlaCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy P3 Matrix SLA ID
+        label:
+          type: string
+          example: P3 Matrix Review
+          description: Policy P3 Matrix SLA label
+        timeFrame:
+          type: string
+          example: '1'
+          description: Policy P3 Matrix SLA time frame
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
+      required:
+      - id
+      - label
+      - timeFrame
+      - createdAt
+      - updatedAt
+    PoliciesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    GroupCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Group ID
+        name:
+          type: string
+          example: Engineering Team
+          description: Group name
+        externalId:
+          type: string
+          example: external-group-123
+          description: External ID from Group identity provider
+        source:
+          type: string
+          example: GOOGLE
+          description: 'Identity source. DEPRECATED: This field will be removed in a future release.'
+          deprecated: true
+        connectionId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: The ID of the identity provider connection that synced this group. Use Get Connection to retrieve connection details including `clientType` and `clientAlias`.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
+      required:
+      - id
+      - name
+      - externalId
+      - source
+      - createdAt
+      - updatedAt
+    PolicyVersionSummaryResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 201
+          description: Policy version ID
+        version:
+          type: number
+          example: 1
+          description: Major version number (always 1 on initial create)
+        subVersion:
+          type: number
+          example: 0
+          description: Minor version number (always 0 on initial create)
+        status:
+          type: string
+          example: DRAFT
+          description: Policy version status (always DRAFT on creation)
+        sourceType:
+          type: string
+          example: UPLOADED
+          description: How the policy content is sourced
+        externalFileId:
+          type:
+          - number
+          - 'null'
+          example: null
+          description: ID of the referenced external file record (EXTERNAL only)
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: data-backup-policy.pdf
+          description: Display name for the file
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Version creation timestamp
+      required:
+      - id
+      - version
+      - subVersion
+      - status
+      - sourceType
+      - externalFileId
+      - fileName
+      - createdAt
+    PolicyApprovalConfigurationResponsePublicV2Dto:
+      type: object
+      properties:
+        reviewGroups:
+          description: Approval tiers that make up the policy approval workflow, ordered by `hierarchyLevel`. Each tier must be fully completed before the next tier begins.
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewGroupResponsePublicV2Dto'
+      required:
+      - reviewGroups
+    PolicyLanguageEnum:
+      type: string
+      enum:
+      - en-US
+      - es-LA
+      - de-DE
+      - fr-FR
+      - it-IT
+      - nl
+      - af-ZA
+      - sq-AL
+      - ar-SA
+      - hy-AM
+      - as-IN
+      - az-AZ
+      - eu-ES
+      - bn-BD
+      - bs-BA
+      - bg-BG
+      - my-MM
+      - ca-ES
+      - ceb-PH
+      - zh-CN
+      - zh-TW
+      - hr-HR
+      - cs-CZ
+      - da-DK
+      - et-EE
+      - fi-FI
+      - ff-SN
+      - gl-ES
+      - ka-GE
+      - el-GR
+      - gu-IN
+      - ht-HT
+      - ha-NG
+      - he-IL
+      - hi-IN
+      - hu-HU
+      - is-IS
+      - ig-NG
+      - id-ID
+      - ja-JP
+      - jv-ID
+      - kn-IN
+      - kk-KZ
+      - km-KH
+      - ko-KR
+      - ku-TR
+      - ky-KG
+      - lv-LV
+      - lt-LT
+      - mk-MK
+      - mai-IN
+      - mg-MG
+      - ms-MY
+      - ml-IN
+      - mi-NZ
+      - mr-IN
+      - mn-MN
+      - ne-NP
+      - no-NO
+      - om-ET
+      - fa-IR
+      - pl-PL
+      - pt-PT
+      - pa-IN
+      - ro-RO
+      - ru-RU
+      - sr-RS
+      - sn-ZW
+      - sd-IN
+      - si-LK
+      - sk-SK
+      - sl-SI
+      - so-SO
+      - su-ID
+      - sw-KE
+      - sv-SE
+      - tl-PH
+      - ta-IN
+      - te-IN
+      - th-TH
+      - tr-TR
+      - uk-UA
+      - ur-PK
+      - uz-UZ
+      - vi-VN
+      - cy-GB
+      - wo-SN
+      - xh-ZA
+      - yo-NG
+      - zu-ZA
+      - xx-LS
+      - en-XA
+    PolicyVersionHtmlResponsePublicV2Dto:
+      type: object
+      properties:
+        content:
+          type:
+          - string
+          - 'null'
+          example: <h1>Hello</h1>
+          description: The HTML content with signed URL images of a Policy Version
+      required:
+      - content
+    PolicyVersionResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Version ID
+        approvedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when this Policy Version was approved for use
+        changeSummary:
+          type:
+          - string
+          - 'null'
+          description: A brief summary of the changes made in this Policy Version
+        changesExplanation:
+          type:
+          - string
+          - 'null'
+          description: Detailed explanation of what changes were made in this Policy Version compared to previous versions
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when this Policy Version was first created
+        current:
+          type: boolean
+          example: true
+          description: Indicates whether this is the currently active Policy Version for the Policy
+        description:
+          type:
+          - string
+          - 'null'
+          description: Optional description providing details about this specific Policy Version
+        policyVersionStatus:
+          example: PUBLISHED
+          description: Current status of the Policy Version (e.g., DRAFT, PUBLISHED, ARCHIVED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyVersionStatusEnum'
+        publishedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when this Policy Version was published and made available to users
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Date when this Policy Version is scheduled for renewal
+        subVersion:
+          type: number
+          example: 0
+          description: Minor version number of the Policy Version (e.g., 0, 1, 2) used for incremental changes
+        type:
+          format: date
+          example: BUILDER
+          description: Type of policy this Policy Version belongs to (e.g., BUILDER, CUSTOM)
+          allOf:
+          - $ref: '#/components/schemas/PolicyTypeEnum'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when this Policy Version was last modified
+        version:
+          type: number
+          example: 1
+          description: Major version number of the Policy Version (e.g., 1, 2, 3)
+        gracePeriodSlas:
+          description: Service Level Agreements with grace period configurations for this Policy Version. Only returned when `expand[]=gracePeriodSLAs` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyGracePeriodSlaCompactResponsePublicV2Dto'
+        owner:
+          description: The user who owns and is responsible for this Policy Version. Only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        p3MatrixSlas:
+          description: P3 Matrix Service Level Agreements that define priority-based response times for this Policy Version. Only returned when `expand[]=p3MatrixSLAs` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyP3MatrixSlaCompactResponsePublicV2Dto'
+        policy:
+          description: The parent Policy that this Policy Version belongs to. Only returned when `expand[]=policy` is passed.
+          allOf:
+          - $ref: '#/components/schemas/PolicyCompactResponsePublicV2Dto'
+        requiresAcknowledgment:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates whether users must acknowledge reading this Policy Version before proceeding
+        weekTimeFrameSlas:
+          description: Service Level Agreements based on weekly time frames associated with this Policy Version. Only returned when `expand[]=weekTimeFrameSLAs` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyWeekTimeFrameSlaCompactResponsePublicV2Dto'
+        downloadUrl:
+          type:
+          - string
+          - 'null'
+          description: Signed URL (valid 15 minutes) to download this Policy Version in its original format (PDF, DOCX, XLSX, etc.). Only returned when `expand[]=downloadUrl` is passed.
+          example: https://s3.amazonaws.com/bucket/file.pdf?signature=...
+        downloadPdfUrl:
+          type:
+          - string
+          - 'null'
+          description: Signed URL (valid 15 minutes) to download this Policy Version as a PDF. Only returned when `expand[]=downloadPdfUrl` is passed.
+          example: https://s3.amazonaws.com/bucket/file.pdf?signature=...
+        languages:
+          description: The language variants available for this Policy Version. Only returned when `expand[]=languages` is passed AND the Policy languages feature is enabled for the organization; omitted entirely otherwise. An enabled organization whose Policy Version has no language variants returns an empty array.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersionLanguageCompactResponsePublicV2Dto'
+      required:
+      - id
+      - approvedAt
+      - changeSummary
+      - changesExplanation
+      - createdAt
+      - current
+      - description
+      - policyVersionStatus
+      - publishedAt
+      - renewalDate
+      - subVersion
+      - type
+      - updatedAt
+      - version
+    ReviewStatusEnum:
+      type: string
+      enum:
+      - READY_FOR_REVIEW
+      - APPROVED
+      - CHANGES_REQUESTED
+      - DEADLINE_EXCEEDED
+    PolicyVersionLanguageCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Version Language ID. Pass this to `GET /policy-language-versions/{policyLanguageVersionId}` to retrieve this specific language variant.
+        language:
+          example: en-US
+          description: The language of this variant, as a BCP-47 locale code
+          allOf:
+          - $ref: '#/components/schemas/PolicyLanguageEnum'
+        default:
+          type: boolean
+          example: false
+          description: 'Whether this variant is the default language for its Policy Version. Recorded on the version itself, so it reflects the default at the time the version was published rather than the organization default as it stands today. Reserved: no current flow records a per-version default, so this is `false` for every variant until per-version defaults are written. Do not branch on it yet.'
+        hasFile:
+          type: boolean
+          example: true
+          description: Whether this language variant has an uploaded file available for download in its original format
+        hasPdf:
+          type: boolean
+          example: true
+          description: Whether this language variant has a PDF rendering available for download
+        hasHtml:
+          type: boolean
+          example: false
+          description: Whether this language variant has authored HTML content
+        originalFileName:
+          type:
+          - string
+          - 'null'
+          example: information-security-policy-es.pdf
+          description: Original file name of the uploaded document for this language variant
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
+      required:
+      - id
+      - language
+      - default
+      - hasFile
+      - hasPdf
+      - hasHtml
+      - originalFileName
+      - createdAt
+      - updatedAt
+    PolicyOwnerModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        userId:
+          type: number
+          minimum: 1
+          example: 42
+          description: 'ID of the user to assign as the policy owner. The user must have one of the following roles: Admin, Tech/Gov, Workspace Administrator, Policy Manager, or Control Manager.'
+      required:
+      - userId
+    PolicyScopeEnum:
+      type: string
+      enum:
+      - ALL
+      - GROUP
+      - NONE
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    PayloadSchemaResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: reason
+          description: Field name
+        type:
+          type: string
+          example: string
+          description: Field type (string, number, boolean)
+        required:
+          type: boolean
+          example: true
+          description: Whether the field is required
+        description:
+          type: string
+          example: Reason for requesting changes
+          description: Field description
+      required:
+      - name
+      - type
+      - required
+      - description
+    ReviewGroupResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Legal Review
+          description: Name of the approval tier.
+        tier:
+          type: number
+          example: 1
+          description: Position of this tier in the sequential approval workflow. Tier 1 runs first; each subsequent tier only begins once the previous tier is fully approved. Use this value as the `:tier` path parameter when updating this tier via PUT.
+          minimum: 1
+        consensusRule:
+          example: ALL
+          description: Voting rule for this tier. `ALL` requires every approver to approve; `ONE_OF` requires any one approver.
+          allOf:
+          - $ref: '#/components/schemas/ConsensusRulePublicV2'
+        timeline:
+          type: number
+          example: 7
+          description: Number of days allowed to complete this approval tier.
+        approvers:
+          description: Users assigned as approvers for this tier.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - name
+      - tier
+      - consensusRule
+      - timeline
+      - approvers
+    ReviewGroupRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Legal Review
+          description: Name of this approval tier.
+        userIds:
+          minItems: 1
+          example:
+          - 12
+          - 34
+          description: Approver user IDs for this tier.
+          type: array
+          items:
+            type: number
+            minimum: 1
+        consensusRule:
+          example: ALL
+          description: Voting rule for this tier. `ALL` requires every approver to approve; `ONE_OF` requires any one approver.
+          allOf:
+          - $ref: '#/components/schemas/ConsensusRulePublicV2'
+        timeline:
+          type: number
+          minimum: 1
+          example: 7
+          description: Number of days allowed to complete this approval tier.
+      required:
+      - name
+      - userIds
+      - consensusRule
+      - timeline
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    PolicyActionItemResponsePublicV2Dto:
+      type: object
+      properties:
+        action:
+          type: string
+          example: SubmitForApproval
+          description: Name of the action
+        label:
+          type: string
+          example: Submit for Approval
+          description: Human-readable label for the action
+        description:
+          type: string
+          example: Submit this Policy Version for approval review
+          description: Description of what the action does
+        payloadSchema:
+          description: Describes additional payload fields required for this action. Only present when the action requires extra fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/PayloadSchemaResponsePublicV2Dto'
+      required:
+      - action
+      - label
+      - description
+    PolicyActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          example: SubmitForApproval
+          description: The action to perform on the Policy
+          allOf:
+          - $ref: '#/components/schemas/PolicyApprovalAction'
+        reason:
+          type: string
+          description: Required when action is `RequestChanges`. The reason for requesting changes.
+        overrideReason:
+          type: string
+          description: Required when action is `OverrideApprove`. The reason for overriding approval.
+      required:
+      - action
+    ExceptionResponsePublicDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PolicyListExpandEnum:
+      type: string
+      enum:
+      - groups
+      - weekTimeFrameSlas
+      - gracePeriodSlas
+      - p3MatrixSlas
+      - owner
+    PolicyTypeEnum:
+      type: string
+      enum:
+      - BUILDER
+      - UPLOADED
+      - EXTERNAL
+    PolicyCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy ID
+        name:
+          type: string
+          example: Acceptable Use Policy
+          description: The Policy name
+        description:
+          type: string
+          description: The Policy description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy last updated date timestamp
+        assignedTo:
+          example: ALL
+          description: The scope of Users the Policy is assigned to
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        policyStatus:
+          example: ACTIVE
+          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyStatusEnum'
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy renewal date
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - policyStatus
+      - renewalDate
+    PolicyExpandEnum:
+      type: string
+      enum:
+      - groups
+      - controls
+      - weekTimeFrameSlas
+      - gracePeriodSlas
+      - p3MatrixSlas
+      - owner
+    PolicyVersionStatusEnum:
+      type: string
+      enum:
+      - NEEDS_APPROVAL
+      - APPROVED
+      - PUBLISHED
+      - DRAFT
+      - DISCARDED
+    PolicyVersionListExpandEnum:
+      type: string
+      enum:
+      - owner
+      - weekTimeFrameSlas
+      - p3MatrixSlas
+      - gracePeriodSlas
+      - downloadUrl
+      - downloadPdfUrl
   securitySchemes:
-    bearerAuth:
-      type: http
+    bearer:
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

@@ -1,32 +1,605 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Drata Public API v2 Assets Audits API
-  version: 2.0.0
-  description: Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.
-  contact:
-    name: API Evangelist
-    email: kin@apievangelist.com
-    url: https://developers.drata.com/openapi/reference/v2/overview/
+  title: Drata Audits API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Audits across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
-  description: Drata Public API v2
-security:
-- bearerAuth: []
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Audits
+  description: Audits represent compliance assessments for a specific framework and time period. Audit Requests are evidence requests associated with an audit.
 paths:
-  /audits:
+  /workspaces/{workspaceId}/audits:
     get:
-      tags:
-      - Audits
-      summary: List audits
-      operationId: listAudits
+      operationId: AuditsPublicV2Controller_listAudits
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditListExpandEnum'
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
       responses:
         '200':
-          description: A page of audits
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Audits
+      tags:
+      - Audits
+      x-drata-permissions:
+      - audit-get
+      x-product-area:
+      - AUDIT_HUB
+      description: '🔒 Requires **Audits: Get Audits** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/audits/{auditId}:
+    get:
+      operationId: AuditsPublicV2Controller_getAudit
+      parameters:
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditExpandEnum'
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: auditId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuditGetResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Audit
+      tags:
+      - Audits
+      x-drata-permissions:
+      - audit-get
+      x-product-area:
+      - AUDIT_HUB
+      description: '🔒 Requires **Audits: Get Audits** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
 components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    AuditGetResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier of the Audit
+        frameworkType:
+          example: SOC_2_TYPE_2
+          description: Framework type of the Audit
+          allOf:
+          - $ref: '#/components/schemas/AuditorFrameworkTypeEnum'
+        auditType:
+          example: FULL_AUDIT
+          description: Audit type
+          allOf:
+          - $ref: '#/components/schemas/AuditTypeEnum'
+        isInternalAudit:
+          type: boolean
+          example: false
+          description: Whether the audit is an internal audit
+        status:
+          example: ACTIVE
+          description: Current status of the Audit
+          allOf:
+          - $ref: '#/components/schemas/AuditorFrameworkOverhaulStatusEnum'
+        startDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Audit start date
+        endDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Audit end date
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit was completed, or null if still in progress
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit was last updated
+        auditors:
+          description: External auditors assigned to the audit, only returned when `expand[]=auditors` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditorCompactResponsePublicV2Dto'
+        internalAuditors:
+          description: Internal auditors assigned to the audit, only returned when `expand[]=internalAuditors` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        controls:
+          description: Controls associated with this audit, only returned when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditControlCompactResponsePublicV2Dto'
+      required:
+      - id
+      - frameworkType
+      - auditType
+      - isInternalAudit
+      - status
+      - startDate
+      - endDate
+      - completedAt
+      - createdAt
+      - updatedAt
+    AuditItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier of the Audit
+        frameworkType:
+          example: SOC_2_TYPE_2
+          description: Framework type of the Audit
+          allOf:
+          - $ref: '#/components/schemas/AuditorFrameworkTypeEnum'
+        auditType:
+          example: FULL_AUDIT
+          description: Audit type
+          allOf:
+          - $ref: '#/components/schemas/AuditTypeEnum'
+        isInternalAudit:
+          type: boolean
+          example: false
+          description: Whether the audit is an internal audit
+        status:
+          example: ACTIVE
+          description: Current status of the Audit
+          allOf:
+          - $ref: '#/components/schemas/AuditorFrameworkOverhaulStatusEnum'
+        startDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Audit start date
+        endDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Audit end date
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit was completed, or null if still in progress
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit was last updated
+        auditors:
+          description: External auditors assigned to the audit, only returned when `expand[]=auditors` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditorCompactResponsePublicV2Dto'
+        internalAuditors:
+          description: Internal auditors assigned to the audit, only returned when `expand[]=internalAuditors` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - id
+      - frameworkType
+      - auditType
+      - isInternalAudit
+      - status
+      - startDate
+      - endDate
+      - completedAt
+      - createdAt
+      - updatedAt
+    AuditExpandEnum:
+      type: string
+      enum:
+      - auditors
+      - internalAuditors
+      - controls
+    AuditorCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier of the Auditor
+        name:
+          type: string
+          example: Jane Smith
+          description: Full name of the Auditor
+        email:
+          type: string
+          format: email
+          example: jane.smith@auditfirm.com
+          description: Email address of the Auditor
+      required:
+      - id
+      - name
+      - email
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    AuditorFrameworkOverhaulStatusEnum:
+      type: string
+      enum:
+      - PREPARING
+      - ACTIVE
+      - COMPLETED
+    AuditListExpandEnum:
+      type: string
+      enum:
+      - auditors
+      - internalAuditors
+    AuditTypeEnum:
+      type: string
+      enum:
+      - FULL_AUDIT
+      - DOWNLOAD_ONLY_AUDIT
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    AuditControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: DCF-1001
+          description: Control code
+        name:
+          type: string
+          example: Vulnerability Management
+          description: Control name
+        controlNumber:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: Control number used for ordering
+      required:
+      - id
+      - code
+      - name
+      - controlNumber
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    AuditorFrameworkTypeEnum:
+      type: string
+      enum:
+      - SOC_2_TYPE_1
+      - SOC_2_TYPE_2
+      - ISO_27001
+      - HIPAA
+      - PCI
+      - GDPR
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - CCPA
+      - ISO_27701
+      - COBIT
+      - SOX_ITGC
+      - ISO_27001_2022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO_27017_2015
+      - ISO_27018_2019
+      - NISTAI
+      - PCI4
+      - FEDRAMP
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO_42001_2023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO_27018_2025
+      - CCPA2026
+      - ISO_27701_2025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - CUSTOM
+    AuditsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
   securitySchemes:
-    bearerAuth:
-      type: http
+    bearer:
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

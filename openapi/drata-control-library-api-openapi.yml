@@ -1,0 +1,1875 @@
+openapi: 3.2.0
+info:
+  title: Drata Control Library API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Control Library across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Control Library
+  description: The Control Library is a catalog of pre-built Control Templates that can be provisioned into a Workspace. Each item carries default mappings to Tests, Policies, Evidence, and Framework Requirements.
+paths:
+  /control-library:
+    get:
+      description: 'Returns a paginated list of Control Templates with optional field and relational filters.
+
+
+        🔒 Requires **Controls: List Controls** permission.
+
+
+        💎 Requires your account have the **Custom Frameworks** feature. Contact your CSM for help upgrading.'
+      operationId: ControlLibraryPublicV2Controller_listControlLibrary
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Field to sort by.
+        schema:
+          $ref: '#/components/schemas/ControlLibrarySortEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: search
+        required: false
+        in: query
+        description: Prefix search across Control name AND code. Matches Controls where either the name OR the code starts with the provided value.
+        schema:
+          example: DCF-
+          type: string
+      - name: codes[]
+        required: false
+        in: query
+        description: Filter by **exact** Control codes (not prefix). Returns only Controls whose code matches one of the provided values. Use `search` for prefix matching.
+        schema:
+          example:
+          - DCF-1
+          - DCF-42
+          type: array
+          items:
+            type: string
+      - name: ids[]
+        required: false
+        in: query
+        description: Filter by Control Template IDs. Returns only Controls whose ID matches one of the provided values.
+        schema:
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      - name: excludeIds[]
+        required: false
+        in: query
+        description: Exclude Control Templates with these IDs from the response.
+        schema:
+          example:
+          - 99
+          type: array
+          items:
+            type: number
+      - name: domain
+        required: false
+        in: query
+        description: Filter by Control Domain. Accepts the Domain name (e.g. `DATA_AND_PRIVACY`).
+        schema:
+          $ref: '#/components/schemas/ControlDomainEnum'
+      - name: category
+        required: false
+        in: query
+        description: Filter by Control Category. Accepts the Category name (e.g. `ACCESS_CONTROL`).
+        schema:
+          $ref: '#/components/schemas/ControlCategoryEnum'
+      - name: frameworkTag
+        required: false
+        in: query
+        description: Filter by Framework. Accepts the Framework Tag name (e.g. `SOC_2`, `ISO27001`, `HIPAA`). Returns Controls mapped to a Requirement on the given Framework.
+        schema:
+          $ref: '#/components/schemas/FrameworkTagEnum'
+      - name: hasTests
+        required: false
+        in: query
+        description: When true, returns only Controls with at least one default Test mapping.
+        schema:
+          type: boolean
+      - name: hasPolicies
+        required: false
+        in: query
+        description: When true, returns only Controls with at least one default Policy mapping.
+        schema:
+          type: boolean
+      - name: hasEvidence
+        required: false
+        in: query
+        description: When true, returns only Controls with at least one default Evidence mapping.
+        schema:
+          type: boolean
+      - name: hasRisks
+        required: false
+        in: query
+        description: When true, returns only Controls mapped to at least one Risk in the Risk Library.
+        schema:
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlLibraryResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Control Library
+      tags:
+      - Control Library
+      x-drata-entitlement:
+      - CUSTOM_FRAMEWORKS
+      x-drata-permissions:
+      - controls-get
+      x-product-area:
+      - CONTROL_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /control-library/{templateId}:
+    get:
+      description: 'Returns a single Control Template by id with optional expand-gated relations.
+
+
+        🔒 Requires **Controls: List Controls** permission.
+
+
+        💎 Requires your account have the **Custom Frameworks** feature. Contact your CSM for help upgrading.'
+      operationId: ControlLibraryPublicV2Controller_getControlLibraryItem
+      parameters:
+      - name: templateId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryDetailExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlLibraryDetailResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Control Library Item
+      tags:
+      - Control Library
+      x-drata-entitlement:
+      - CUSTOM_FRAMEWORKS
+      x-drata-permissions:
+      - controls-get
+      x-product-area:
+      - CONTROL_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /control-library/action-import:
+    post:
+      description: 'Provisions one or more tenant Controls from Control Library templates. All-or-nothing semantics: any invalid spec rejects the whole request with no writes. Each provisioned Control includes the template default mappings (tests, policies, evidence, requirements).
+
+
+        🔒 Requires **Controls: Create Control** permission.
+
+
+        💎 Requires your account have the **Custom Frameworks** feature. Contact your CSM for help upgrading.'
+      operationId: ControlLibraryPublicV2Controller_importControlLibrary
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlLibraryImportRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlLibraryImportResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlLibraryImportErrorResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Import Control Library Controls
+      tags:
+      - Control Library
+      x-drata-entitlement:
+      - CUSTOM_FRAMEWORKS
+      x-drata-permissions:
+      - controls-post
+      x-product-area:
+      - CONTROL_LIBRARY
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ControlLibraryImportValidationErrorPublicV2Dto:
+      type: object
+      properties:
+        inputIndex:
+          type: number
+          description: Index of the offending input in the request's `data` array.
+        workspaceId:
+          type: number
+          description: Workspace the offending input targeted.
+        templateIdentifier:
+          oneOf:
+          - type: number
+          - type: string
+          description: Template identifier echoed from the offending input.
+        reason:
+          type: string
+          description: Human-readable explanation of the validation failure.
+        code:
+          enum:
+          - CUSTOM_TASK_UNAUTHORIZED_ROLE
+          - UNDEFINED
+          - HEALTH_CHECK
+          - INTERNAL_SERVER_ERROR
+          - VALIDATION
+          - ORM_VALIDATION
+          - COMPANY_EXISTS
+          - ENTRY_EXISTS
+          - JWT_EMPTY_ENTRY
+          - JWT_EMPTY_SITE_ADMIN
+          - JWT_EMPTY_ACCOUNT
+          - JWT_EMPTY_PAYLOAD
+          - JWT_EMPTY_PAYLOAD_DATA
+          - JWT_EMPTY_AUTHORIZATION
+          - JWT_INVALID_SIGNATURE
+          - JWT_INVALID_PAYLOAD
+          - JWT_MISSING_USER
+          - JWT_MISSING_ROLES
+          - JWT_MISSING_PRODUCT_ROLE
+          - JWT_MISSING_ACCOUNT
+          - JWT_MISSING_SITE_ADMIN
+          - ENTITY_NOT_FOUND
+          - MONITOR_TEST_NOT_FOUND
+          - BAD_CODE
+          - BAD_ACCESS_TOKEN
+          - CONFLICT_SELF
+          - CONFLICT_PERSONNEL_OK
+          - VERSION_NOT_FOUND
+          - CONFLICT_DEPENDENCY
+          - AGENT_MISSING_BODY
+          - AGENT_MISSING_FIELDS
+          - AGENT_EMPTY_ACCOUNT
+          - ACCOUNT_NOT_FOUND
+          - ACCOUNT_PENDING
+          - ACCOUNT_MAINTENANCE
+          - ACCOUNT_NON_PAYMENT
+          - ACCOUNT_ADMIN_DISABLED
+          - ACCOUNT_USER_DELETED
+          - ACCOUNT_UNKNOWN_STATUS
+          - ACCOUNT_CREATION_FAILED
+          - ACCOUNT_SITE_ADMIN_DELETED
+          - ACCOUNT_DISABLED_LEGAL_HOLD
+          - CONNECTION_NOT_FOUND
+          - ACCOUNT_DISABLED_NO_DELETE
+          - ACCOUNT_MIGRATED
+          - CONNECTION_CAN_NOT_BE_DELETED
+          - USER_NOT_FOUND
+          - USER_ROLES_NOT_FOUND
+          - PERSONNEL_NOT_FOUND
+          - PERSONNEL_PROPERTIES_NOT_FOUND
+          - PERSONNEL_IS_FUTURE_HIRE
+          - PERSONNEL_IS_FORMER_SPECIAL
+          - PERSONNEL_NOT_ACTIVE
+          - PERSONNEL_IS_FORMER
+          - PERSONNEL_IS_OUT_OF_SCOPE
+          - PERSONNEL_SELF_STATUS_TO_FORMER_STATUS
+          - PERSONNEL_ALREADY_HAS_SAME_STATUS
+          - CONFLICT_SEPARATION_DATE_WITH_UNKNOWN_STATUS
+          - CONFLICT_UNKNOWN_STATUS_AND_HRIS
+          - PERSONNEL_IS_ON_HRIS
+          - SEPARATION_DATE_IS_REQUIRED
+          - INVALID_SEPARATION_DATE_FOR_CURRENT_DATE
+          - TOKEN_EXPIRED
+          - TOKEN_REVOKED
+          - TOKEN_ALREADY_USED
+          - TOKEN_NOT_FOUND
+          - DRATA_TERMS_NOT_AGREED_TO
+          - BACKGROUND_CHECK_ALREADY_STARTED
+          - BACKGROUND_CHECK_MISSING_PACKAGES
+          - BACKGROUND_CHECK_PACKAGES_REQUEST
+          - BACKGROUND_CHECK_UNAUTHORIZED
+          - CONFLICT_MONITOR_CHECK_STATUS
+          - CONFLICT_USER_IDENTITY_VERSION_CONTROL_LINK
+          - CONFLICT_USER_IDENTITY_ACCESS_REVIEW_LINK
+          - CONFLICT_MONITOR_CUSTOM_CONNECTION_DELETED
+          - CONFLICT_USER_INFRASTRUCTURE_CONTROL_LINK
+          - PUBLISH_FRAMEWORK_MISSING_ELEMENT
+          - CONFLICT_DUPLICATE_PROVIDER_CONNECTION
+          - CONFLICT_MISMATCHED_EMAIL_DOMAIN
+          - CONFLICT_COMMENT_AUTHOR
+          - NONEXISTENT_COMMENT_THREAD
+          - CONFLICT_COMMENT_EXISTS
+          - SECURITY_REPORT_NOT_SHAREABLE
+          - SECURITY_REPORT_SHARE_TOKEN_MISMATCH
+          - RIPPLING_SERVICE_ERROR
+          - ONBOARDING_STEP_LOCKED
+          - ONBOARDING_NOT_COMPLETE
+          - POLICY_NAME_UNAVAILABLE
+          - MERGEDEV_LINK_TOKEN_FAILED
+          - MERGEDEV_ACCESS_TOKEN_FAILED
+          - REFRESH_TOKEN_NOT_FOUND
+          - MAGIC_TOKEN_NOT_FOUND
+          - POLICY_VERSION_TOO_LOW
+          - FAILED_TO_UPLOAD_POLICY_VERSION_HTML
+          - POLICY_ALREADY_APPROVED
+          - POLICY_NOT_FOUND
+          - NO_ENABLED_FRAMEWORKS_FOR_POLICY
+          - POLICY_VERSION_NOT_APPROVED_OR_PUBLISHED
+          - POLICY_VERSION_NOT_CURRENT
+          - JWT_EMPTY_AUDITOR
+          - JWT_MISSING_AUDITOR
+          - AUDITOR_CLIENT_FORBIDDEN
+          - JWT_AUDITOR_MISSING_CLIENT
+          - CONFLICT_DUPLICATE_CLIENT_ID_CONNECTION
+          - CONFLICT_CONNECTION_CLIENTID
+          - CONFLICT_CONNECTION_CLIENT_ALIAS
+          - CONFLICT_CONNECTION_AUTOPOPULATED_CLIENTID
+          - CONFLICT_CONNECTION_AUTOPOPULATED_CLIENT_ALIAS
+          - CONFLICT_CONNECTION_MULTIPLE_PROVIDER_TYPE
+          - CONFLICT_MULTIPLE_CONNECTION_FEATURE
+          - CONFLICT_MULTIPLE_IDPS
+          - CONFLICT_CONNECTION_JIRA_EXTRANEOUS_ACCOUNT
+          - FAILED_DEPENDENCY_JIRA
+          - AUTHENTICATION_ERROR_WORK_OS
+          - AUTHENTICATION_ERROR_SOCKET
+          - AUTHENTICATION_ERROR_WORK_OS_MISSING_PROFILE
+          - AUTHENTICATION_ERROR_WORK_OS_MISSING_EMAIL
+          - PAYMENT_REQUIRED
+          - NO_CONTROLS_FOUND
+          - CONFLICT_CONTROL_NEEDS_REQUIREMENT
+          - CONFLICT_CONTROL_PRODUCT_MISMATCH
+          - INVALID_DOMAIN
+          - CONFLICT_DUPLICATED_AUDITOR
+          - CONFLICT_MISMATCH_DATA
+          - EMPLOYEE_AUDITOR_CONFLICT
+          - CUSTOMER_AUDITOR_CONFLICT
+          - CUSTOMER_UNAUTHORIZED
+          - IDP_CLIENT_UNAUTHORIZED
+          - INVALID_CODE_PREFIX
+          - DUPLICATE_CONTROL_CODE
+          - REQUIREMENT_DOES_NOT_EXIST
+          - NO_REQUIREMENTS_FOUND
+          - SSO_ENFORCED
+          - IDP_ENFORCED
+          - SETTING_NOT_FOUND
+          - CANNOT_CHANGE_DCF_CONTROL_CODE
+          - CANNOT_CHANGE_OTHER_USER_SETTING
+          - DUPLICATED_FRAMEWORK
+          - FRAMEWORK_NOT_RELATED
+          - POLICY_VERSION_NOT_FOUND
+          - FRAMEWORK_NOT_FOUND
+          - FRAMEWORK_DISABLED
+          - FRAMEWORKS_NOT_PROVISIONED
+          - POLICY_VERSION_WITHOUT_KEY
+          - INVALID_FILE_NAME
+          - JWT_MISSING_TOKEN
+          - CONFLICT_DUPLICATE_CLIENT_CONNECTION
+          - DIFFERENT_DEVICE_OWNER
+          - CONFLICT_DEVICE_ALREADY_IN_USE
+          - CANNOT_ENABLE_ACCOUNT_ENTITLEMENT
+          - CANNOT_DISABLE_ACCOUNT_ENTITLEMENT
+          - ACCOUNT_FEATURE_TOGGLE_INVALID_FEATURE_TYPE
+          - TRUST_CENTER_CNAME
+          - TRUST_CENTER_CRM_DELETE
+          - TRUST_CENTER_POLICY_NOT_FOUND
+          - TRUST_CENTER_SECURITY_REPORT_NOT_FOUND
+          - TRUST_CENTER_REPORT_NOT_FOUND
+          - TRUST_CENTER_NDA_NOT_FOUND
+          - TRUST_CENTER_NDA_DOWNLOAD
+          - TRUST_CENTER_REQUEST_FILES_DOWNLOAD
+          - TRUST_CENTER_REQUEST_NOT_FOUND
+          - CRM_NO_DATA
+          - CRM_INVALID_FIELD
+          - CRM_INVALID_FIELD_TYPE
+          - CRM_QUERY_FAILED
+          - TRUST_CENTER_REQUEST_CRM_CONNECTION_FAILED
+          - CRM_NO_OPPORTUNITY
+          - TRUST_CENTER_CRM_CONNECTION_NOT_FOUND
+          - TRUST_CENTER_REQUEST_INVALID
+          - TRUST_CENTER_REQUEST_ZIP_NOT_FOUND
+          - TRUST_CENTER_COMPANY_INFO_NOT_FOUND
+          - TRUST_CENTER_EMAIL_DOMAIN_NOT_FOUND
+          - TRUST_CENTER_ANNOUNCEMENT_NOT_FOUND
+          - TRUST_CENTER_DISMISSAL_DUPLICATED
+          - TRUST_CENTER_EMAIL_ADDRESS_NOT_FOUND
+          - FEATURE_ANNOUNCEMENT_DISMISSAL_DUPLICATED
+          - CONFLICT_CROSS_TENANT_ENTRY
+          - CONFLICT_CROSS_ENTRY_EMAIL
+          - TRUST_CENTER_FORBIDDEN
+          - TRUST_CENTER_SUB_PROCESSORS_INFO_NOT_FOUND
+          - MULTIPLE_PRODUCT_SUPPORT_PRODUCT_NOT_FOUND
+          - CONFLICT_USER_OBSERVABILITY_CONTROL_LINK
+          - NOTIFICATION_CONNECTION_NOT_AVAILABLE
+          - NOTIFICATIONS_NOT_FOUND
+          - CUSTOM_FRAMEWORK_NOT_SAVED
+          - CUSTOM_REQUIREMENT_NOT_SAVED
+          - CONFLICT_DUPLICATE_REQUIREMENT_CODE
+          - CONFLICT_REQUIREMENT_ALREADY_EXISTS
+          - CONFLICT_INVALID_REQUIREMENT
+          - CREATE_TICKET_DATATYPE_NOT_SUPPORTED
+          - CREATE_TICKET_FIELD_NOT_VALID
+          - TICKET_STRUCTURE_NOT_SUPPORTED
+          - TICKET_NOT_FOUND
+          - CONNECTION_WITH_WRITE_ACCESS_NOT_FOUND
+          - SDLC_INVALID_QUERY
+          - SDLC_SERVICE_UNAVAILABLE
+          - CONFLICT_AUDITOR_LOGIN
+          - CONFLICT_MULTI_DOMAIN_DISABLED
+          - CONFLICT_MULTI_DOMAIN_ENABLED
+          - BEARER_TOKEN_NOT_FOUND
+          - PUBLIC_API_KEY_NOT_FOUND
+          - PUBLIC_API_KEY_ACCOUNT_NOT_FOUND
+          - PUBLIC_API_KEY_FORBIDDEN
+          - MERGEDEV_ACCOUNT_NEEDS_RELINK
+          - ENDPOINT_NOT_FOUND
+          - DATADOG_LOGS_READ_ARCHIVES_PERMISSION
+          - DATADOG_USAGE_READ_PERMISSION
+          - DATADOG_SECURITY_NOTIFICATION_PERMISSION
+          - DATADOG_CONNECTION_REQUEST_INVALID
+          - WORKSPACE_NAME_ALREADY_EXISTS
+          - WORKSPACE_IS_PRIMARY
+          - GOOGLE_IDP_ACCESS_DENIED
+          - GOOGLE_OAUTH_IDP_ACCESS_DENIED
+          - GOOGLE_IDP_INVALID_GRANT
+          - GOOGLE_OAUTH_IDP_INVALID_GRANT
+          - GITHUB_ORGANIZATION_NOT_FOUND
+          - AWS_CONNECTION_ACCESS_DENIED
+          - MICROSOFT_365_INVALID_DOMAIN
+          - MICROSOFT_365_ACCESS_DENIED
+          - MICROSOFT_365_INVALID_GRANT
+          - GCP_INVALID_GRANT
+          - GCP_PROJECTS_INVALID_PROJECT_IDS
+          - GCP_ACCESS_DENIED
+          - AZURE_ACCESS_DENIED
+          - OKTA_ACCESS_DENIED
+          - OKTA_OAUTH_ACCESS_DENIED
+          - JIRA_ACCESS_DENIED
+          - CLOUDFLARE_ACCESS_DENIED
+          - CLOUDFLARE_NO_ACCOUNTS
+          - GITLAB_ACCESS_DENIED
+          - GITLAB_NOT_FOUND
+          - BITBUCKET_ACCESS_DENIED
+          - DOCUSIGN_BAD_CLIENT_ID
+          - SITE_ADMIN_MISSING_ADMIN_ROLE
+          - SITE_ADMIN_NOT_FOUND
+          - AUDITOR_INVALID_DATA
+          - AUDITOR_FRAMEWORK_WRONG_AUDIT_TYPE
+          - TICKET_MONITORING_NOT_FOUND
+          - AUTOMATE_TICKETING_CONNECTION_NOT_FOUND
+          - TICKET_MONITORING_FIELD_NOT_FOUND
+          - FIELDS_NOT_FOUND
+          - PRODUCT_NOT_FOUND
+          - TICKET_STRUCTURE_MISSING_SUMMARY
+          - MICROSOFT_GRAPH_ACCESS_DENIED
+          - MICROSOFT_GRAPH_BAD_REQUEST
+          - MICROSOFT_GRAPH_RESOURCE_NOT_FOUND
+          - MICROSOFT_GRAPH_THROTTLED
+          - MICROSOFT_GRAPH_UNAVAILABLE
+          - MICROSOFT_GRAPH_REQUEST_FAILED
+          - MICROSOFT_GRAPH_CLIENT_ERROR
+          - MTLS_CLIENT_CERT_MISSING
+          - MTLS_UNAUTHORIZED_CN
+          - MTLS_NOT_ENABLED
+          - MTLS_ACCOUNT_HEADER_MISSING
+          - ROLE_PERMISSION_FORBIDDEN
+          - MDM_UNAUTHORIZED
+          - SERVICE_PROVIDER_DUPLICATED
+          - SERVICE_PROVIDER_NOT_ALLOWED_DOMAIN
+          - SERVICE_GROUP_DUPLICATED_DOMAIN
+          - JWT_MISSING_SERVICE_USER
+          - JWT_EMPTY_SERVICE_USER
+          - AUDITOR_EXISTS
+          - SERVICE_USER_NOT_FOUND
+          - SERVICE_PROVIDER_AUDITOR_CONFLICT
+          - DOCUMENT_LIBRARY_NOT_FOUND
+          - CONTROL_DOCUMENT_NOT_FOUND
+          - DOCUMENT_VERSION_NOT_FOUND
+          - DOCUMENT_WORKFLOW_TYPE_NOT_SUPPORTED
+          - REQUEST_MESSAGE_NOT_FOUND
+          - POLICY_VERSION_EXIST
+          - POLICY_IS_NOT_CUSTOM_POLICY
+          - EXTERNAL_POLICY_NOT_FOUND
+          - EXTERNAL_POLICY_FILE_NOT_FOUND
+          - EXTERNAL_POLICY_FILE_ID_NOT_FOUND
+          - PROCESS_NOT_SUPPORTED
+          - RAPID7_INVALID_LICENSE_STATUS
+          - RAPID7_UNAUTHORIZED_CREDENTIALS
+          - RAPID7_INVALID_DOMAIN
+          - AUTOPILOT_RECIPE_BAD_SCHEMA
+          - AUTOPILOT_NO_AP2_TESTS_ENABLED
+          - AUTOPILOT_NO_AP2_MONITOR_STATUS
+          - AUTOPILOT_MONITOR_RECIPE_NOT_FOUND
+          - AUTOPILOT_WORKFLOW_LIST_NOT_FOUND
+          - AUTOPILOT_TEMPORAL_CLUSTER_DATA_NOT_FOUND
+          - AUTOPILOT_MONITOR_CONNECTIONS_NOT_FOUND
+          - CUSTOM_TASK_WRONG_WORKSPACE_ID
+          - CUSTOM_TASK_WRONG_ASSIGNEE_ID
+          - INVALID_RECURRING_SCHEDULE
+          - USER_MISSING_ROLES
+          - CUSTOM_TASK_CONFIGURATION_WRONG_ID
+          - CUSTOM_TASK_SCHEDULE_REQUIRED
+          - CUSTOM_TASK_WRONG_TASK_TYPE
+          - CUSTOM_TASK_WRONG_ID
+          - CUSTOM_RISK_NOT_FOUND
+          - CONFLICT_ADMIN_SERVICE_USER
+          - SCANNER_ACCESS_DENIED
+          - FILES_NOT_SCANNABLE
+          - ZIP_INTERNAL_FILES_NOT_SUPPORTED
+          - SCANNER_FILE_MAX_SIZE_REACHED
+          - SCANNER_FILE_NOT_OK
+          - ZIP_FILE_EMPTY
+          - CSV_INVALID_FORMAT
+          - CSV_INVALID_FILETYPE
+          - CSV_INVALID_FILE_EXTENSION
+          - CSV_INVALID_FILE_SIZE
+          - CSV_INVALID_FILE_FORMAT
+          - CSV_MISSING_COLUMNS
+          - CSV_MISSING_REQUIRED_VALUES
+          - CSV_DUPLICATED_CODES
+          - CSV_INVALID_DATA
+          - CSV_INVALID_FIELD_SCHEMA
+          - CSV_DUPLICATED_NAMES
+          - CSV_NO_RECORDS
+          - CSV_EMPTY_ROW
+          - CSV_DUPLICATED_REQUIREMENT
+          - CSV_CONTROL_NOT_ENABLED
+          - CSV_MAX_LENGTH_EXCEEDED
+          - CSV_DUPLICATED_REQUEST_IDS
+          - CSV_DUPLICATED_TITLES
+          - CSV_DUPLICATED_CUSTOMER_REQUESTS
+          - CSV_MAX_ROWS_EXCEEDED
+          - CSV_DUPLICATED_ROWS
+          - INVALID_ARGUMENT
+          - DOCUMENT_NOT_FOUND
+          - DOCUMENT_VERSION_MISMATCH
+          - EVIDENCE_NOT_FOUND
+          - INVALID_EVIDENCE
+          - EVIDENCE_LIBRARY_MISSING_RENEWAL_DATE_FOR_NOT_NONE_TYPE
+          - CONTROL_NOT_FOUND
+          - CONTROL_NOT_FROM_WORKSPACE
+          - FEATURE_FLAG_DISABLED
+          - INVALID_SCAN_METADATA
+          - SCAN_PROCESS_NOT_FOUND
+          - GITLAB_PAT_EXPIRED
+          - RISK_THRESHOLD_INVALID_LOWEST_THRESHOLD_VALUE
+          - RISK_THRESHOLD_INVALID_HIGHEST_THRESHOLD_VALUE
+          - RISK_THRESHOLD_INVALID_THRESHOLD_RANGES
+          - RISK_INVALID_SCORE_VALUE
+          - RISK_INVALID_IMPACT_VALUE
+          - RISK_INVALID_LIKELIHOOD_VALUE
+          - SENTINEL_ONE_INVALID_DOMAIN
+          - SENTINEL_ONE_UNAUTHORIZED_CREDENTIALS
+          - RISK_NOT_FOUND
+          - AUDIT_API_KEY_NOT_FOUND
+          - AUDIT_API_KEY_ACCOUNT_NOT_FOUND
+          - AUDIT_API_KEY_FORBIDDEN
+          - AUDIT_API_KEY_FIRM_NOT_FOUND
+          - AUDITOR_NOT_FOUND
+          - TENANT_AUDITOR_FORBIDDEN
+          - AUDIT_AUDITOR_FORBIDDEN
+          - AUDIT_ACCOUNT_MISMATCH
+          - AUDIT_ASSIGNED_AUDITOR_FORBIDDEN
+          - AUDIT_SAMPLE_NOT_FOUND
+          - SWITCH_REQUIREMENT_PROFILE_PRODUCT_ID_NOT_FOUND
+          - SWITCH_REQUIREMENT_PROFILE_REQUIREMENT_NOT_FOUND
+          - SWITCH_REQUIREMENT_PROFILE_CONTROL_MAPPING_NOT_FOUND
+          - SWITCH_REQUIREMENT_PROFILE_FRAMEWORK_NOT_FOUND
+          - SWITCH_REQUIREMENT_PROFILE_LOWER_BASELINE
+          - SWITCH_FRAMEWORK_PROFILE_FRAMEWORK_NOT_FOUND
+          - SWITCH_FRAMEWORK_PROFILE_PROFILE_DETAILS_NOT_FOUND
+          - TICKET_ATTACHMENT_SIZE_LIMIT
+          - APIDECK_FAILED
+          - INVALID_TICKET_STATUS
+          - CSPM_RULE_URL_ERROR
+          - CSPM_RISK_TYPE_CONFLICT
+          - CSPM_CONTROLS_NOT_ENABLED
+          - OKTA_NO_MATCHING_DOMAINS
+          - OKTA_SOURCE_MISSING_ID
+          - OKTA_SOURCE_MISSING_EMAIL
+          - OKTA_SOURCE_MISSING_FIRSTNAME
+          - OKTA_SOURCE_MISSING_LASTNAME
+          - OKTA_DOMAINS_MISMATCH
+          - OKTA_USER_NO_IDENTITIES
+          - OKTA_IDENTITY_MISMATCH
+          - OKTA_BAD_CODE
+          - OKTA_NO_ROUTER_MD_MATCH
+          - OKTA_NO_ROUTER_ACCOUNT_MATCH
+          - OKTA_BAD_GET_USER_INFO_RESPONSE
+          - OKTA_MISSING_METADATA
+          - OKTA_MISSING_PAYLOAD
+          - OKTA_GET_USER_INFO_RESPONSE_INVALID_URL
+          - OKTA_SOURCE_MISSING_DOMAIN
+          - OKTA_MULTIPLE_ROUTER_KEYS_ON_LOGIN
+          - OKTA_MULTIPLE_ACCOUNTS_WITH_SAME_EMAIL_AND_TENANT_ROUTER_KEY
+          - CONNECTION_GROUP_NOT_FOUND
+          - PROVIDER_CATALOG_PROVIDER_NOT_AVAILABLE
+          - PROVIDER_CATALOG_RESOURCE_NOT_AVAILABLE
+          - PROVIDER_CATALOG_PROVIDER_TYPE_NOT_AVAILABLE
+          - PROVIDER_CATALOG_SERVICE_RESOURCES_NOT_AVAILABLE
+          - PROVIDER_CATALOG_SERVICE_RESOURCE_NOT_AVAILABLE
+          - PROVIDER_CATALOG_MISSING_CLIENT_ALIAS
+          - PROVIDER_CATALOG_MISSING_WORKSPACE_ID
+          - LLM_ERROR
+          - LLM_EMPTY_RESPONSE
+          - LLM_NOT_FOUND
+          - LLM_FAIL
+          - CONTROL_TEST_STATUS_INVALID
+          - CONTROL_TEST_DRAFT_ALREADY_EXIST
+          - CONTROL_TEST_INSTANCE_NOT_FOUND
+          - CONTROL_TEST_INSTANCE_DRAFT_FORBIDDEN
+          - CONTROL_TEST_INSTANCE_CHECK_TYPE_FORBIDDEN
+          - ORG_UNITS_SUB_ACCOUNTS_LIMIT_EXCEEDED
+          - ORG_UNITS_INVALID_ROOT_ID
+          - ORG_UNITS_INVALID_ACCOUNT_IDS
+          - VENDOR_DISCOVERED_NOT_FOUND
+          - VENDOR_FEATURE_DISMISSAL_DUPLICATED
+          - VENDOR_CURATED_EDIT_RESTRICTED
+          - CONTROL_TEST_IS_NOT_DRAFT
+          - CONTROL_TEST_IS_NOT_PUBLISHED
+          - RESTRICTED_VIEW_ENABLED
+          - CONTROL_IS_CUSTOM_CANNOT_RESET_REQUIREMENT_MAPPINGS
+          - CONTROL_IS_CUSTOM_CANNOT_RESET_TEST_MAPPINGS
+          - CONTROL_IS_CUSTOM_CANNOT_RESET_POLICY_MAPPINGS
+          - REQUIREMENT_IS_CUSTOM_CANNOT_RESET_REQUIREMENT_MAPPINGS
+          - FRAMEWORK_IS_CUSTOM_CANNOT_RESET_CONTROL_MAPPINGS
+          - CONFLICT_CONTROL_NEEDS_WORKSPACE
+          - CONTROL_TEST_IS_NOT_CUSTOM
+          - POLICY_RESPONSIBILITY_NOT_FOUND
+          - CUSTOM_TEST_LIMIT_NOT_FOUND
+          - FEATURE_NOT_FOUND
+          - FEATURE_METADATA_NOT_ENABLED
+          - FEATURE_METADATA_NOT_VALID
+          - FEATURE_METADATA_NOT_FOUND
+          - CUSTOM_TEST_LIMIT_REACHED
+          - ADAPTIVE_AUTOMATION_METADATA_NOT_FOUND
+          - SYNC_IS_IN_PROGRESS
+          - CROWDSTRIKE_INVALID_CONNECTION_DATA
+          - MAX_CUSTOM_FIELDS_PER_TENANT
+          - MAX_CUSTOM_FIELDS_PLACEMENTS_LIMIT_REACHED
+          - NOTION_UNAUTHORIZED_WORKSPACE
+          - NOTION_INVALID_GRANT
+          - NOTION_UNAUTHORIZED_TOKEN
+          - RUN_MODE_NOT_SUPPORTED
+          - OPPORTUNITY_NOT_FOUND
+          - AI_FORBIDDEN
+          - AI_DOCUMENT_NOT_FOUND
+          - TYPEFORM_FORM_NOT_FOUND
+          - CUSTOM_FIELD_SECTION_LIMIT
+          - CUSTOM_FIELD_MAX_PER_TENANT
+          - CUSTOM_FIELD_MAX_PLACEMENTS
+          - CUSTOM_FIELD_PROHIBITED_TYPE_CHANGE
+          - CUSTOM_FIELD_TYPE_RESTRICTION
+          - CUSTOM_FIELD_AUTHORIZED_DATA_OBJECT
+          - CUSTOM_FIELD_CURRENCY_CODE_EDITING
+          - CUSTOM_FIELD_GENERAL_ERROR
+          - CUSTOM_FIELD_INVALID_FORMAT
+          - CUSTOM_FIELD_NAME_EXIST
+          - POLICY_IMAGE_SIZE_EXCEEDED
+          - POLICY_IMAGE_LIMIT_EXCEEDED
+          - POLICY_FILE_SIZE_EXCEEDED
+          - FAILED_TO_GET_FILE_SIZE
+          - POLICY_IMAGE_UNSUPPORTED_MIMETYPE
+          - GITHUB_ENTERPRISE_CONVERSION_ERROR
+          - GITHUB_ENTERPRISE_CONVERSION_EMPTY
+          - GITHUB_ENTERPRISE_CONNECTION_EMPTY
+          - CUSTOM_FIELDS_PROHIBITED_LOCATION_CHANGE
+          - AZURE_ORG_UNITS_MAX_SUBSCRIPTIONS
+          - AZURE_ORG_UNITS_TENANT_EXISTS
+          - POLICY_VERSION_CONTENT_NOT_FOUND
+          - POLICY_VERSION_APPENDIX_NOT_FOUND
+          - AUDIT_HUB_AUDITOR_NOT_AUTHORIZED_IN_ACCOUNT
+          - AUDIT_HUB_AUDITOR_EXISTS_FOR_ACCOUNT
+          - AUDIT_NOT_FOUND
+          - AUDIT_WITH_NO_AUDITORS
+          - CUSTOM_FIELD_LOCATION_ENTITY_EDITING
+          - CUSTOM_FORMULA_LOCATION
+          - CUSTOM_FORMULA_MAX_PER_TENANT
+          - CUSTOM_FIELD_NAME_EDITING
+          - CUSTOM_FIELD_IS_HIDDEN_EDITING
+          - CUSTOM_FIELD_DELETING
+          - SECURITY_QUESTIONNAIRE_INVALID_STATUS
+          - AWS_IDENTITY_CENTER_FORBIDDEN
+          - AWS_IDENTITY_CENTER_UNAUTHORIZED
+          - VULNERABILITY_CONNECTION_UNAUTHORIZED
+          - SLACK_CONNECTION_MISSING_CLIENT_ID
+          - EXTERNAL_CLIENT_ROUTER_CLIENT_ID_MULTIPLE_TENANTS
+          - AWS_ACTIONS_DENIED_BY_CONFIGURATION
+          - CUSTOM_FIELD_FRAMEWORK_ASSOCIATION_REQUIRED
+          - LEEN_MISSING_LEEN_RESOURCE
+          - AWS_IDENTITY_CENTER_SERVICE_UNAVAILABLE
+          - SUPPORT_USER_NOT_SUPPORTED
+          - INVALID_AUTHORIZATION_CONTEXT
+          - BITBUCKET_CODE_ACCESS_DENIED
+          - CUSTOM_WORKFLOWS_AUTHORIZED_DATA_OBJECT
+          - CUSTOM_WORKFLOWS_WORKFLOW_NOT_FOUND
+          - CUSTOM_WORKFLOWS_STEP_NOT_FOUND
+          - CUSTOM_WORKFLOWS_DRAFT_NOT_FOUND
+          - CUSTOM_WORKFLOWS_VERSION_STATUS_MISMATCH
+          - CUSTOM_WORKFLOWS_NO_PUBLISHED_VERSION
+          - POLICY_VERSION_VERSION_NOT_SAVED
+          - POLICY_VERSION_VERSION_NOT_UPDATED
+          - POLICY_VERSION_VERSION_INVALID_STATUS
+          - FAILED_TO_GET_POLICY_VERSION_VERSION_HTML
+          - POLICY_VERSION_PDF_NOT_FOUND
+          - POLICY_VERSION_FILE_NOT_FOUND
+          - POLICY_STATUS_NOT_UPDATED
+          - POLICY_OWNER_MISSING
+          - USER_IS_NOT_POLICY_OWNER
+          - POLICY_VERSION_FILE_NOT_UPDATED
+          - POLICY_VERSION_FILE_INCORRECT_PASSWORD
+          - POLICY_INVALID_STATUS
+          - DATA_INGEST_INVALID_SCHEMA
+          - EXCEPTION_MANAGEMENT_WORKFLOW_NAME_TAKEN
+          - DATA_INGEST_CUSTOM_RESOURCE_NOT_FOUND
+          - DATA_INGEST_SCHEMA_NOT_FOUND
+          - DATA_INGESTION_INVALID_DATA
+          - DATA_INGESTION_CONNECTION_NOT_ASSOCIATED
+          - DATA_INGEST_DATA_NOT_FOUND
+          - DATA_INGEST_DUPLICATED_CUSTOM_DATA
+          - CUSTOM_CONNECTION_DUPLICATED_CONNECTION
+          - CUSTOM_CONNECTION_DUPLICATED_RESOURCE
+          - CUSTOM_CONNECTION_JSON_MAX_SIZE
+          - CUSTOM_CONNECTION_HAS_NO_CUSTOM_RESOURCES
+          - AWS_UNAVAILABLE_REGIONS
+          - AWS_SECURITY_AUDIT_ACTIONS_NOT_MET
+          - CUSTOM_RESOURCE_ALREADY_EXISTS
+          - CUSTOM_DATA_GENERATE_EVIDENCE_WORKFLOW_INVALID_INPUT
+          - CUSTOM_CONNECTION_NOT_FOUND
+          - SLACK_HMAC_REQUEST_INVALID
+          - SLACK_HMAC_VERIFICATION_FAILED
+          - POC_EXPIRED
+          - VENDOR_SECURITY_REVIEW_DOCUMENT_ALREADY_EXISTS
+          - UNAUTHORIZED_USA_PERSON_RESTRICTION
+          - FILE_FORMAT_MISMATCH
+          - ATLASSIAN_ACCESS_DENIED
+          - MICROSOFT_365_AUTH_TENANT_MISMATCH
+          - COMPANY_NOT_FOUND
+          - TC_PARTNER_INVALID_DOMAIN
+          - TC_PARTNER_KEY_NOT_FOUND
+          - TC_PARTNER_KEY_FORBIDDEN
+          - TC_PARTNER_ACCOUNT_MISSING
+          - SEARCH_ENGINE_SEARCH_DOCUMENTS_ERROR
+          - UNSUPPORTED_ACCOUNT_ENTITLEMENT
+          - DELETE_CURRENT_VERSION
+          - VERSION_ALREADY_DELETED
+          - MISSING_EVIDENCE
+          - MISSING_ARTIFACT
+          - ARTIFACT_DELETE_FAILED
+          - EVIDENCE_UPDATE_LATEST_VERSION_FAILED
+          - TEST_EVIDENCE_DELETE_FAIL
+          - EVIDENCE_LIBRARY_TICKET_CONNECTION_NOT_FOUND
+          - CONTROL_TEST_INSTANCE_HISTORY_NOT_FOUND
+          - CONTROL_TEST_INSTANCE_CHECK_TYPE_INVALID
+          - TICKET_PROVIDER_CREATION_TICKET_NO_PERMISSIONS
+          - TICKET_PROVIDER_PROJECT_NOT_SIMPLIFIED
+          - CONTROL_TEST_TEMPLATE_NOT_FOUND
+          - CONTROL_TEST_INSTANCE_NAME_EXISTS
+          - MULTI_IDP_DUPLICATE_CONNECTIONS_RANKING
+          - MULTI_IDP_CONNECTION_RANKING_PROVIDER_NOT_ALLOWED
+          - TRUST_CENTER_MANAGED_BY_SAFEBASE
+          - FEDRAMP_20X_KSI_REPORT_SHARE_TOKEN_MISMATCH
+          - FEDRAMP_20X_KSI_REPORT_NOT_SHAREABLE
+          - TRUST_BAD_REQUEST
+          - TRUST_UNAUTHORIZED
+          - TRUST_FORBIDDEN
+          - TRUST_NOT_FOUND
+          - TRUST_INTERNAL_SERVER_ERROR
+          - AGENT_WEBHOOK_PROCESSING_FAILED
+          - AGENT_VRM_EXPORT_FAILED
+          - RISK_REGISTER_NOT_OWNED
+          - RISK_REGISTER_MINIMUM_ONE_REQUIRED
+          - RISK_REGISTER_NOT_EMPTY
+          - RISK_REGISTER_NAME_IN_USE
+          - RISK_REGISTER_LIMIT_REACHED
+          - MCP_BAD_ACCESS_TOKEN
+          - MCP_ENTITY_NOT_FOUND
+          - MCP_JWT_EMPTY_ACCOUNT
+          - MCP_TOKEN_EXPIRED
+          - MCP_USER_NOT_FOUND
+          - MCP_JWT_INVALID_PAYLOAD
+          - OAUTH_ACCOUNT_NOT_FOUND
+          - OAUTH_ENTITY_NOT_FOUND
+          - OAUTH_JWT_INVALID_PAYLOAD
+          - OAUTH_TOKEN_EXPIRED
+          - EVIDENCE_EXCLUSION_NOT_FOUND
+          - EVIDENCE_EXCLUSION_CUSTOMER_REQUEST_NOT_FOUND
+          - EVIDENCE_EXCLUSION_CONTROL_NOT_LINKED
+          - EVIDENCE_EXCLUSION_REQUEST_NOT_SYNCED
+          - GAINSIGHT_API_UNAVAILABLE
+          - GAINSIGHT_API_UNAUTHORIZED
+          - GAINSIGHT_INVALID_TOKEN
+          - TICKET_PROVIDER_PROJECT_NOT_FOUND
+          type: string
+          description: 'Canonical error code identifying why this input failed validation. Expected values: `ENTITY_NOT_FOUND` (template not in catalog), `PRODUCT_NOT_FOUND` (workspace not accessible), `DUPLICATE_CONTROL_CODE` (already provisioned in workspace and `allowDuplicates` was not set), `VALIDATION` (override field violated an entity constraint).'
+      required:
+      - inputIndex
+      - workspaceId
+      - templateIdentifier
+      - reason
+      - code
+    ControlLibraryDetailResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1042
+          description: Unique identifier of the Control Template.
+        code:
+          type: string
+          example: DCF-42
+          description: Human-readable Control code.
+        controlNumber:
+          type: number
+          example: 42
+          description: Sequential Control number used for sorting and display.
+        name:
+          type: string
+          example: Access Control Policy
+          description: Display name of the Control Template.
+        description:
+          type:
+          - string
+          - 'null'
+          example: Documented policy describing access controls...
+          description: Description of the Control Template.
+        question:
+          type:
+          - string
+          - 'null'
+          example: Does the company enforce documented access controls?
+          description: Audit-prep question presented to the Control owner for this Control Template.
+        activity:
+          type:
+          - string
+          - 'null'
+          example: Review and approve access requests at least quarterly.
+          description: Recommended ongoing activity for personnel responsible for this Control.
+        domain:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DATA_AND_PRIVACY
+          - INTERNAL_SECURITY_PROCEDURES
+          - ORGANIZATIONAL_SECURITY
+          - PRODUCT_SECURITY
+          - INFRASTRUCTURE_SECURITY
+          - PHYSICAL_SECURITY
+          - AVAILABILITY
+          - CONFIDENTIALITY
+          - PROCESSING_INTEGRITY
+          - PRIVACY
+          - GENERAL
+          description: Domain classification of the Control Template.
+        category:
+          type:
+          - string
+          - 'null'
+          enum:
+          - CUSTOMER_DATA_POLICIES
+          - INTERNAL_ADMIN_TOOL
+          - SOFTWARE_DEVELOPMENT_LIFE_CYCLE
+          - RESPONSIBLE_DISCLOSURE_POLICY
+          - ACCESS_CONTROL
+          - VULNERABILITY_MANAGEMENT
+          - SECURITY_ISSUES
+          - BUSINESS_CONTINUITY
+          - INCIDENT_RESPONSE_PLAN
+          - SECURITY_POLICIES
+          - SECURITY_PROGRAM
+          - PERSONNEL_SECURITY
+          - ENDPOINTS_LAPTOPS
+          - DATA_ENCRYPTION
+          - VENDOR_MANAGEMENT
+          - SOFTWARE_APPLICATION_SECURITY
+          - CUSTOMER_COMMUNICATION
+          - AUTHENTICATION_AND_AUTHORIZATION
+          - AVAILABILITY
+          - STORAGE
+          - BACKUP
+          - LOGGING
+          - MONITORING
+          - NETWORK
+          - PROTECTING_SECRETS
+          - DATA_CENTER_SECURITY
+          - SCALING
+          - BACKUPS
+          - DATA
+          - EMPLOYEE_RESPONSIBILITIES
+          - REGRESSION_TESTING
+          - APPLICATION_AND_SYSTEM_EDITS
+          - COMMUNICATION_OF_OBJECTIVES_RELATED_TO_PRIVACY_PRACTICES
+          - PRIVACY_RELATED_TO_CHOICE_AND_CONSENT
+          - PRIVACY_RELATED_TO_COLLECTION
+          - PRIVACY_RELATED_TO_USE_RETENTION_AND_DISPOSAL
+          - PRIVACY_CRITERIA_RELATED_TO_ACCESS
+          - PRIVACY_CRITERIA_RELATED_TO_DISCLOSURE_AND_NOTIFICATION
+          - PRIVACY_RELATED_TO_QUALITY
+          - PRIVACY_RELATED_TO_MONITORING_AND_ENFORCEMENT
+          - DEFINITIONS
+          - BREACH_NOTIFICATIONS
+          - TECHNICAL
+          - OPERATIONAL
+          - MANAGEMENT
+          description: Category classification of the Control Template.
+        inUse:
+          type: boolean
+          example: true
+          description: True when at least one Control derived from this Template exists in the caller account.
+        testTemplates:
+          description: Default Test Templates mapped to this Control. Only returned when `expand[]=testTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryTestTemplateCompactResponsePublicV2Dto'
+        policyTemplates:
+          description: Default Policy Templates mapped to this Control. Only returned when `expand[]=policyTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryPolicyTemplateCompactResponsePublicV2Dto'
+        evidenceTemplates:
+          description: Default Evidence Templates mapped to this Control. Only returned when `expand[]=evidenceTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryEvidenceTemplateCompactResponsePublicV2Dto'
+        requirementTemplates:
+          description: Requirement Templates mapped to this Control, each with its parent Framework. Only returned when `expand[]=requirementTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryRequirementTemplateCompactResponsePublicV2Dto'
+        controlsUsingTemplate:
+          description: Tenant Controls derived from this Template, one row per (Control × Workspace) edge. Includes archived Controls; excludes soft-deleted. Only returned when `expand[]=controlsUsingTemplate` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryTenantControlCompactResponsePublicV2Dto'
+      required:
+      - id
+      - code
+      - controlNumber
+      - name
+      - description
+      - question
+      - activity
+      - domain
+      - category
+      - inUse
+    ControlLibrarySortEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+      - name
+      - controlNumber
+    ControlLibraryTestTemplateCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 305
+          description: Unique identifier of the Test Template.
+        name:
+          type: string
+          example: MFA Enabled Across Workforce
+          description: Display name of the Test Template.
+        description:
+          type:
+          - string
+          - 'null'
+          example: Verifies multi-factor authentication is enabled for all workforce identities.
+          description: Detailed description of the Test Template.
+        rating:
+          type: string
+          example: RECOMMENDED
+          description: Drata-assigned rating that signals how strongly this Test is recommended (e.g. `RECOMMENDED`, `STRONGLY_RECOMMENDED`).
+        source:
+          type: string
+          example: DRATA
+          description: Origin of the Test Template (e.g. `DRATA`, `CUSTOM`, `EXTERNAL`, `ACORN`, `DRATA_LIBRARY`).
+      required:
+      - id
+      - name
+      - description
+      - rating
+      - source
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    ControlLibraryImportOutcomeResponsePublicV2Dto:
+      type: object
+      properties:
+        inputIndex:
+          type: number
+          description: Index of the corresponding input in the request's `data` array. Use to correlate outcomes back to inputs.
+        templateIdentifier:
+          oneOf:
+          - type: number
+          - type: string
+          description: Template identifier echoed from the input (id or code).
+        workspaceId:
+          type: number
+          description: Workspace the input targeted.
+        controlId:
+          type: number
+          description: Resulting tenant Control id. Present for `created` and `skipped` (echoes the existing control); absent for `failed`.
+        code:
+          type: string
+          example: DCF-042
+          description: Resulting tenant Control code. For `created` outputs this is the code persisted on the new row, which may carry a duplicate-suffix (e.g. `DCF-042.1`) when `allowDuplicates` was set. For `skipped` outputs this echoes the existing control. Absent for `failed`.
+        status:
+          type: string
+          enum:
+          - created
+          - skipped
+          - failed
+          description: '`created`: new control provisioned. `skipped`: template already present in workspace and `allowDuplicates` was false (echoes the existing controlId). `failed`: input couldn''t be provisioned — see `failureReason`.'
+        failureReason:
+          type: string
+          description: Human-readable reason this input failed. Present only when `status` is `failed`.
+        associations:
+          description: Per-association-type outcome buckets. Each bucket reports the entities `created`, those now `mapped` to this control (whether newly created or pre-existing), and any per-entity `failures`.
+          allOf:
+          - $ref: '#/components/schemas/ControlLibraryImportAssociationsResponsePublicV2Dto'
+        customFields:
+          description: Custom Field values written onto the newly provisioned Control. Echoes the post-submission state — same shape returned by the Control GET endpoints. Present only when the input supplied `customFields` and `status` is `created`.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+      required:
+      - inputIndex
+      - templateIdentifier
+      - workspaceId
+      - status
+      - associations
+    ControlAssociationFailurePublicV2Dto:
+      type: object
+      properties:
+        identifier:
+          oneOf:
+          - type: number
+          - type: string
+          description: Identifier of the entity that failed (id or code).
+        reason:
+          type: string
+          description: Human-readable reason this entity failed. Prefixed with `Creation failed:` or `Mapping failed:` to indicate which phase encountered the error.
+      required:
+      - identifier
+      - reason
+    ControlLibraryImportResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Per-input outcomes in the same order as the request `data` array. Each outcome reports status, resulting controlId, and per-association-type provisioning buckets.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryImportOutcomeResponsePublicV2Dto'
+      required:
+      - data
+    ControlLibraryResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ControlLibraryImportInputPublicV2Dto:
+      type: object
+      properties:
+        workspaceId:
+          type: number
+          example: 100
+          description: The workspace where the Control will be provisioned.
+        templateId:
+          type: number
+          example: 1042
+          description: The Control Library template id to provision from.
+        name:
+          type: string
+          maxLength: 191
+          example: Quarterly User Access Reviews
+          description: Override the name on the provisioned Control. Defaults to the template name.
+        description:
+          type: string
+          maxLength: 30000
+          example: Access to critical systems is reviewed on a quarterly basis to ensure that only authorized users retain access.
+          description: Override the description on the provisioned Control. Defaults to the template description.
+        question:
+          type: string
+          maxLength: 768
+          example: Is the access review performed on a quarterly basis?
+          description: Override the question on the provisioned Control. Defaults to the template question.
+        activity:
+          type: string
+          maxLength: 768
+          example: On a quarterly schedule, generate access reports from identity providers.
+          description: Override the activity on the provisioned Control. Defaults to the template activity.
+        customFields:
+          description: Custom Field submissions to apply to the provisioned Control. Each entry must reference the Custom Field by `id` or `name` and provide a `value`. Any Custom Field marked as required must be present; invalid or missing required fields cause the entire import to be rejected.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+      required:
+      - workspaceId
+      - templateId
+    ControlLibraryDetailExpandEnum:
+      type: string
+      enum:
+      - testTemplates
+      - policyTemplates
+      - evidenceTemplates
+      - requirementTemplates
+      - controlsUsingTemplate
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ControlLibraryRequirementFrameworkCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        slug:
+          type: string
+          example: soc2
+          description: Stable slug identifier for the Framework.
+        name:
+          type: string
+          example: SOC 2
+          description: Display name of the Framework.
+      required:
+      - slug
+      - name
+    ControlLibraryTenantControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        controlId:
+          type: number
+          example: 8801
+          description: Unique identifier of the tenant Control row.
+        code:
+          type: string
+          example: DCF-042
+          description: Tenant-side Control code. May be suffixed (e.g. `DCF-042.1`) when multiple copies of the same template exist in a Workspace.
+        workspaceId:
+          type: number
+          example: 100
+          description: Identifier of the Workspace this Control belongs to.
+        workspaceName:
+          type: string
+          example: Production
+          description: Display name of the Workspace.
+      required:
+      - controlId
+      - code
+      - workspaceId
+      - workspaceName
+    ControlLibraryItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1042
+          description: Unique identifier of the Control Template.
+        code:
+          type: string
+          example: DCF-42
+          description: Human-readable Control code.
+        controlNumber:
+          type: number
+          example: 42
+          description: Sequential Control number used for sorting and display.
+        name:
+          type: string
+          example: Access Control Policy
+          description: Display name of the Control Template.
+        description:
+          type:
+          - string
+          - 'null'
+          example: Documented policy describing access controls...
+          description: Description of the Control Template.
+        question:
+          type:
+          - string
+          - 'null'
+          example: Does the company enforce documented access controls?
+          description: Audit-prep question presented to the Control owner for this Control Template.
+        activity:
+          type:
+          - string
+          - 'null'
+          example: Review and approve access requests at least quarterly.
+          description: Recommended ongoing activity for personnel responsible for this Control.
+        domain:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DATA_AND_PRIVACY
+          - INTERNAL_SECURITY_PROCEDURES
+          - ORGANIZATIONAL_SECURITY
+          - PRODUCT_SECURITY
+          - INFRASTRUCTURE_SECURITY
+          - PHYSICAL_SECURITY
+          - AVAILABILITY
+          - CONFIDENTIALITY
+          - PROCESSING_INTEGRITY
+          - PRIVACY
+          - GENERAL
+          description: Domain classification of the Control Template.
+        category:
+          type:
+          - string
+          - 'null'
+          enum:
+          - CUSTOMER_DATA_POLICIES
+          - INTERNAL_ADMIN_TOOL
+          - SOFTWARE_DEVELOPMENT_LIFE_CYCLE
+          - RESPONSIBLE_DISCLOSURE_POLICY
+          - ACCESS_CONTROL
+          - VULNERABILITY_MANAGEMENT
+          - SECURITY_ISSUES
+          - BUSINESS_CONTINUITY
+          - INCIDENT_RESPONSE_PLAN
+          - SECURITY_POLICIES
+          - SECURITY_PROGRAM
+          - PERSONNEL_SECURITY
+          - ENDPOINTS_LAPTOPS
+          - DATA_ENCRYPTION
+          - VENDOR_MANAGEMENT
+          - SOFTWARE_APPLICATION_SECURITY
+          - CUSTOMER_COMMUNICATION
+          - AUTHENTICATION_AND_AUTHORIZATION
+          - AVAILABILITY
+          - STORAGE
+          - BACKUP
+          - LOGGING
+          - MONITORING
+          - NETWORK
+          - PROTECTING_SECRETS
+          - DATA_CENTER_SECURITY
+          - SCALING
+          - BACKUPS
+          - DATA
+          - EMPLOYEE_RESPONSIBILITIES
+          - REGRESSION_TESTING
+          - APPLICATION_AND_SYSTEM_EDITS
+          - COMMUNICATION_OF_OBJECTIVES_RELATED_TO_PRIVACY_PRACTICES
+          - PRIVACY_RELATED_TO_CHOICE_AND_CONSENT
+          - PRIVACY_RELATED_TO_COLLECTION
+          - PRIVACY_RELATED_TO_USE_RETENTION_AND_DISPOSAL
+          - PRIVACY_CRITERIA_RELATED_TO_ACCESS
+          - PRIVACY_CRITERIA_RELATED_TO_DISCLOSURE_AND_NOTIFICATION
+          - PRIVACY_RELATED_TO_QUALITY
+          - PRIVACY_RELATED_TO_MONITORING_AND_ENFORCEMENT
+          - DEFINITIONS
+          - BREACH_NOTIFICATIONS
+          - TECHNICAL
+          - OPERATIONAL
+          - MANAGEMENT
+          description: Category classification of the Control Template.
+        inUse:
+          type: boolean
+          example: true
+          description: True when at least one Control derived from this Template exists in the caller account.
+      required:
+      - id
+      - code
+      - controlNumber
+      - name
+      - description
+      - question
+      - activity
+      - domain
+      - category
+      - inUse
+    ControlCategoryEnum:
+      type: string
+      enum:
+      - CUSTOMER_DATA_POLICIES
+      - INTERNAL_ADMIN_TOOL
+      - SOFTWARE_DEVELOPMENT_LIFE_CYCLE
+      - RESPONSIBLE_DISCLOSURE_POLICY
+      - ACCESS_CONTROL
+      - VULNERABILITY_MANAGEMENT
+      - SECURITY_ISSUES
+      - BUSINESS_CONTINUITY
+      - INCIDENT_RESPONSE_PLAN
+      - SECURITY_POLICIES
+      - SECURITY_PROGRAM
+      - PERSONNEL_SECURITY
+      - ENDPOINTS_LAPTOPS
+      - DATA_ENCRYPTION
+      - VENDOR_MANAGEMENT
+      - SOFTWARE_APPLICATION_SECURITY
+      - CUSTOMER_COMMUNICATION
+      - AUTHENTICATION_AND_AUTHORIZATION
+      - AVAILABILITY
+      - STORAGE
+      - BACKUP
+      - LOGGING
+      - MONITORING
+      - NETWORK
+      - PROTECTING_SECRETS
+      - DATA_CENTER_SECURITY
+      - SCALING
+      - BACKUPS
+      - DATA
+      - EMPLOYEE_RESPONSIBILITIES
+      - REGRESSION_TESTING
+      - APPLICATION_AND_SYSTEM_EDITS
+      - COMMUNICATION_OF_OBJECTIVES_RELATED_TO_PRIVACY_PRACTICES
+      - PRIVACY_RELATED_TO_CHOICE_AND_CONSENT
+      - PRIVACY_RELATED_TO_COLLECTION
+      - PRIVACY_RELATED_TO_USE_RETENTION_AND_DISPOSAL
+      - PRIVACY_CRITERIA_RELATED_TO_ACCESS
+      - PRIVACY_CRITERIA_RELATED_TO_DISCLOSURE_AND_NOTIFICATION
+      - PRIVACY_RELATED_TO_QUALITY
+      - PRIVACY_RELATED_TO_MONITORING_AND_ENFORCEMENT
+      - DEFINITIONS
+      - BREACH_NOTIFICATIONS
+      - TECHNICAL
+      - OPERATIONAL
+      - MANAGEMENT
+    ControlLibraryEvidenceTemplateCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 412
+          description: Unique identifier of the Evidence Template.
+        evidenceTemplateCode:
+          type: string
+          example: DEC-12
+          description: Human-readable Evidence Template code.
+        name:
+          type: string
+          example: Quarterly Access Review
+          description: Display name of the Evidence Template.
+        requestDescription:
+          type:
+          - string
+          - 'null'
+          example: Upload a signed copy of the most recent quarterly access review.
+          description: Customer-facing description of what evidence to collect for this Evidence Template.
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          example: Export the access list from your IdP and have a Control owner sign-off.
+          description: Internal guidance on how to satisfy this Evidence Template.
+      required:
+      - id
+      - evidenceTemplateCode
+      - name
+      - requestDescription
+      - implementationGuidance
+    ControlLibraryImportErrorResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        invalidInputs:
+          description: Every offending input from the request, with the reason it failed pre-flight validation. None of the request was committed — the caller must fix the listed inputs and retry the entire request.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryImportValidationErrorPublicV2Dto'
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+      - invalidInputs
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    CustomFieldResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
+      required:
+      - customFieldId
+      - name
+    ControlLibraryImportAssociationsResponsePublicV2Dto:
+      type: object
+      properties:
+        tests:
+          description: Test associations created or linked during import.
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+        policies:
+          description: Policy associations created or linked during import.
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+        evidence:
+          description: Evidence associations created or linked during import (mass noun — covers any number of evidence items).
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+        requirements:
+          description: Requirement associations created or linked during import.
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+      required:
+      - tests
+      - policies
+      - evidence
+      - requirements
+    ControlLibraryPolicyTemplateCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 201
+          description: Unique identifier of the Policy Template.
+        name:
+          type: string
+          example: Access Control Policy
+          description: Display name of the Policy Template.
+        description:
+          type: string
+          example: Documents the company approach to provisioning, reviewing, and revoking access...
+          description: Detailed description of the Policy Template.
+      required:
+      - id
+      - name
+      - description
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
+    ControlLibraryRequirementTemplateCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 501
+          description: Unique identifier of the Requirement Template.
+        name:
+          type: string
+          example: CC6.1
+          description: Display name of the Requirement Template.
+        description:
+          type: string
+          example: The entity implements logical access security software, infrastructure, and architectures...
+          description: Detailed description of the Requirement Template.
+        longDescription:
+          type:
+          - string
+          - 'null'
+          example: Extended narrative covering scope and exceptions...
+          description: Extended description of the Requirement Template, if available.
+        additionalInfo:
+          type:
+          - string
+          - 'null'
+          example: Additional context for auditors.
+          description: Free-form supplemental info for this Requirement Template.
+        additionalInfo2:
+          type:
+          - string
+          - 'null'
+          description: Second free-form supplemental info field for this Requirement Template.
+        additionalInfo3:
+          type:
+          - string
+          - 'null'
+          description: Third free-form supplemental info field for this Requirement Template.
+        framework:
+          description: The Framework this Requirement Template belongs to.
+          allOf:
+          - $ref: '#/components/schemas/ControlLibraryRequirementFrameworkCompactResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - longDescription
+      - additionalInfo
+      - additionalInfo2
+      - additionalInfo3
+      - framework
+    ControlLibraryImportRequestPublicV2Dto:
+      type: object
+      properties:
+        data:
+          minItems: 1
+          description: 'List of import inputs. Each input provisions one tenant Control from a Control Library template. Defaults from the template are applied; per-input fields override them. Limits: at most 100 inputs per request, spanning no more than 10 distinct workspaceIds.'
+          maxItems: 100
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryImportInputPublicV2Dto'
+        allowDuplicates:
+          type: boolean
+          default: false
+          description: When true, a template already provisioned in the target workspace produces an additional copy with a suffixed code. When false (default), duplicate inputs reject the entire request.
+      required:
+      - data
+    ControlDomainEnum:
+      type: string
+      enum:
+      - DATA_AND_PRIVACY
+      - INTERNAL_SECURITY_PROCEDURES
+      - ORGANIZATIONAL_SECURITY
+      - PRODUCT_SECURITY
+      - INFRASTRUCTURE_SECURITY
+      - PHYSICAL_SECURITY
+      - AVAILABILITY
+      - CONFIDENTIALITY
+      - PROCESSING_INTEGRITY
+      - PRIVACY
+      - GENERAL
+    ControlAssociationProvisioningResponsePublicV2Dto:
+      type: object
+      properties:
+        created:
+          description: IDs of entities newly created during this import. Every id here is also in `mapped` — a freshly created entity is also freshly linked to this control.
+          type: array
+          items:
+            type: number
+        mapped:
+          description: IDs of entities now linked to this control via the junction row, whether newly created or pre-existing. An existing entity newly mapped to this control appears here but NOT in `created`.
+          type: array
+          items:
+            type: number
+        failures:
+          description: Per-entity failures encountered while creating or mapping this association. Each entry includes the entity identifier and a reason whose prefix names the failure type (creation vs mapping).
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlAssociationFailurePublicV2Dto'
+      required:
+      - created
+      - mapped
+      - failures
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

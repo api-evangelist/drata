@@ -1,0 +1,2343 @@
+openapi: 3.2.0
+info:
+  title: Drata Vendor Security Reviews API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Vendor Security Reviews across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Vendor Security Reviews
+  description: Vendor Security Reviews track the status of security reviews for Vendors. You can create a security review, upload questionnaires, and track the progress of the review. The [help docs](https://help.drata.com/en/articles/9676307-start-and-manage-security-reviews-for-your-vendors) have more information.
+paths:
+  /vendors/{vendorId}/security-reviews:
+    get:
+      description: 'Get a paginated list of all Security Reviews for a given Vendor.
+
+
+        🔒 Requires **Vendors: List Vendors** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviews
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: status[]
+        required: false
+        in: query
+        description: Filter by security review status
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewStatusEnum'
+      - name: type[]
+        required: false
+        in: query
+        description: Filter by security review type
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewTypeEnum'
+      - name: decision[]
+        required: false
+        in: query
+        description: Filter by security review decision
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewDecisionEnum'
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewExpandEnum'
+      - name: createdAtFrom
+        required: false
+        in: query
+        description: Filter to Security Reviews created on or after this value (inclusive).
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: createdAtTo
+        required: false
+        in: query
+        description: Filter to Security Reviews created on or before this value (inclusive).
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: updatedAtFrom
+        required: false
+        in: query
+        description: Filter to Security Reviews last updated on or after this value (inclusive)
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: updatedAtTo
+        required: false
+        in: query
+        description: Filter to Security Reviews last updated on or before this value (inclusive).
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityReviewsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Vendor Security Reviews
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-get
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    post:
+      description: 'Create a new Security Review for a given Vendor.
+
+
+        🔒 Requires **Vendors: Create Security Review** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_createVendorSecurityReview
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorSecurityReviewCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityReviewResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Vendor Security Review
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-post-security-review
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /vendors/{vendorId}/security-reviews/with-file:
+    post:
+      description: 'Create a new Security Review for a given Vendor with file upload in a single atomic operation.
+
+
+        🔒 Requires **Vendors: Create Security Review** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_createVendorSecurityReviewWithFile
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorSecurityReviewWithFileCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityReviewResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Vendor Security Review with File
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-post-security-review
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /vendor-security-reviews:
+    get:
+      description: 'Get a paginated list of Security Reviews across all Vendors in the account, subject to the caller''s vendor access. Supports the same filters as the per-vendor list plus optional `vendorIds[]` narrowing. When the caller has restricted vendor access, results are limited to the intersection of the vendors they are permitted to see and the (optional) `vendorIds[]` filter.
+
+
+        🔒 Requires **Vendors: List Vendors** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviewsAcrossVendors
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: status[]
+        required: false
+        in: query
+        description: Filter by security review status
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewStatusEnum'
+      - name: type[]
+        required: false
+        in: query
+        description: Filter by security review type
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewTypeEnum'
+      - name: decision[]
+        required: false
+        in: query
+        description: Filter by security review decision
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewDecisionEnum'
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewsAcrossVendorsExpandEnum'
+      - name: createdAtFrom
+        required: false
+        in: query
+        description: Filter to Security Reviews created on or after this value (inclusive).
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: createdAtTo
+        required: false
+        in: query
+        description: Filter to Security Reviews created on or before this value (inclusive).
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: updatedAtFrom
+        required: false
+        in: query
+        description: Filter to Security Reviews last updated on or after this value (inclusive)
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: updatedAtTo
+        required: false
+        in: query
+        description: Filter to Security Reviews last updated on or before this value (inclusive).
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: vendorIds[]
+        required: false
+        in: query
+        description: Filter to Security Reviews for these Vendor IDs. When the caller has restricted vendor access, the effective set is the intersection of this parameter and their permitted vendors.
+        schema:
+          uniqueItems: true
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityReviewsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Vendor Security Reviews Across Vendors
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-get
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /vendors/{vendorId}/security-reviews/{securityReviewId}:
+    get:
+      description: 'Get a specific Security Review for a given Vendor. For SOC_REPORT reviews the response includes a `socReview` field with the SOC form data.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Vendors: List Vendors** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_getVendorSecurityReview
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: securityReviewId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityReviewResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Vendor Security Review 🧪
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-get
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    put:
+      description: 'Update a Vendor Security Review. The `title` field applies to all security review types. The `socForm` field is only processed when securityReviewType is SOC_REPORT.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Vendors: Update Security Review** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_updateVendorSecurityReview
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: securityReviewId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VendorSecurityReviewUpdateRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityReviewResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Vendor Security Review 🧪
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-put-security-review
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /vendors/{vendorId}/security-questionnaires:
+    post:
+      operationId: VendorSecurityReviewsPublicV2Controller_sendSecurityQuestionnaire
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VendorSecurityReviewQuestionnaireCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityQuestionnaireResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Upload Security Questionnaire
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-post-upload-questionnaires
+      x-product-area:
+      - VENDOR_PUBLIC_API
+      description: '🔒 Requires **Vendors: Upload Security Questionnaire** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /vendors/{vendorId}/security-reviews/{securityReviewId}/security-questionnaires:
+    get:
+      description: 'List the questionnaires that belong to a Vendor Security Review. Cursor-paginated. Archived or soft-deleted questionnaires are excluded from the response.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Vendors: List Vendor Questionnaire** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviewSecurityQuestionnaires
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        description: The numeric ID of the vendor.
+        schema:
+          type: number
+      - name: securityReviewId
+        required: true
+        in: path
+        description: The numeric ID of the security review.
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityQuestionnairesResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Security Review Questionnaires 🧪
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-get-questionnaires
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    post:
+      description: 'Upload a Security Questionnaire to a Vendor for a specific Security Review.
+
+
+        🔒 Requires **Vendors: Upload Security Questionnaire** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_sendSecurityQuestionnaireForSecurityReview
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: securityReviewId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/VendorSecurityReviewQuestionnaireCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VendorSecurityQuestionnaireResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Upload Security Questionnaire
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-post-upload-questionnaires
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /vendors/{vendorId}/security-reviews/{securityReviewId}/actions:
+    get:
+      description: 'List available actions for a security review based on its current state (e.g. Finalize, Reopen). Supported for all security review types (SECURITY, SOC_REPORT, UPLOAD_REPORT). SOC_REPORT reviews additionally require the linked vendor report review to pass readiness validation before Finalize is offered.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Vendors: List Security Review Actions** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_listSecurityReviewActions
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: securityReviewId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityReviewActionsResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Security Review Actions 🧪
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-get-security-review-actions
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    post:
+      description: 'Execute an action on a security review. Finalize marks the review as complete and records the reviewer decision (APPROVED, APPROVED_WITH_CONDITIONS, or REJECTED); decision defaults to APPROVED when omitted. PENDING is not accepted; use Reopen instead if the reviewer needs to return the review to in-progress. Reopen returns a completed review to in-progress and, when `resetDecision` is true, also clears the prior decision back to PENDING. Supported for all security review types (SECURITY, SOC_REPORT, UPLOAD_REPORT).
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Vendors: Perform Security Review Action** permission.'
+      operationId: VendorSecurityReviewsPublicV2Controller_performSecurityReviewAction
+      parameters:
+      - name: vendorId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: securityReviewId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SecurityReviewActionRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecurityReviewActionResultResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: The requested action is not available for the current state of this security review.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Perform Security Review Action 🧪
+      tags:
+      - Vendor Security Reviews
+      x-drata-permissions:
+      - vendors-post-security-review-action
+      x-product-area:
+      - VENDOR_PUBLIC_API
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    VendorSecurityQuestionnairesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityQuestionnaireResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SocReviewFindingsSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        findings:
+          description: List of findings.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewFindingItemResponsePublicV2Dto'
+        hasMaterialImpact:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the findings have a material impact.
+          example: false
+      required:
+      - isComplete
+      - missingRequiredFields
+      - findings
+      - hasMaterialImpact
+    VendorSecurityReviewsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Full list of Vendor Security Reviews
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SecurityReviewActionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Available actions for the current security review state.
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityReviewActionItemResponsePublicV2Dto'
+      required:
+      - data
+    SocReviewReviewerInformationSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        reviewerUserId:
+          type:
+          - number
+          - 'null'
+          minimum: 1
+          description: User ID of the reviewer.
+          example: 42
+        reportIssueDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The date the report was issued. Cannot be a future date.
+          example: '2020-07-06'
+    VendorSecurityQuestionnaireResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Questionnaire ID
+        completedBy:
+          type:
+          - string
+          - 'null'
+          example: Acme
+          description: Who completed the Questionnaire, null if not completed
+        recipientEmail:
+          type: string
+          maxLength: 191
+          format: email
+          example: jdoe@company.com
+          description: The email address to receive the Questionnaire
+        isCompleted:
+          type: boolean
+          example: 'true'
+          description: The status of the Questionnaire
+        dateSent:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Questionnaire was sent
+        isManualUpload:
+          type: boolean
+          example: 'true'
+          description: Flag indicating whether the questionnaire was manually uploaded
+        responseId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: The Questionnaire response ID to the Questionnaire data file, null if not completed
+        title:
+          type: string
+          example: Vendor Security Questionnaire
+          description: Vendor Questionnaire title
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - SENT
+          example: SENT
+          description: Lifecycle status of the Questionnaire. DRAFT is an agent-generated follow-up questionnaire that has been saved but not yet sent to the vendor.
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Questionnaire was completed, null if not completed
+        totalQuestions:
+          type:
+          - number
+          - 'null'
+          example: 10
+          description: Total number of questions in the Questionnaire, null for DRAFT Questionnaires
+        totalQuestionsAnswered:
+          type:
+          - number
+          - 'null'
+          example: 10
+          description: Total number of questions answered, null for DRAFT Questionnaires
+        reminderDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the most recent reminder for this Questionnaire was sent, if any
+      required:
+      - id
+      - completedBy
+      - recipientEmail
+      - isCompleted
+      - dateSent
+      - isManualUpload
+      - responseId
+      - status
+      - completedAt
+      - totalQuestions
+      - totalQuestionsAnswered
+      - reminderDate
+    HateoasLinkPublicV2Dto:
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the linked resource
+          example: https://app.drata.com/risk/vendors/profile/1/overview
+      required:
+      - href
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    SecurityReviewActionItemResponsePublicV2Dto:
+      type: object
+      properties:
+        action:
+          example: finalize
+          description: Action name.
+          allOf:
+          - $ref: '#/components/schemas/SecurityReviewActionEnum'
+      required:
+      - action
+    SocReviewServicesAndLocationsSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        services:
+          description: Services included in the report.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewServiceItemResponsePublicV2Dto'
+        locations:
+          description: Locations covered by the report.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewLocationItemResponsePublicV2Dto'
+      required:
+      - isComplete
+      - missingRequiredFields
+      - services
+      - locations
+    VendorReportOpinionEnum:
+      type: string
+      enum:
+      - UNQUALIFIED
+      - QUALIFIED
+      - ADVERSE
+      - DISCLAIMER
+    SocReviewLocationItemRequestPublicV2Dto:
+      type: object
+      properties:
+        city:
+          type: string
+          maxLength: 191
+          description: City of the geographic location where the vendor provides its services.
+          example: Austin
+        stateOrCountry:
+          type: string
+          maxLength: 191
+          description: State (for US-based locations) or country (for international locations) paired with the city to identify where the vendor provides its services.
+          example: TX
+    SocReviewReportOpinionSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        reportOpinion:
+          type:
+          - string
+          - 'null'
+          description: The auditor's opinion on the report.
+          enum:
+          - UNQUALIFIED
+          - QUALIFIED
+          - ADVERSE
+          - DISCLAIMER
+          example: UNQUALIFIED
+        encompassBusinessNeeds:
+          type:
+          - boolean
+          - 'null'
+          description: Do control objectives encompass business needs?
+          example: true
+        followUpActivity:
+          type:
+          - string
+          - 'null'
+          description: Planned follow-up activity if the report opinion was qualified.
+          example: Schedule a follow-up review in 90 days.
+      required:
+      - isComplete
+      - missingRequiredFields
+      - reportOpinion
+      - encompassBusinessNeeds
+      - followUpActivity
+    VendorReviewScopeTypeEnum:
+      type: string
+      enum:
+      - TYPE_1
+      - TYPE_2
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    VendorSecurityReviewQuestionnaireCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        files:
+          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .csv'
+          type: array
+          items:
+            type: string
+            format: binary
+      required:
+      - files
+    SocReviewUserControlItemRequestPublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 30000
+          description: Description of the user control.
+        inPlace:
+          type: boolean
+          description: Whether the user control is in place.
+          example: true
+    SecurityReviewActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: Action to perform on the security review.
+          example: finalize
+          allOf:
+          - $ref: '#/components/schemas/SecurityReviewActionEnum'
+        decision:
+          example: APPROVED
+          description: Finalization decision. Only valid when `action` is `finalize`. Must be one of APPROVED, APPROVED_WITH_CONDITIONS, or REJECTED. PENDING is intentionally not accepted; use the `reopen` action if the reviewer needs to return the review to in-progress. When omitted on `finalize`, defaults to APPROVED for backward compatibility.
+          allOf:
+          - $ref: '#/components/schemas/SecurityReviewFinalizeDecisionEnum'
+        note:
+          type: string
+          maxLength: 1000
+          description: Optional reviewer note captured with the finalization. Only valid when `action` is `finalize`.
+        resetDecision:
+          type: boolean
+          example: true
+          description: When true, reset the decision back to PENDING as part of the reopen. Only valid when `action` is `reopen`. Defaults to `false`, which preserves the prior decision on the reopened review.
+      required:
+      - action
+    SecurityReviewFinalizeDecisionEnum:
+      type: string
+      enum:
+      - APPROVED
+      - APPROVED_WITH_CONDITIONS
+      - REJECTED
+    VendorCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor ID
+        name:
+          type: string
+          example: Acme
+          description: Vendor name
+      required:
+      - id
+      - name
+    SocReviewFormSaveRequestPublicV2Dto:
+      type: object
+      properties:
+        reviewerInformation:
+          description: Reviewer identity and report issue date.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReviewerInformationSectionRequestPublicV2Dto'
+        complianceScope:
+          description: SOC certification type, scope type, audit period, and trust service criteria.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewComplianceScopeSectionRequestPublicV2Dto'
+        reportOpinion:
+          description: Auditor's opinion on the report and any follow-up activity.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReportOpinionSectionRequestPublicV2Dto'
+        findings:
+          description: Exceptions or findings noted in the report and their material impact.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewFindingsSectionRequestPublicV2Dto'
+        endUserControls:
+          description: Complementary user entity controls identified in the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewEndUserControlsSectionRequestPublicV2Dto'
+        servicesAndLocations:
+          description: Services and physical locations covered by the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewServicesAndLocationsSectionRequestPublicV2Dto'
+        cpaFirm:
+          description: CPA firm that performed the audit and procedures used to assess its reputation.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewCpaFirmSectionRequestPublicV2Dto'
+        subserviceOrganizations:
+          description: Subservice organizations included in the report and the method used to present them.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewSubserviceOrganizationsSectionRequestPublicV2Dto'
+    SocReviewSubserviceOrganizationsSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        subserviceOrganization:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          description: Subservice organizations listed in the report.
+        subserviceOrganizationUsingInclusiveMethod:
+          type:
+          - boolean
+          - 'null'
+          description: Are subservice organizations presented using the inclusive method?
+          example: true
+        subserviceOrganizationProcedurePerformed:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          description: Procedures performed to assess subservice organizations.
+    SecurityReviewActionResultResponsePublicV2Dto:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+          description: Whether the action was successful
+        newStatus:
+          type: string
+          example: COMPLETED
+          description: The new status of the security review after the action
+        message:
+          type: string
+          example: Security review finalized successfully
+          description: A human-readable message about the result
+      required:
+      - success
+      - message
+    SocReviewLocationItemResponsePublicV2Dto:
+      type: object
+      properties:
+        city:
+          type: string
+          description: City of the geographic location where the vendor provides its services.
+          example: Austin
+        stateOrCountry:
+          type: string
+          description: State (for US-based locations) or country (for international locations) paired with the city to identify where the vendor provides its services.
+          example: TX
+      required:
+      - city
+      - stateOrCountry
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    SocReviewFindingItemResponsePublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the finding.
+          example: Control objective was not met during the audit period.
+      required:
+      - description
+    SocReviewCpaFirmSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        cpaFirm:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          description: CPA firm that performed the audit.
+          example: Deloitte
+        cpaProcedurePerformed:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          description: Procedures performed to assess reputation of CPA firm.
+    SocReviewSubserviceOrganizationsSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        subserviceOrganization:
+          type:
+          - string
+          - 'null'
+          description: Subservice organizations listed in the report.
+          example: SubCo Inc.
+        subserviceOrganizationUsingInclusiveMethod:
+          type:
+          - boolean
+          - 'null'
+          description: Whether subservice organizations are presented using the inclusive method. Null indicates N/A.
+          example: true
+        subserviceOrganizationProcedurePerformed:
+          type:
+          - string
+          - 'null'
+          description: Procedures performed to assess subservice organizations.
+          example: Reviewed available SOC reports.
+      required:
+      - isComplete
+      - missingRequiredFields
+      - subserviceOrganization
+      - subserviceOrganizationUsingInclusiveMethod
+      - subserviceOrganizationProcedurePerformed
+    SocReviewServiceItemResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the service.
+          example: Cloud Hosting
+      required:
+      - name
+    SocReviewServiceItemRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 30000
+          description: Name of the service.
+    SocReviewComplianceScopeSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        certification:
+          description: SOC report certification type.
+          example: SOC_2
+          allOf:
+          - $ref: '#/components/schemas/SocReportTypeEnum'
+        scopeType:
+          description: Scope type of the audit.
+          example: TYPE_2
+          allOf:
+          - $ref: '#/components/schemas/VendorReviewScopeTypeEnum'
+        auditPeriod:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The audit period date. Required at finalize when TYPE_1.
+          example: '2020-07-06'
+        auditPeriodRange:
+          description: The audit period date range. Required at finalize when TYPE_2.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewAuditPeriodRangeSectionRequestPublicV2Dto'
+        trustServiceCriteria:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/VendorReviewServiceCategoryEnum'
+          description: Trust service criteria categories. Required at finalize (min 1) unless SOC_1 or SOC_3.
+          example:
+          - AVAILABILITY
+    VendorSecurityReviewUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 191
+          description: The Security Review name.
+        socForm:
+          description: SOC review form data. Only processed when `securityReviewType` is SOC_REPORT.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewFormSaveRequestPublicV2Dto'
+    SocReviewComplianceScopeSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        certification:
+          type:
+          - string
+          - 'null'
+          description: SOC report certification type.
+          enum:
+          - SOC_1
+          - SOC_2
+          - SOC_3
+          example: SOC_2
+        scopeType:
+          description: Scope type of the audit.
+          example: TYPE_2
+          allOf:
+          - $ref: '#/components/schemas/VendorReviewScopeTypeEnum'
+        auditPeriod:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Audit period date for TYPE_1 audits.
+          example: '2020-07-06'
+        auditPeriodRange:
+          type:
+          - object
+          - 'null'
+          description: Audit period range for TYPE_2.
+          properties:
+            start:
+              type:
+              - string
+              - 'null'
+              format: date
+            end:
+              type:
+              - string
+              - 'null'
+              format: date
+          example:
+            start: '2020-07-06'
+            end: '2020-07-06'
+        trustServiceCriteria:
+          type:
+          - array
+          - 'null'
+          description: Trust service criteria categories.
+          items:
+            type: string
+            enum:
+            - AVAILABILITY
+            - CONFIDENTIALITY
+            - SECURITY
+            - PRIVACY
+            - PROCESSING_INTEGRITY
+      required:
+      - isComplete
+      - missingRequiredFields
+      - certification
+      - scopeType
+      - auditPeriod
+      - auditPeriodRange
+      - trustServiceCriteria
+    SocReportTypeEnum:
+      type: string
+      enum:
+      - SOC_1
+      - SOC_2
+      - SOC_3
+    SocReviewReviewerInformationSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        reviewer:
+          type:
+          - string
+          - 'null'
+          description: Reviewer display name.
+          example: Jane Doe
+        reportIssueDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Report issue date.
+          example: '2020-07-06'
+      required:
+      - isComplete
+      - missingRequiredFields
+      - reviewer
+      - reportIssueDate
+    VendorSecurityReviewsAcrossVendorsExpandEnum:
+      type: string
+      enum:
+      - user
+      - requesterUser
+      - vendor
+    SocReviewReportOpinionSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        reportOpinion:
+          description: The auditor's opinion on the report.
+          example: UNQUALIFIED
+          allOf:
+          - $ref: '#/components/schemas/VendorReportOpinionEnum'
+        encompassBusinessNeeds:
+          type:
+          - boolean
+          - 'null'
+          description: Do control objectives or trust principles encompass business needs?
+          example: true
+        followUpActivity:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          description: Planned follow-up activity if the report opinion is qualified.
+    VendorSecurityReviewCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        reviewDeadlineAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Vendor Security Review deadline date
+        securityReviewStatus:
+          example: NOT_YET_STARTED
+          description: The status of the Security Review
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewStatusEnum'
+        securityReviewType:
+          example: SECURITY
+          description: The type of the Security Review
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewTypeEnum'
+        requestedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Vendor Security Review requested date
+        note:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+          example: Security Review note
+          description: Vendor Security Review note
+        requesterUserId:
+          type:
+          - number
+          - 'null'
+          maximum: 1000000000
+          example: 1
+          description: 'Optional. The user ID of the person that requested the Security Review. If not provided, defaults to: (1) the vendor''s security owner if assigned and active, or (2) the platform admin user.'
+        title:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Security Review title
+          description: Vendor Security Review title
+      required:
+      - reviewDeadlineAt
+      - securityReviewStatus
+      - securityReviewType
+    SocReviewAuditPeriodRangeSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date
+          description: The start date of the audit period range.
+          example: '2020-07-06'
+        end:
+          type: string
+          format: date
+          description: The end date of the audit period range. Must be after start.
+          example: '2020-07-06'
+      required:
+      - start
+      - end
+    SocReviewCpaFirmSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        cpaFirm:
+          type:
+          - string
+          - 'null'
+          description: CPA firm name.
+          example: Deloitte
+        cpaProcedurePerformed:
+          type:
+          - string
+          - 'null'
+          description: Procedures performed to assess reputation of CPA firm.
+          example: Assessed reputation via public records.
+      required:
+      - isComplete
+      - missingRequiredFields
+      - cpaFirm
+      - cpaProcedurePerformed
+    SocReviewEndUserControlsSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        userControls:
+          description: List of user controls to add. New items are appended to any existing ones. Pass an empty array to clear all existing user controls. Omit to leave existing user controls unchanged.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewUserControlItemRequestPublicV2Dto'
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    VendorSecurityReviewStatusEnum:
+      type: string
+      enum:
+      - NOT_YET_STARTED
+      - IN_PROGRESS
+      - COMPLETED
+      - NOT_REQUIRED
+    SecurityReviewActionEnum:
+      type: string
+      enum:
+      - finalize
+      - reopen
+    SocReviewFormResponsePublicV2Dto:
+      type: object
+      properties:
+        readyToFinalize:
+          type: boolean
+          description: True when all required fields for finalization are complete.
+          example: false
+        reviewerInformation:
+          description: Reviewer identity and report issue date.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReviewerInformationSectionResponsePublicV2Dto'
+        complianceScope:
+          description: SOC certification type, scope type, audit period, and trust service criteria.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewComplianceScopeSectionResponsePublicV2Dto'
+        reportOpinion:
+          description: Auditor's opinion on the report and any follow-up activity.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReportOpinionSectionResponsePublicV2Dto'
+        findings:
+          description: Exceptions or findings noted in the report and their material impact.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewFindingsSectionResponsePublicV2Dto'
+        endUserControls:
+          description: Complementary user entity controls identified in the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewEndUserControlsSectionResponsePublicV2Dto'
+        servicesAndLocations:
+          description: Services and physical locations covered by the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewServicesAndLocationsSectionResponsePublicV2Dto'
+        cpaFirm:
+          description: CPA firm that performed the audit and procedures used to assess its reputation.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewCpaFirmSectionResponsePublicV2Dto'
+        subserviceOrganizations:
+          description: Subservice organizations included in the report and the method used to present them.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewSubserviceOrganizationsSectionResponsePublicV2Dto'
+      required:
+      - readyToFinalize
+      - reviewerInformation
+      - complianceScope
+      - reportOpinion
+      - findings
+      - endUserControls
+      - servicesAndLocations
+      - cpaFirm
+      - subserviceOrganizations
+    SocReviewUserControlItemResponsePublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the user control.
+          example: Users must enforce strong password policies.
+        inPlace:
+          type: boolean
+          description: Whether the control is in place.
+          example: true
+      required:
+      - description
+      - inPlace
+    VendorSecurityReviewDecisionEnum:
+      type: string
+      enum:
+      - PENDING
+      - APPROVED
+      - APPROVED_WITH_CONDITIONS
+      - REJECTED
+    HateoasLinksPublicV2Dto:
+      type: object
+      properties:
+        self:
+          description: Link to the resource in the Drata application
+          allOf:
+          - $ref: '#/components/schemas/HateoasLinkPublicV2Dto'
+      required:
+      - self
+    SocReviewEndUserControlsSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        userControls:
+          description: User controls identified in the report.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewUserControlItemResponsePublicV2Dto'
+      required:
+      - isComplete
+      - missingRequiredFields
+      - userControls
+    VendorSecurityReviewExpandEnum:
+      type: string
+      enum:
+      - user
+      - requesterUser
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    SocReviewServicesAndLocationsSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        services:
+          description: List of services to add. New items are appended to any existing ones. Pass an empty array to clear all existing services. Omit to leave existing services unchanged.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewServiceItemRequestPublicV2Dto'
+        locations:
+          description: List of locations to add. New items are appended to any existing ones. Pass an empty array to clear all existing locations. Omit to leave existing locations unchanged.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewLocationItemRequestPublicV2Dto'
+    VendorSecurityReviewResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor Security Review ID
+        requestedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Requested date
+        reviewDeadlineAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Review deadline date
+        decision:
+          description: The decision about the Security Review
+          example: APPROVED
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewDecisionEnum'
+        title:
+          type:
+          - string
+          - 'null'
+          description: Vendor Security Review title
+        note:
+          type:
+          - string
+          - 'null'
+          description: Vendor Security Review note
+        status:
+          description: The status for the Security Review
+          example: NOT_YET_STARTED
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewStatusEnum'
+        type:
+          description: The type for the Security Review
+          example: SECURITY
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when the Security Review was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when the Security Review was last updated
+        vendorId:
+          type: number
+          example: 1
+          description: ID of the Vendor this Security Review belongs to
+        vendor:
+          description: Compact Vendor payload. Included only when `expand[]=vendor` is requested.
+          allOf:
+          - $ref: '#/components/schemas/VendorCompactResponsePublicV2Dto'
+        userId:
+          type:
+          - number
+          - 'null'
+          description: The ID of the user assigned to conduct this Vendor Security Review
+        requesterUserId:
+          type:
+          - number
+          - 'null'
+          description: The requester user ID
+        user:
+          description: The Security Review Vendor user
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        requesterUser:
+          description: The related Security Review requester user
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        _links:
+          description: HATEOAS links for the resource
+          allOf:
+          - $ref: '#/components/schemas/HateoasLinksPublicV2Dto'
+        socReviewForm:
+          description: SOC review form data. Present when `securityReviewType` is SOC_REPORT.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewFormResponsePublicV2Dto'
+      required:
+      - id
+      - requestedAt
+      - reviewDeadlineAt
+      - decision
+      - title
+      - note
+      - status
+      - type
+      - createdAt
+      - updatedAt
+      - vendorId
+      - userId
+      - requesterUserId
+    VendorReviewServiceCategoryEnum:
+      type: string
+      enum:
+      - AVAILABILITY
+      - CONFIDENTIALITY
+      - SECURITY
+      - PRIVACY
+      - PROCESSING_INTEGRITY
+    SocReviewFindingItemRequestPublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 30000
+          description: Description of the finding.
+    VendorSecurityReviewTypeEnum:
+      type: string
+      enum:
+      - SECURITY
+      - SOC_REPORT
+      - UPLOAD_REPORT
+    VendorSecurityReviewWithFileCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          example: Q4 2024 Security Review
+          description: The title of the security review
+        reviewDeadlineAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Vendor Security Review deadline date
+        requestedAt:
+          type: string
+          example: '2024-01-01T00:00:00.000Z'
+          description: The date when the security review was requested
+        securityReviewStatus:
+          enum:
+          - NOT_YET_STARTED
+          - IN_PROGRESS
+          - COMPLETED
+          - NOT_REQUIRED
+          type: string
+          example: 3
+          description: The status of the security review
+        securityReviewType:
+          enum:
+          - SECURITY
+          - SOC_REPORT
+          - UPLOAD_REPORT
+          type: string
+          example: 1
+          description: The type of security review
+        requesterUserId:
+          type: number
+          example: 123
+          description: 'Optional. The ID of the user requesting the security review. If not provided, defaults to: (1) the vendor''s security owner if assigned and active, or (2) the platform admin user.'
+        note:
+          type: string
+          maxLength: 1000
+          example: Additional notes about the security review
+          description: Optional notes for the security review
+        documentType:
+          enum:
+          - COMPLIANCE_REPORT
+          - COMPLIANCE_REPORT_REVIEW
+          - BRIDGE_LETTER
+          - UPLOADED_COMPLIANCE_REPORT_REVIEW
+          - QUESTIONNAIRE_ATTACHMENT
+          - SOC_DOCUMENT
+          - QUESTIONNAIRE_REPORT
+          - TRUST_CENTER_PAGE
+          type: string
+          example: 1
+          description: The type of document being uploaded
+        file:
+          type: string
+          format: binary
+          description: 'File to upload. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .csv'
+      required:
+      - title
+      - reviewDeadlineAt
+      - securityReviewStatus
+      - securityReviewType
+      - file
+    SocReviewFindingsSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        findings:
+          description: List of findings to add. New findings are appended to any existing ones. Pass an empty array to clear all existing findings. Omit to leave existing findings unchanged.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewFindingItemRequestPublicV2Dto'
+        hasMaterialImpact:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the findings have a material impact. Required at finalize when at least one finding is present.
+          example: false
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

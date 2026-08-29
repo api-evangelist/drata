@@ -1,0 +1,1306 @@
+openapi: 3.2.0
+info:
+  title: Drata Custom Data Records API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Custom Data Records across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Custom Data Records
+  description: Custom Data Records are JSON evidence records pushed to a Custom Connection resource. Use the session management endpoints to batch upload records and track the status of bulk operations. You can create monitors on this data to provide continuous compliance. The [help docs](https://help.drata.com/en/articles/11995676-part-1-custom-connections-and-tests) have more information.
+paths:
+  /custom-connections/{connectionId}/resources/{resourceId}/records:
+    get:
+      description: 'List Custom Data Records matching the provided filters.
+
+
+        🔒 Requires **Custom Connections Management: List Custom Connections** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomDataRecordsPublicV2Controller_listCustomDataRecords
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: resourceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: sessionId
+        required: false
+        in: query
+        description: Filter records by session ID.
+        schema:
+          minLength: 3
+          maxLength: 64
+          example: session-abc-123
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDataRecordsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Custom Data Records
+      tags:
+      - Custom Data Records
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-get
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    post:
+      description: 'Create or update Custom Data records for a Custom Connection.
+
+
+        🔒 Requires **Custom Connections Data: Create Custom Connection Data** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomDataRecordsPublicV2Controller_createCustomData
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: resourceId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomDataRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                  title: Single Record Operation
+                  description: Drata supports creating or updating a single record. The response provides detailed feedback on the operation's outcome.
+                  properties:
+                    id:
+                      type: string
+                      example: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt:
+                      type: string
+                      example: '2020-07-06 12:00:00.000000'
+                    updatedAt:
+                      type: string
+                      example: '2020-07-06 13:00:00.000000'
+                    statusCode:
+                      type: number
+                      example: 200
+                    data:
+                      type: object
+                      description: Custom data information, reflects record sent on request
+                      additionalProperties: true
+                  example:
+                    id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt: '2020-07-06 12:00:00.000000'
+                    updatedAt: '2020-07-06 13:00:00.000000'
+                    statusCode: 200
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                - type: array
+                  title: Bulk Operation
+                  description: Drata supports bulk operations to create multiple records simultaneously. The response provides detailed feedback for each individual record operation.
+                  items:
+                    properties:
+                      id:
+                        type: string
+                        example: fd52f04f-a030-44ea-a5af-40919194ab7e
+                      createdAt:
+                        type: string
+                        example: '2020-07-06 12:00:00.000000'
+                      updatedAt:
+                        type: string
+                        example: '2020-07-06 13:00:00.000000'
+                      statusCode:
+                        type: number
+                        example: 200
+                      data:
+                        type: object
+                        description: Custom data information, reflects record sent on request
+                        additionalProperties: true
+                      error:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: Error message
+                            example: 'Schema validation failed for data: [{"":"must have required property ''name''"}]'
+                          code:
+                            type: number
+                            description: Error code
+                            example: 28022
+                  example:
+                  - id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt: '2020-07-06 12:00:00.000000'
+                    updatedAt: '2020-07-06 13:00:00.000000'
+                    statusCode: 200
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                  - id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt: '2020-07-06 12:00:00.000000'
+                    updatedAt: '2020-07-06 12:00:00.000000'
+                    statusCode: 201
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                  - statusCode: 400
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                    error:
+                      error:
+                        message: 'Schema validation failed for data: [{"":"must have required property ''name''"}]'
+                        code: 28022
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: fd52f04f-a030-44ea-a5af-40919194ab7e
+                  createdAt:
+                    type: string
+                    example: '2020-07-06 12:00:00.000000'
+                  updatedAt:
+                    type: string
+                    example: '2020-07-06 13:00:00.000000'
+                  statusCode:
+                    type: number
+                    example: 200
+                  data:
+                    type: object
+                    description: Custom data information, reflects record sent on request
+                    additionalProperties: true
+                example:
+                  id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                  createdAt: '2020-07-06 12:00:00.000000'
+                  updatedAt: '2020-07-06 13:00:00.000000'
+                  statusCode: 200
+                  data:
+                    YOUR: DATA
+                    PROPERTIES:
+                      WILL: BE_HERE
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Upsert Custom Data Records
+      tags:
+      - Custom Data Records
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-data-post
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}/resources/{resourceId}/sessions:
+    get:
+      description: 'List Custom Data Sessions matching the provided filters.
+
+
+        🔒 Requires **Custom Connections Management: List Custom Connections** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomDataRecordsPublicV2Controller_listSessions
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: resourceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: status
+        required: false
+        in: query
+        description: Filter sessions by status
+        schema:
+          $ref: '#/components/schemas/CustomDataSessionStatusEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Custom Data Sessions
+      tags:
+      - Custom Data Records
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-get
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}/resources/{resourceId}/sessions/{sessionId}:
+    post:
+      description: 'Insert or update Custom Data records in batches using Session Management.
+
+
+        🔒 Requires **Custom Connections Data: Create Custom Connection Data** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomDataRecordsPublicV2Controller_uploadSessionRecords
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: resourceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: sessionId
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomDataSessionRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                oneOf:
+                - type: object
+                  title: Single Record Operation
+                  description: Drata supports creating or updating a single record. The response provides detailed feedback on the operation's outcome.
+                  properties:
+                    id:
+                      type: string
+                      example: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt:
+                      type: string
+                      example: '2020-07-06 12:00:00.000000'
+                    updatedAt:
+                      type: string
+                      example: '2020-07-06 13:00:00.000000'
+                    statusCode:
+                      type: number
+                      example: 200
+                    data:
+                      type: object
+                      description: Custom data information, reflects record sent on request
+                      additionalProperties: true
+                  example:
+                    id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt: '2020-07-06 12:00:00.000000'
+                    updatedAt: '2020-07-06 13:00:00.000000'
+                    statusCode: 200
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                - type: array
+                  title: Bulk Operation
+                  description: Drata supports bulk operations to create multiple records simultaneously. The response provides detailed feedback for each individual record operation.
+                  items:
+                    properties:
+                      id:
+                        type: string
+                        example: fd52f04f-a030-44ea-a5af-40919194ab7e
+                      createdAt:
+                        type: string
+                        example: '2020-07-06 12:00:00.000000'
+                      updatedAt:
+                        type: string
+                        example: '2020-07-06 13:00:00.000000'
+                      statusCode:
+                        type: number
+                        example: 200
+                      data:
+                        type: object
+                        description: Custom data information, reflects record sent on request
+                        additionalProperties: true
+                      error:
+                        type: object
+                        properties:
+                          message:
+                            type: string
+                            description: Error message
+                            example: 'Schema validation failed for data: [{"":"must have required property ''name''"}]'
+                          code:
+                            type: number
+                            description: Error code
+                            example: 28022
+                  example:
+                  - id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt: '2020-07-06 12:00:00.000000'
+                    updatedAt: '2020-07-06 13:00:00.000000'
+                    statusCode: 200
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                  - id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                    createdAt: '2020-07-06 12:00:00.000000'
+                    updatedAt: '2020-07-06 12:00:00.000000'
+                    statusCode: 201
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                  - statusCode: 400
+                    data:
+                      YOUR: DATA
+                      PROPERTIES:
+                        WILL: BE_HERE
+                    error:
+                      error:
+                        message: 'Schema validation failed for data: [{"":"must have required property ''name''"}]'
+                        code: 28022
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    example: fd52f04f-a030-44ea-a5af-40919194ab7e
+                  createdAt:
+                    type: string
+                    example: '2020-07-06 12:00:00.000000'
+                  updatedAt:
+                    type: string
+                    example: '2020-07-06 13:00:00.000000'
+                  statusCode:
+                    type: number
+                    example: 200
+                  data:
+                    type: object
+                    description: Custom data information, reflects record sent on request
+                    additionalProperties: true
+                example:
+                  id: fd52f04f-a030-44ea-a5af-40919194ab7e
+                  createdAt: '2020-07-06 12:00:00.000000'
+                  updatedAt: '2020-07-06 13:00:00.000000'
+                  statusCode: 200
+                  data:
+                    YOUR: DATA
+                    PROPERTIES:
+                      WILL: BE_HERE
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Upsert Custom Data Records with Session Management
+      tags:
+      - Custom Data Records
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-data-post
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}/resources/{resourceId}/sessions/{sessionId}/actions:
+    post:
+      description: 'Perform an action on a Custom Data record Session
+
+
+        🔒 Requires **Custom Connections Data: Create Custom Connection Data** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomDataRecordsPublicV2Controller_performSessionAction
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: resourceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: sessionId
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SessionActionRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SessionActionResponsePublicV2Dto'
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Perform Session Action
+      tags:
+      - Custom Data Records
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-data-post
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /custom-connections/{connectionId}/resources/{resourceId}/records/{recordId}:
+    put:
+      description: 'Update an existing Custom Data record by ID.
+
+
+        🔒 Requires **Custom Connections Data: Create and Update Custom Connection Data** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomDataRecordsPublicV2Controller_updateCustomData
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: resourceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: recordId
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCustomDataRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomDataResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '413':
+          description: The file was too large to upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Custom Data Record
+      tags:
+      - Custom Data Records
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-data-put
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    delete:
+      description: 'Delete a Custom Data Record by ID.
+
+
+        🔒 Requires **Custom Connections Data: Delete Custom Connection Data** permission.
+
+
+        💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
+      operationId: CustomDataRecordsPublicV2Controller_deleteCustomData
+      parameters:
+      - name: connectionId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: resourceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: recordId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Custom Connection Data Record
+      tags:
+      - Custom Data Records
+      x-drata-entitlement:
+      - CUSTOM_CONNECTIONS_AND_TESTS
+      x-drata-permissions:
+      - custom-connections-data-delete
+      x-product-area:
+      - CUSTOM_CONNECTIONS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    CustomDataRecordsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Data records based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDataResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CustomDataSessionStatusEnum:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - ACTIVE
+      - CANCELED
+      - ARCHIVED
+    SessionResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The internal database primary key for this Session record
+        sessionId:
+          type: string
+          example: session-abc-123
+          description: The caller-provided string identifier for this Session
+        status:
+          example: ACTIVE
+          description: The Session status
+          allOf:
+          - $ref: '#/components/schemas/CustomDataSessionStatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Session was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Session was last updated
+        activatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Session was activated
+        canceledAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Session was canceled
+      required:
+      - id
+      - sessionId
+      - status
+      - createdAt
+      - updatedAt
+      - activatedAt
+      - canceledAt
+    CreateCustomDataSessionRequestPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: The Custom Data record(s) to be created or updated within a session. Can be a single object or an array of objects for bulk upload. Records remain inactive until the session is completed via the session action endpoint.
+          oneOf:
+          - type: array
+            items:
+              type: object
+            example:
+            - id: employee-001
+              name: John
+              last_name: Doe
+              department: Engineering
+              status: Active
+            - id: employee-002
+              name: Jane
+              last_name: Smith
+              department: Sales
+              status: Active
+          - type: object
+            example:
+              id: employee-001
+              name: John
+              department: Engineering
+      required:
+      - data
+    CustomDataResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: employee-001
+          description: The unique identifier for the Custom Data record
+        attributes:
+          type: object
+          additionalProperties: true
+          example:
+            id: employee-001
+            name: John Doe
+            department: Engineering
+            status: Active
+          description: The Custom Data for this record
+        sessionId:
+          type:
+          - string
+          - 'null'
+          example: session-abc-123
+          description: The session ID for bulk upload operations. Records with the same session ID are grouped together into a single upload batch.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Data record was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Data record was last updated
+      required:
+      - id
+      - attributes
+      - sessionId
+      - createdAt
+      - updatedAt
+    SessionActionEnum:
+      type: string
+      enum:
+      - complete
+      - cancel
+    UpdateCustomDataRequestPublicV2Dto:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+          description: The custom data to update
+          example:
+            employeeId: EMP-001
+            name: Jane Smith
+            department: Engineering
+            startDate: '2024-01-15T00:00:00Z'
+            isActive: true
+            accessLevel: 3
+            tags:
+            - engineer
+            - remote
+            metadata:
+              lastReview: '2025-03-01T00:00:00Z'
+      required:
+      - data
+    SessionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Data sessions based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CreateCustomDataRequestPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: The Custom Data record(s) to be created or updated. Can be a single object or an array of objects for bulk upload. Records with matching IDs will be updated; new records will be created. Records will be added grouped under ACTIVE session if one exists.
+          oneOf:
+          - type: array
+            items:
+              type: object
+            example:
+            - id: employee-001
+              name: John
+              last_name: Doe
+              department: Engineering
+              status: Active
+            - id: employee-002
+              name: Jane
+              last_name: Smith
+              department: Sales
+              status: Active
+          - type: object
+            example:
+              id: employee-001
+              name: John
+              department: Engineering
+      required:
+      - data
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    SessionActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: 'The action to perform on the session.
+
+
+            * `complete`: Mark session as complete, sets data as active and **permanently deletes all data that is not part of the session**
+
+            * `cancel`: Cancels session and discard data associated with that session'
+          example: complete
+          allOf:
+          - $ref: '#/components/schemas/SessionActionEnum'
+      required:
+      - action
+    SessionActionResponsePublicV2Dto:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: The Session ID that the action was performed on
+          example: upload-2024-03-13
+        status:
+          description: Current status of the Session after the action was performed
+          example: ACTIVE
+          allOf:
+          - $ref: '#/components/schemas/CustomDataSessionStatusEnum'
+        action:
+          description: The action that was performed
+          allOf:
+          - $ref: '#/components/schemas/SessionActionEnum'
+        connectionId:
+          type: number
+          description: The ID of the Custom Connection the Session was for
+          example: 123
+        resourceId:
+          type: number
+          description: The ID of the Custom Resource the Session was for
+          example: 456
+      required:
+      - sessionId
+      - status
+      - action
+      - connectionId
+      - resourceId
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

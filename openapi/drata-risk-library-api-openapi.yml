@@ -1,0 +1,607 @@
+openapi: 3.2.0
+info:
+  title: Drata Risk Library API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Risk Library across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Risk Library
+  description: The Risk Library is a collection of Risks that can be copied into a Risk Register. The [help docs](https://help.drata.com/en/articles/13371089-drata-s-risk-library-new-experience) have more information.
+paths:
+  /risk-registers/{riskRegisterId}/risk-library:
+    get:
+      description: 'Find Library Risks by search terms and filters.
+
+
+        🔒 Requires **Risk Management: List Risks** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskLibraryPublicV2Controller_listRiskLibrary
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: riskId
+        required: false
+        in: query
+        description: Filter by Risk ID. Searches for risks whose ID starts with the provided value (e.g., "AA" matches "AA-01", "AA-02").
+        schema:
+          example: AA-01
+          type: string
+      - name: title
+        required: false
+        in: query
+        description: Filter by Title. Searches for risks whose title contains the provided text anywhere in the field (case-insensitive).
+        schema:
+          example: Activity Log Evaluation
+          type: string
+      - name: description
+        required: false
+        in: query
+        description: Filter by Description. Searches for risks whose description contains the provided text anywhere in the field (case-insensitive).
+        schema:
+          example: Unauthorized System Access
+          type: string
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskLibraryExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskLibraryResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Risk Libraries
+      tags:
+      - Risk Library
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-management-get
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /risk-registers/{riskRegisterId}/risk-library/{riskLibraryId}:
+    get:
+      description: 'Get Risk Library
+
+
+        🔒 Requires **Risk Management: Get Risk** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskLibraryPublicV2Controller_getRiskLibraryItem
+      parameters:
+      - name: riskRegisterId
+        required: true
+        in: path
+        description: The Risk Register ID
+        schema:
+          example: 1
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskLibraryExpandEnum'
+      - name: riskLibraryId
+        required: true
+        in: path
+        description: An integer Risk Library ID or string Risk Library ID prefixed with `riskId:`
+        schema:
+          oneOf:
+          - type: number
+            description: Integer Risk Library ID
+          - type: string
+            description: String Risk Library ID, prefixed with 'riskId:' e.g. `riskId:AC-10`
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Risk Library Item by ID.
+      tags:
+      - Risk Library
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-management-get-risk-details
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /risk-library/action-copy:
+    post:
+      description: 'Copy Risk Library Items to Register
+
+
+        🔒 Requires **Risk Management: Create Risk** permission.
+
+
+        💎 Requires your account have the **Risk Management Pro** feature. Contact your CSM for help upgrading.'
+      operationId: RiskLibraryPublicV2Controller_copyRiskLibrary
+      parameters: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RiskLibraryCopyRequestPublicV2Dto'
+      responses:
+        '201':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RiskLibraryCopyResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '402':
+          description: You must upgrade your plan to use this feature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Copies Risk Library Items to a Risk Register.
+      tags:
+      - Risk Library
+      x-drata-entitlement:
+      - RISK_MANAGEMENT
+      x-drata-permissions:
+      - risk-management-post
+      x-product-area:
+      - RISK_MANAGEMENT
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RiskLibraryResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    RiskCategoryCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Risk Category ID
+        name:
+          type: string
+          example: Access Control
+          description: Risk Category name used to group and organize related Risks
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was last updated
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+    RiskCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 100
+          description: Unique identifier of the newly created Risk in the register
+        riskId:
+          type: string
+          example: AC-04
+          description: Human-readable Risk Identifier
+        title:
+          type: string
+          example: Password Management - Password Cracking
+          description: Title of the Risk
+        description:
+          type: string
+          example: An attacker attempts to gain access to organizational information by guessing passwords.
+          description: Description of the Risk
+        registerId:
+          type: number
+          example: 5
+          description: ID of the Risk Register where the Risk was created
+      required:
+      - id
+      - riskId
+      - title
+      - description
+      - registerId
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    RiskLibraryCopyRequestPublicV2Dto:
+      type: object
+      properties:
+        bulkActionType:
+          enum:
+          - COPY_BY_IDS
+          - COPY_BY_GROUPS
+          type: string
+          example: COPY_BY_IDS
+          description: The copy action to perform on from Risk Library to the Risk Register.
+        riskIds:
+          minItems: 1
+          example:
+          - AA-01
+          - AA-02
+          - AA-03
+          description: An array of the Risk IDs that you want to copy from Risk Library to the Risk Register.
+          type: array
+          items:
+            type: string
+        riskGroups:
+          minItems: 1
+          type: array
+          items:
+            type: string
+            enum:
+            - WIZARD_CORE
+            - AI_DEVELOPMENT
+            - AI_USE
+            - PHYSICAL_SITE
+            - CLOUD_ENVIRONMENT
+            - UNSECURE_DEVICES
+            - DEVICE_DELIVERY
+            - SOFTWARE_DEVELOPMENT
+            - REGULATORY_REQUIREMENTS
+          example:
+          - CLOUD_ENVIRONMENT
+          description: An array of the Risk Groups that you want to copy from Risk Library to the Risk Register.
+        registerId:
+          type: number
+          example: 1
+          description: The Register ID to copy the Risks to.
+      required:
+      - bulkActionType
+      - riskIds
+      - riskGroups
+      - registerId
+    RiskLibraryExpandEnum:
+      type: string
+      enum:
+      - controls
+      - categories
+    RiskControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 10
+          description: Unique identifier of the Control
+        code:
+          type: string
+          example: AC-2
+          description: Human-readable Control identifier
+        name:
+          type: string
+          example: Account Management
+          description: Control name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Control was last updated
+      required:
+      - id
+      - code
+      - name
+      - createdAt
+      - updatedAt
+    RiskLibraryItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier for the Risk Library Item
+        riskId:
+          type: string
+          example: AC-04
+          description: Human-readable Risk Identifier
+        title:
+          type: string
+          example: Password Management - Password Cracking
+          description: Title of the Risk Library Item
+        description:
+          type: string
+          example: An attacker attempts to gain access to organizational information by guessing passwords.
+          description: Detailed description of the Risk Library Item
+        controls:
+          description: Associated Controls in compact format, only returned when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskControlCompactResponsePublicV2Dto'
+        categories:
+          description: Associated Categories in compact format, only returned when `expand[]=categories` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
+      required:
+      - id
+      - riskId
+      - title
+      - description
+    RiskLibraryCopyResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of created risk objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
+      required:
+      - data
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

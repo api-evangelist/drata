@@ -1,32 +1,1113 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Drata Public API v2 Assets Tasks API
-  version: 2.0.0
-  description: Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.
-  contact:
-    name: API Evangelist
-    email: kin@apievangelist.com
-    url: https://developers.drata.com/openapi/reference/v2/overview/
+  title: Drata Tasks API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Tasks across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
-  description: Drata Public API v2
-security:
-- bearerAuth: []
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Tasks
+  description: Tasks are individual units of work that can be assigned to users.
 paths:
-  /tasks:
+  /workspaces/{workspaceId}/tasks:
     get:
-      tags:
-      - Tasks
-      summary: List tasks
-      operationId: listTasks
+      description: 'Find Tasks matching the provided filters.
+
+
+        🔒 Requires **Tasks: List and Get Tasks** permission.'
+      operationId: TasksPublicV2Controller_listTasks
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/TaskSortEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskExpandEnum'
+      - name: status
+        required: false
+        in: query
+        description: Filter by Task status
+        schema:
+          $ref: '#/components/schemas/TaskStatus'
+      - name: assigneeId
+        required: false
+        in: query
+        description: Filter by assigned User ID
+        schema:
+          example: 456
+          type: number
+      - name: createdById
+        required: false
+        in: query
+        description: Filter by User ID who created the task
+        schema:
+          example: 123
+          type: number
+      - name: dueDateFrom
+        required: false
+        in: query
+        description: Filter Tasks with due date on or after this value (inclusive)
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: dueDateTo
+        required: false
+        in: query
+        description: Filter Tasks with due date on or before this value (inclusive)
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: controlId
+        required: false
+        in: query
+        description: Filter by linked Control ID
+        schema:
+          example: 101
+          type: number
+      - name: taskType
+        required: false
+        in: query
+        description: Filter by Task type
+        schema:
+          $ref: '#/components/schemas/TaskTypeEnum'
+      - name: title
+        required: false
+        in: query
+        description: Filter by Task title (prefix search)
+        schema:
+          example: Review SOC 2
+          type: string
+      - name: description
+        required: false
+        in: query
+        description: Filter by Task description (prefix search)
+        schema:
+          example: quarterly review
+          type: string
       responses:
         '200':
-          description: A page of tasks
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TasksResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Tasks
+      tags:
+      - Tasks
+      x-drata-permissions:
+      - tasks-get
+      x-product-area:
+      - TASKS
+    post:
+      description: 'Create a new Task.
+
+
+        🔒 Requires **Tasks: Create Task** permission.'
+      operationId: TasksPublicV2Controller_createTask
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Create Task
+      tags:
+      - Tasks
+      x-drata-permissions:
+      - tasks-post
+      x-product-area:
+      - TASKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/tasks/{taskId}:
+    get:
+      description: 'Get details for a specific Task.
+
+
+        🔒 Requires **Tasks: List and Get Tasks** permission.'
+      operationId: TasksPublicV2Controller_getTask
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: taskId
+        required: true
+        in: path
+        description: The Task ID
+        schema:
+          example: 123
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Task
+      tags:
+      - Tasks
+      x-drata-permissions:
+      - tasks-get
+      x-product-area:
+      - TASKS
+    put:
+      description: 'Update an existing Task.
+
+
+        🔒 Requires **Tasks: Update Task** permission.'
+      operationId: TasksPublicV2Controller_updateTask
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: taskId
+        required: true
+        in: path
+        description: The Task ID
+        schema:
+          example: 123
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskUpdateRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponsePublicV2Dto'
+        '204':
+          description: No Content
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Update Task
+      tags:
+      - Tasks
+      x-drata-permissions:
+      - tasks-put
+      x-product-area:
+      - TASKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/tasks/{taskId}/actions:
+    post:
+      description: 'Perform an action on a Task: complete or uncomplete.
+
+
+        🔒 Requires **Tasks: Update Task** permission.'
+      operationId: TasksPublicV2Controller_performTaskAction
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: taskId
+        required: true
+        in: path
+        description: The Task ID
+        schema:
+          example: 123
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TaskActionRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Perform Task Action
+      tags:
+      - Tasks
+      x-drata-permissions:
+      - tasks-put
+      x-product-area:
+      - TASKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/upcoming-tasks:
+    get:
+      description: 'Find Upcoming Tasks for a workspace. Returns Drata-assigned tasks sourced from policy renewals, vendor reviews, external evidence due dates, library document renewals, control approvals, and custom tasks.
+
+
+        **Note:** Vendor and policy renewal tasks are account-level and will appear identically across all workspaces for a given account.
+
+
+        🔒 Requires **Tasks: List and Get Tasks** permission.'
+      operationId: UpcomingTasksPublicV2Controller_listUpcomingTasks
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/UpcomingTaskSortEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: status
+        required: false
+        in: query
+        description: Filter by Task status
+        schema:
+          $ref: '#/components/schemas/TaskStatus'
+      - name: taskType
+        required: false
+        in: query
+        description: Filter by Task type
+        schema:
+          $ref: '#/components/schemas/TaskTypeEnum'
+      - name: dueDateFrom
+        required: false
+        in: query
+        description: Filter Tasks with due date on or after this value (inclusive)
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      - name: dueDateTo
+        required: false
+        in: query
+        description: Filter Tasks with due date on or before this value (inclusive)
+        schema:
+          format: date
+          example: '2020-07-06'
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpcomingTasksResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Upcoming Tasks
+      tags:
+      - Tasks
+      x-drata-permissions:
+      - tasks-get
+      x-product-area:
+      - TASKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
 components:
+  schemas:
+    TaskActionEnum:
+      type: string
+      enum:
+      - complete
+      - uncomplete
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    TaskSortEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+      - dueDate
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    ExpandDataWithCountDto:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            type: array
+        totalCount:
+          type: number
+          description: Total count of linked items
+      required:
+      - data
+      - totalCount
+    UpcomingTasksResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/UpcomingTaskResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    TaskResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: Unique identifier of the Task
+        title:
+          type: string
+          example: Review SOC 2 controls
+          description: Task title
+        description:
+          type:
+          - string
+          - 'null'
+          example: Quarterly review of all SOC 2 Type II controls
+          description: Task description
+        status:
+          description: 'Task status: PAST_DUE (due date passed, not completed), COMPLETED (marked complete), INCOMPLETE (not yet due and not completed)'
+          example: INCOMPLETE
+          allOf:
+          - $ref: '#/components/schemas/TaskStatus'
+        taskType:
+          description: Task type
+          example: GENERAL
+          allOf:
+          - $ref: '#/components/schemas/TaskTypeEnum'
+        dueDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Due date
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Completion timestamp
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Creation timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Last update timestamp
+        assigneeId:
+          type:
+          - number
+          - 'null'
+          example: 456
+          description: ID of the assigned User
+        createdById:
+          type:
+          - number
+          - 'null'
+          example: 789
+          description: ID of the User who created the task
+        assignee:
+          description: Assignee User details, only returned when `expand[]=assignee` is passed
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        createdBy:
+          description: Created-by User details, only returned when `expand[]=createdBy` is passed
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        controls:
+          description: Linked Controls with data wrapper, only returned when `expand[]=controls` is passed
+          allOf:
+          - $ref: '#/components/schemas/ExpandDataWithCountDto'
+        risks:
+          description: Linked Risks with data wrapper, only returned when `expand[]=risks` is passed
+          allOf:
+          - $ref: '#/components/schemas/ExpandDataWithCountDto'
+        policies:
+          description: Linked Policies with data wrapper, only returned when `expand[]=policies` is passed
+          allOf:
+          - $ref: '#/components/schemas/ExpandDataWithCountDto'
+      required:
+      - id
+      - title
+      - description
+      - status
+      - taskType
+      - dueDate
+      - completedAt
+      - createdAt
+      - updatedAt
+      - assigneeId
+      - createdById
+    TaskUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          description: Task title
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          description: Task description. Set to null to clear.
+        dueDate:
+          type: string
+          format: date
+          description: Due date
+          example: '2020-07-06'
+        assigneeId:
+          type:
+          - number
+          - 'null'
+          description: ID of the User who should complete the task. Set to null to unassign.
+        controlIds:
+          uniqueItems: true
+          description: IDs of Controls to link to this task. Associates the task with compliance controls, making it visible in control detail views and filterable by control. Replaces all existing control links. Pass `[]` to clear all links. Omit to leave unchanged.
+          type: array
+          items:
+            type: number
+        riskIds:
+          uniqueItems: true
+          description: IDs of Risks to link. Replaces all existing links. Pass `[]` to clear. Omit to leave unchanged.
+          type: array
+          items:
+            type: number
+        policyIds:
+          uniqueItems: true
+          description: IDs of Policies to link. Replaces all existing links. Pass `[]` to clear. Omit to leave unchanged.
+          type: array
+          items:
+            type: number
+    TaskExpandEnum:
+      type: string
+      enum:
+      - assignee
+      - createdBy
+      - controls
+      - risks
+      - policies
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    TaskCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          description: Task title
+          example: Review access controls
+        description:
+          type: string
+          maxLength: 768
+          description: Task description
+          example: Quarterly review of access control policies
+        dueDate:
+          type: string
+          format: date
+          description: Due date
+          example: '2020-07-06'
+        assigneeId:
+          type: number
+          description: ID of the User to assign the task to
+          example: 456
+        taskType:
+          default: GENERAL
+          description: Task type
+          example: GENERAL
+          allOf:
+          - $ref: '#/components/schemas/TaskTypeEnum'
+        controlIds:
+          uniqueItems: true
+          description: IDs of Controls to link to this Task. Can be combined with `riskIds` and `policyIds`.
+          example:
+          - 101
+          - 102
+          type: array
+          items:
+            type: number
+        riskIds:
+          uniqueItems: true
+          description: IDs of Risks to link to this Task. Can be combined with `controlIds` and `policyIds`.
+          example:
+          - 201
+          type: array
+          items:
+            type: number
+        policyIds:
+          uniqueItems: true
+          description: IDs of Policies to link to this Task. Can be combined with `controlIds` and `riskIds`.
+          example:
+          - 301
+          - 302
+          type: array
+          items:
+            type: number
+      required:
+      - title
+      - dueDate
+    UpcomingTaskResponsePublicV2Dto:
+      type: object
+      properties:
+        sourceId:
+          type: number
+          example: 123
+          description: 'ID of the underlying source entity for this task. Meaning varies by `taskType`:
+
+            - POLICY_RENEWALS: policy ID → GET /policies/{sourceId}
+
+            - VENDOR: vendor ID → GET /vendors/{sourceId}
+
+            - GENERAL, CONTROL, RISK, POLICY_APPROVALS: custom task ID → GET /workspaces/{workspaceId}/tasks/{sourceId}
+
+            - EXTERNAL_EVIDENCE, CONTROL_APPROVALS: control ID → GET /workspaces/{workspaceId}/controls/{sourceId}
+
+            - REPORT: evidence library document ID → GET /workspaces/{workspaceId}/evidence-library/{sourceId}'
+        name:
+          type: string
+          example: Acme Corp Vendor Review
+          description: Display name of the task. Sourced from the underlying entity (policy name, vendor name, task title, etc.)
+        taskType:
+          description: Task type
+          example: VENDOR
+          allOf:
+          - $ref: '#/components/schemas/TaskTypeEnum'
+        dueDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Due date
+        status:
+          description: 'Task status: PAST_DUE (due date passed, not completed), COMPLETED (marked complete), INCOMPLETE (not yet due and not completed)'
+          example: INCOMPLETE
+          allOf:
+          - $ref: '#/components/schemas/TaskStatus'
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Completion timestamp
+        assigneeIds:
+          example:
+          - 456
+          - 789
+          description: IDs of users assigned to this task. May contain multiple users. Empty array if no assignee.
+          type: array
+          items:
+            type: number
+      required:
+      - sourceId
+      - name
+      - taskType
+      - dueDate
+      - status
+      - completedAt
+      - assigneeIds
+    TaskTypeEnum:
+      type: string
+      enum:
+      - POLICY_RENEWALS
+      - EVIDENCE
+      - VENDOR
+      - EXTERNAL_EVIDENCE
+      - REPORT
+      - GENERAL
+      - CONTROL
+      - RISK
+      - CONTROL_APPROVALS
+      - POLICY_APPROVALS
+    TaskActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: 'Action to execute: `complete` marks the task as completed, `uncomplete` marks it as incomplete'
+          example: complete
+          allOf:
+          - $ref: '#/components/schemas/TaskActionEnum'
+      required:
+      - action
+    UpcomingTaskSortEnum:
+      type: string
+      enum:
+      - dueDate
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    TaskStatus:
+      type: string
+      enum:
+      - PAST_DUE
+      - COMPLETED
+      - INCOMPLETE
+      x-enumDescriptions:
+        PAST_DUE: Past Due – Due date has passed and task is not completed
+        COMPLETED: Completed – Task has been marked as complete
+        INCOMPLETE: Incomplete – Task is not yet due and not completed
+    TasksResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
   securitySchemes:
-    bearerAuth:
-      type: http
+    bearer:
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

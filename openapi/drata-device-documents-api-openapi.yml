@@ -1,0 +1,502 @@
+openapi: 3.2.0
+info:
+  title: Drata Device Documents API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Device Documents across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Device Documents
+  description: Device Documents allow you to provide manual evidence of Devices compliance. Using the Drata Agent or an MDM connection automatically provides this information.
+paths:
+  /devices/{deviceId}/documents:
+    get:
+      description: 'Get a list of Documents for a given Device and Document type.
+
+
+        🔒 Requires **Devices: Manage Device Documents** permission.'
+      operationId: DeviceDocumentsPublicV2Controller_getDeviceDocuments
+      parameters:
+      - name: deviceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: type
+        required: false
+        in: query
+        description: Filter documents by their type
+        schema:
+          $ref: '#/components/schemas/DeviceDocumentTypeEnum'
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDocumentsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Device Documents
+      tags:
+      - Device Documents
+      x-drata-permissions:
+      - devices-get-documents
+      x-product-area:
+      - MDM
+    post:
+      description: 'Upload a new Device compliance Document for a given Device.
+
+
+        🔒 Requires **Devices: Manage Device Documents** permission.'
+      operationId: DeviceDocumentsPublicV2Controller_uploadDocumentForDevice
+      parameters:
+      - name: deviceId
+        required: true
+        in: path
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DeviceDocumentCreateRequestPublicV2Dto'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeviceDocumentCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '413':
+          description: The file was too large to upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '503':
+          description: Third party system was unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+      security:
+      - bearer: []
+      summary: Upload Device Document
+      tags:
+      - Device Documents
+      x-drata-permissions:
+      - devices-post-document
+      x-product-area:
+      - MDM
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /devices/{deviceId}/documents/{documentId}:
+    get:
+      operationId: DeviceDocumentsPublicV2Controller_getDeviceDocument
+      parameters:
+      - name: deviceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: documentId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentExpandEnum'
+      responses:
+        '200':
+          description: ''
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Device Document
+      tags:
+      - Device Documents
+      x-drata-permissions:
+      - devices-get-download-document
+      x-product-area:
+      - MDM
+      description: '🔒 Requires **Devices: Manage Device Documents** permission.'
+    delete:
+      description: 'Removes a specific Device Document using the provided Document ID
+
+
+        🔒 Requires **Devices: Manage Device Documents** permission.'
+      operationId: DeviceDocumentsPublicV2Controller_deleteDeviceDocument
+      parameters:
+      - name: deviceId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: documentId
+        required: true
+        in: path
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Delete Device Document
+      tags:
+      - Device Documents
+      x-drata-permissions:
+      - devices-delete-document
+      x-product-area:
+      - MDM
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    DeviceDocumentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Device document ID
+        type:
+          type: string
+          example: PASSWORD_MANAGER_EVIDENCE
+          description: The device document type
+        name:
+          type: string
+          example: Password Manager Evidence
+          description: The document name
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          example: http://localhost:5000/download/device-documents/1
+          description: The secure URL to the device document
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Device document created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Device document updated date timestamp
+        downloadUrl:
+          description: The signed URL to download the Device Document, only returned when `expand[]=downloadUrl` is passed.
+          allOf:
+          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
+      required:
+      - id
+      - type
+      - name
+      - fileUrl
+      - createdAt
+      - updatedAt
+    DeviceDocumentCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        type:
+          enum:
+          - PASSWORD_MANAGER_EVIDENCE
+          - AUTO_UPDATES_EVIDENCE
+          - HARD_DRIVE_ENCRYPTION_EVIDENCE
+          - ANTIVIRUS_EVIDENCE
+          - LOCK_SCREEN_EVIDENCE
+          type: string
+          example: PASSWORD_MANAGER_EVIDENCE
+          description: The device document type
+        file:
+          type: string
+          format: binary
+          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png'
+        base64File:
+          type: string
+          example:
+            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
+            filename: excellent-filename
+          description: JSON string with external evidence in Base64 format.
+      required:
+      - type
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    DeviceDocumentsResponsePublicV2Dto:
+      type: object
+      properties:
+        documents:
+          description: Full list of device documents
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+      required:
+      - documents
+    SignedUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+      required:
+      - signedUrl
+      - fileBuffer
+      - fileName
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    DeviceDocumentTypeEnum:
+      type: string
+      enum:
+      - PASSWORD_MANAGER_EVIDENCE
+      - AUTO_UPDATES_EVIDENCE
+      - HARD_DRIVE_ENCRYPTION_EVIDENCE
+      - ANTIVIRUS_EVIDENCE
+      - LOCK_SCREEN_EVIDENCE
+    DeviceDocumentExpandEnum:
+      type: string
+      enum:
+      - downloadUrl
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

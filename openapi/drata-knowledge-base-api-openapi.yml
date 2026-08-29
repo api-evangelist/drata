@@ -1,0 +1,415 @@
+openapi: 3.2.0
+info:
+  description: SafeBase API documentation.
+  version: 1.4.1
+  title: SafeBase API documentation Knowledge Base API
+  contact:
+    email: support@safebase.io
+servers:
+- url: https://app.safebase.io/api/ext/v1/rest
+security:
+- apiKey: []
+tags:
+- name: Knowledge Base
+paths:
+  /kb/search:
+    get:
+      tags:
+      - Knowledge Base
+      summary: Search Knowledge Base
+      description: Search Knowledge Base by a given search text and receive the first page of results
+      operationId: searchKnowledgeBase
+      parameters:
+      - in: query
+        name: query
+        description: The search text. May be empty, and must not exceed 512 characters.
+        allowEmptyValue: true
+        schema:
+          type: string
+      - in: query
+        name: products
+        description: The products to search in. Comma separated product ids. If empty, all products will be searched.
+        allowEmptyValue: true
+        schema:
+          type: string
+      - in: query
+        name: pageNumber
+        description: The number of the page to request data from
+        allowEmptyValue: true
+        schema:
+          type: number
+      - in: query
+        name: pageSize
+        description: The number of items returned per page
+        allowEmptyValue: true
+        schema:
+          type: number
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  result:
+                    type: object
+                    properties:
+                      count:
+                        type: number
+                        description: Number of data entries
+                      items:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              description: The ID for the searched item. The ID is guaranteed to be unique only among Knowledge Base search items.
+                            isFavorite:
+                              type: boolean
+                            accessLevel:
+                              type: string
+                              enum:
+                              - private
+                              - internal
+                              - public
+                            source:
+                              type: string
+                              example: policy
+                              enum:
+                              - policy
+                              - questionnaire
+                              - report
+                              - portal
+                              - manual
+                            subtype:
+                              type: object
+                              properties:
+                                raw:
+                                  type: array
+                                  description: Raw form of the item subtype's values. May begin with the product ID when source is portal. Note that product ID and product name are the same, but this is subject to change.
+                                  items:
+                                    type: string
+                                pretty:
+                                  type: array
+                                  description: Pretty form of the item subtype's values. May begin with the product name when source is portal.
+                                  items:
+                                    type: string
+                            content:
+                              type: string
+                              description: The item's content, which varies based on the source.
+                            product:
+                              oneOf:
+                              - type: object
+                                description: When the source is portal, the product to which the item belongs.
+                                properties:
+                                  id:
+                                    type: string
+                                  name:
+                                    type: string
+                                  pretty:
+                                    type: string
+                                    description: The name of the product as it appears in Knowledge Base.
+                              - type: 'null'
+                                description: When the source is not portal.
+                            products:
+                              type: array
+                              items:
+                                type: object
+                                description: An array containing the product(s) for which this entry applies to.
+                                properties:
+                                  id:
+                                    oneOf:
+                                    - type: string
+                                      example: default
+                                      description: When the entry applies to a specific product, this will be the product ID.
+                                    - type: string
+                                      enum:
+                                      - --global--
+                                      description: When the entry applies to the entire organization or all products, it is considered a global item and this will be the only product in the array.
+                            answer:
+                              oneOf:
+                              - type: string
+                                description: When the source is questionnaire, the answer to the content's question.
+                              - type: 'null'
+                                description: When the source is not questionnaire.
+                            comment:
+                              oneOf:
+                              - type: string
+                                description: When the source is questionnaire, a comment on the content's question, if it exists.
+                              - type: 'null'
+                                description: When the source is is questionnaire and the comment does not exist, or the source is not questionnaire.
+                            pageNumber:
+                              oneOf:
+                              - type: integer
+                                description: When the source is report, the 1-indexed page number of the report.
+                              - type: 'null'
+                                description: When the source is not report.
+                            questionNumber:
+                              oneOf:
+                              - type: integer
+                                description: When the source is questionnaire, the 1-indexed number of the question.
+                              - type: 'null'
+                                description: When the source is not questionnaire.
+                            createdAt:
+                              type: string
+                              format: date-time
+                              description: ISO8601 format creation date.
+                            modifiedAt:
+                              type: string
+                              format: date-time
+                              description: ISO8601 format last-modified date. Defaults to creation date.
+                        description: Items searched from Knowledge Base
+                  pagination:
+                    type: object
+                    $ref: '#/paths/~1accounts/get/responses/200/content/application~1json/schema/properties/pagination'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - knowledgebase:view
+  /kb/entries:
+    post:
+      tags:
+      - Knowledge Base
+      summary: Create Knowledge Base Entry
+      description: Adds a new entry to your Knowledge Base.
+      operationId: addKbEntry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - question
+              properties:
+                question:
+                  type: string
+                answer:
+                  oneOf:
+                  - type: string
+                  - type: 'null'
+                comment:
+                  oneOf:
+                  - type: string
+                  - type: 'null'
+                accessLevel:
+                  type: string
+                  enum:
+                  - public
+                  - private
+                  - internal
+                  description: 'Note: defaults to `internal`'
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  result:
+                    description: The created Knowledge Base item.
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        description: The ID for the created item. The ID is guaranteed to be unique only among Knowledge Base search items.
+                      source:
+                        type: string
+                        enum:
+                        - manual
+                      subtype:
+                        type: object
+                        properties:
+                          raw:
+                            type: array
+                            description: Raw form of the item subtype's values. Note that product ID and product name are the same, but this is subject to change.
+                            items:
+                              type: string
+                              enum:
+                              - Custom
+                          pretty:
+                            type: array
+                            description: Pretty form of the item subtype's values. May begin with the product name when source is portal.
+                            items:
+                              type: string
+                              enum:
+                              - Custom
+                      content:
+                        type: string
+                      product:
+                        type: 'null'
+                      answer:
+                        oneOf:
+                        - type: string
+                        - type: 'null'
+                      comment:
+                        oneOf:
+                        - type: string
+                        - type: 'null'
+                      pageNumber:
+                        type: 'null'
+                      questionNumber:
+                        type: 'null'
+                      createdAt:
+                        type: string
+                        format: date-time
+                        description: ISO8601 format creation date.
+                      modifiedAt:
+                        type: string
+                        format: date-time
+                        description: ISO8601 format last-modified date. Defaults to creation date.
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - knowledgebase:edit
+  /kb/entries/{id}/:
+    patch:
+      tags:
+      - Knowledge Base
+      summary: Update Knowledge Base Entry
+      description: Updates a Knowledge Base entry by ID.
+      operationId: updateKbEntry
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          description: The id of the KB entry to update.
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                question:
+                  type: string
+                answer:
+                  oneOf:
+                  - type: string
+                  - type: 'null'
+                    description: When null is provided, the answer will be removed from the item.
+                comment:
+                  oneOf:
+                  - type: string
+                  - type: 'null'
+                    description: When null is provided, the comment will be removed from the item.
+                accessLevel:
+                  type: string
+                  enum:
+                  - public
+                  - private
+                  - internal
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                  result:
+                    description: The updated Knowledge Base item.
+                    $ref: '#/paths/~1kb~1entries/post/responses/201/content/application~1json/schema/properties/result'
+        '400':
+          $ref: '#/components/responses/400'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '405':
+          $ref: '#/components/responses/405'
+      security:
+      - apiKey:
+        - knowledgebase:edit
+components:
+  schemas:
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
+  responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+  securitySchemes:
+    apiKey:
+      type: apiKey
+      name: x-sb-api-key
+      in: header

@@ -1,0 +1,327 @@
+openapi: 3.2.0
+info:
+  title: Drata Workspaces API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Workspaces across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Workspaces
+  description: Workspaces allow you to represent different products or business lines that have different compliance requirements. Each Workspace can have its own Frameworks and Controls. The [help docs](https://help.drata.com/en/articles/6598264) have more information on how create and manage Workspaces.
+paths:
+  /workspaces:
+    get:
+      operationId: WorkspacesPublicV2Controller_listWorkspaces
+      parameters:
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkspaceExpandEnum'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkspacesResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Workspaces
+      tags:
+      - Workspaces
+      x-drata-permissions:
+      - workspaces-get
+      x-product-area:
+      - WORKSPACE_PLATFORM
+      description: '🔒 Requires **Workspaces: List Workspaces** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    FrameworkCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 13
+          description: Framework ID
+        name:
+          type: string
+          example: NIST AI RMF
+          description: Framework name
+        description:
+          type: string
+          example: The NIST AI Risk Management Framework (AI RMF) is a set of suggestions and guidelines for incorporating trustworthiness considerations in the design, development, deployment, and use of AI systems.
+          description: Framework description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework updated date timestamp
+        enabledAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the framework was enabled
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - enabledAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    WorkspaceExpandEnum:
+      type: string
+      enum:
+      - frameworks
+      - personnelScope
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    WorkspaceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Workspace ID
+        primary:
+          type: boolean
+          example: false
+          description: Primary Workspace
+        name:
+          type: string
+          example: Drata Automation
+          description: Workspace name
+        description:
+          type:
+          - string
+          - 'null'
+          example: Drata automates SOC 2 compliance
+          description: Workspace description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Workspace created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Workspace last updated at
+        howItWorks:
+          type:
+          - string
+          - 'null'
+          example: Connect your systems to the Drata Autopilot system and sit back and relax!
+          description: How does the Product Work?
+        url:
+          type:
+          - string
+          - 'null'
+          example: https://drata.com
+          description: Workspace URL
+        logo:
+          type:
+          - string
+          - 'null'
+          example: https://cdn-prod.imgpilot.com/logo.png
+          description: Workspace Logo URL
+        frameworks:
+          description: Frameworks associated with the Workspace, only returned when `expand[]=frameworks` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkCompactResponsePublicV2Dto'
+        scopedPersonnelCount:
+          type:
+          - number
+          - 'null'
+          example: 42
+          description: "Count of unique personnel in scope for the Workspace. Returned when 'expand[]=personnelScope' is requested.\n            A non-negative integer is the count of personnel reachable through the scope ('0' when the scope is configured\n            but matches no personnel). 'null indicates either that no scope is configured for the Workspace, or that the\n            personnel-scoping feature is not enabled for the tenant — these two states are not distinguishable from this field\n            alone while the feature is in beta."
+      required:
+      - id
+      - primary
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - howItWorks
+      - url
+      - logo
+    WorkspacesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkspaceResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

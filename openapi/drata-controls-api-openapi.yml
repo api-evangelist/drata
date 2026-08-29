@@ -1,47 +1,1843 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Drata Public API v2 Assets Controls API
-  version: 2.0.0
-  description: Best-effort OpenAPI for Drata's Public REST API v2, used to manage assets, personnel, controls, frameworks, evidence, policies, vendors, tasks, audits, risks, and monitoring tests for SOC 2, ISO 27001, HIPAA, PCI DSS, GDPR and other compliance programs.
-  contact:
-    name: API Evangelist
-    email: kin@apievangelist.com
-    url: https://developers.drata.com/openapi/reference/v2/overview/
+  title: Drata Controls API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Controls across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
-  description: Drata Public API v2
-security:
-- bearerAuth: []
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Controls
+  description: Controls are a strategic measure or safeguard that an organization puts in place to protect its assets and meet the requirements of specific compliance frameworks.
 paths:
-  /controls:
+  /workspaces/{workspaceId}/controls:
     get:
-      tags:
-      - Controls
-      summary: List controls
-      operationId: listControls
+      description: 'Find Controls matching the provided filters.
+
+
+        🔒 Requires **Controls: List Controls** permission.'
+      operationId: ControlsPublicV2Controller_getControls
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlsExpandEnum'
+      - name: isMonitored
+        required: false
+        in: query
+        description: Filter Controls that have or do not have a Monitor
+        schema:
+          example: false
+          type: boolean
+      - name: isReady
+        required: false
+        in: query
+        description: Filter Controls that are or are not ready
+        schema:
+          example: false
+          type: boolean
+      - name: hasEvidence
+        required: false
+        in: query
+        description: Filter to Controls with or without Evidence
+        schema:
+          example: true
+          type: boolean
+      - name: hasPolicy
+        required: false
+        in: query
+        description: Filter to Controls with or without Policy
+        schema:
+          example: true
+          type: boolean
+      - name: hasPassingTest
+        required: false
+        in: query
+        description: Filter to Controls with at least one passing Test
+        schema:
+          example: true
+          type: boolean
+      - name: ticketStatus
+        required: false
+        in: query
+        description: Only include Controls with an associated Task Management Ticket
+        schema:
+          example: 0
+          enum:
+          - IN_PROGRESS
+          - ARCHIVED
+          type: string
+      - name: policyId
+        required: false
+        in: query
+        description: Filter Controls associated with a specific Policy ID
+        schema:
+          example: 123
+          type: number
+      - name: isEnabled
+        required: false
+        in: query
+        description: Filter Controls that are or are not enabled
+        schema:
+          example: true
+          type: boolean
+      - name: isArchived
+        required: false
+        in: query
+        description: Filter Controls that are or are not archived
+        schema:
+          example: false
+          type: boolean
       responses:
         '200':
-          description: A page of controls
-  /controls/{controlId}:
-    parameters:
-    - name: controlId
-      in: path
-      required: true
-      schema:
-        type: string
-    get:
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Controls
       tags:
       - Controls
-      summary: Get a control
-      operationId: getControl
+      x-drata-permissions:
+      - controls-get
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    post:
+      description: 'Create a new custom Control
+
+
+        🔒 Requires **Controls: Create Control** permission.'
+      operationId: ControlsPublicV2Controller_createControl
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ControlCreateRequestPublicV2Dto'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlCreateRequestPublicV2Dto'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '413':
+          description: The file was too large to upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '503':
+          description: Third party system was unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+      security:
+      - bearer: []
+      summary: Create Control
+      tags:
+      - Controls
+      x-drata-permissions:
+      - controls-post
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/controls/{controlId}:
+    get:
+      description: 'Get all the information for a specific Control
+
+
+        🔒 Requires **Controls: Get Control** permission.'
+      operationId: ControlsPublicV2Controller_getControlById
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: expand[]
+        required: false
+        in: query
+        description: List of subcollections and sub-objects to expand
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlExpandEnum'
+      - name: controlId
+        required: true
+        in: path
+        description: An integer control ID or a control code prefixed with `code:`
+        schema:
+          oneOf:
+          - type: number
+            description: Integer control ID
+          - type: string
+            description: Control code prefixed with 'code:', e.g. `code:DCF-37`
       responses:
         '200':
-          description: Control details
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Control
+      tags:
+      - Controls
+      x-drata-permissions:
+      - controls-get-control
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    put:
+      operationId: ControlsPublicV2Controller_modifyControl
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        description: An integer control ID or a control code prefixed with `code:`
+        schema:
+          oneOf:
+          - type: number
+            description: Integer control ID
+          - type: string
+            description: Control code prefixed with 'code:', e.g. `code:DCF-37`
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlModifyRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Modify Control
+      tags:
+      - Controls
+      x-drata-permissions:
+      - controls-put
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+      description: '🔒 Requires **Controls: Update Control** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/controls/{controlId}/requirements:
+    get:
+      description: 'Find Control Requirements matching the provided filters.
+
+
+        🔒 Requires **Controls: Get Control** permission.'
+      operationId: ControlsPublicV2Controller_getMappedRequirements
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        schema:
+          type: number
+      - name: cursor
+        required: false
+        in: query
+        description: This parameter is used to paginate through results. No value is needed for the first request. If there are additional results, the response will contain a `pagination.cursor` value that can be used in the subsequent request to retrieve the next page of results
+        schema:
+          type: string
+      - name: size
+        required: false
+        in: query
+        description: Number of results to return
+        schema:
+          minimum: 1
+          maximum: 500
+          default: 50
+          type: number
+      - name: sort
+        required: false
+        in: query
+        description: Which field to sort by
+        schema:
+          $ref: '#/components/schemas/SortTypeLimitedEnum'
+      - name: sortDir
+        required: false
+        in: query
+        description: The direction to sort the data
+        schema:
+          $ref: '#/components/schemas/SortDirectionEnum'
+      - name: includeTotalCount
+        required: false
+        in: query
+        description: Include total count of all matching records in response. Only honored on first page (when cursor is null).
+        schema:
+          default: false
+          example: false
+          type: boolean
+      - name: frameworkTag
+        required: false
+        in: query
+        description: Filter data by controls associated with these framework tags
+        schema:
+          example:
+          - SOC_2
+          - ISO27001
+          type: array
+          items:
+            type: string
+            enum:
+            - NONE
+            - SOC_2
+            - ISO27001
+            - CCPA
+            - GDPR
+            - HIPAA
+            - PCI
+            - SCF
+            - NIST80053
+            - NISTCSF
+            - CMMC
+            - NIST800171
+            - MSSSPA
+            - FFIEC
+            - ISO27701
+            - COBIT
+            - SOX_ITGC
+            - ISO270012022
+            - CCM
+            - CYBER_ESSENTIALS
+            - ISO270172015
+            - ISO270182019
+            - FEDRAMP
+            - NISTAI
+            - PCI4
+            - NISTCSF2
+            - NIS2
+            - DORA
+            - ISO420012023
+            - DRATA_ESSENTIALS
+            - NIST800171R3
+            - CIS8
+            - CYBER_ESSENTIALS_32
+            - FEDRAMP20X
+            - HITRUST
+            - MSSSPA11
+            - ESSENTIAL_EIGHT
+            - NYDFS
+            - TISAX
+            - ISO270182025
+            - CCPA2026
+            - ISO277012025
+            - CPS230
+            - CYFUN
+            - AIUC_1
+            - CUSTOM
+            - ALL
+      - name: excludeIds
+        required: false
+        in: query
+        description: Exclude requirements by array of IDs
+        schema:
+          example: []
+          type: array
+          items:
+            type: number
+      - name: frameworkSlug
+        required: false
+        in: query
+        description: Filter data by controls associated with these framework slugs. This parameter is intended to be used only for custom frameworks
+        schema:
+          example: slug
+          type: string
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlRequirementsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: List Requirements for Control
+      tags:
+      - Controls
+      x-drata-permissions:
+      - controls-get-control
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/controls/action-reset-mappings:
+    post:
+      description: 'Reset multiple controls to their original requirement mappings from control templates. Custom controls cannot be reset. Returns success/failure status for each control.
+
+
+        🔒 Requires **Controls: Create Control** permission.'
+      operationId: ControlsPublicV2Controller_resetControlRequirementMappings
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlsResetMappingsRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsResetMappingsResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Reset Control Requirement Mappings
+      tags:
+      - Controls
+      x-drata-permissions:
+      - controls-post
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/controls/{controlId}/actions:
+    post:
+      description: 'Perform an action on a Control: `markOutOfScope` archives it, `markInScope` restores it. Returns 204 with no body when the action is already in the desired state.
+
+
+        🔒 Requires **Controls: Update Control** permission.'
+      operationId: ControlsPublicV2Controller_performControlAction
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlId
+        required: true
+        in: path
+        description: The Control ID
+        schema:
+          example: 123
+          type: number
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ControlActionRequestPublicV2Dto'
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlResponsePublicV2Dto'
+        '204':
+          description: Control is already in the requested state; no change was made.
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Perform Control Action
+      tags:
+      - Controls
+      x-drata-permissions:
+      - controls-put
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+  /workspaces/{workspaceId}/controls-requirement-comparison:
+    get:
+      description: 'Compare requirements for multiple controls between tenant mappings and global template mappings.
+
+
+        🔒 Requires **Controls: Get Control** permission.'
+      operationId: ControlsPublicV2Controller_compareControlRequirements
+      parameters:
+      - name: workspaceId
+        required: true
+        in: path
+        description: The Workspace ID associated to the Account
+        schema:
+          type: number
+      - name: controlIds[]
+        required: true
+        in: query
+        description: Array of Control IDs to compare requirements for
+        schema:
+          minItems: 1
+          maxItems: 300
+          example:
+          - 1
+          - 2
+          - 3
+          type: array
+          items:
+            type: number
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ControlsRequirementComparisonResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Compare Control Requirements
+      tags:
+      - Controls
+      x-drata-permissions:
+      - controls-get-control
+      x-product-area:
+      - REQUIREMENTS_FRAMEWORKS
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
 components:
+  schemas:
+    ControlsResetMappingsResponsePublicV2Dto:
+      type: object
+      properties:
+        results:
+          description: Results for each control reset operation
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlResetResultPublicV2Dto'
+      required:
+      - results
+    ControlsRequirementComparisonResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of control requirement comparisons
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlRequirementComparisonResponsePublicV2Dto'
+      required:
+      - data
+    ControlFlagsResponsePublicV2Dto:
+      type: object
+      properties:
+        hasEvidence:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Indicates if the Control has any linked Polices, Reports, External Evidence, or Control Tests
+        hasPolicy:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Indicates if the Control has any linked Polices
+        isReady:
+          type:
+          - boolean
+          - 'null'
+          example: 'true'
+          description: Indicates if the Control is ready
+        hasTicket:
+          type:
+          - boolean
+          - 'null'
+          example: 'true'
+          description: Indicates if the Control is associated with a Task Management Ticket
+        hasOwner:
+          type: boolean
+          example: false
+          description: Indicates if the Control has any Owners
+        isMonitored:
+          type: boolean
+          example: false
+          description: Indicates if the Control has a Test
+      required:
+      - hasEvidence
+      - hasPolicy
+      - isReady
+      - hasTicket
+      - hasOwner
+      - isMonitored
+    ControlResetResultPublicV2Dto:
+      type: object
+      properties:
+        controlId:
+          type: number
+          description: Control ID
+          example: 123
+        success:
+          type: boolean
+          description: Whether the reset was successful
+          example: true
+        error:
+          type:
+          - string
+          - 'null'
+          description: Error message if reset failed
+          example: Cannot reset requirement mappings for Custom Control
+      required:
+      - controlId
+      - success
+    ShortRequirementResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: Requirement ID
+        name:
+          type: string
+          example: CC1.1
+          description: Requirement name
+        description:
+          type: string
+          example: The entity demonstrates a commitment to integrity and ethical values.
+          description: Requirement description
+        frameworkTag:
+          type: string
+          example: SOC_2
+          description: The framework tag this requirement is associated with
+        isOutOfScope:
+          type: boolean
+          example: false
+          description: Whether the requirement is marked as out of scope
+      required:
+      - id
+      - name
+      - description
+      - frameworkTag
+      - isOutOfScope
+    ControlActionEnum:
+      type: string
+      enum:
+      - markInScope
+      - markOutOfScope
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    ControlRequirementComparisonResponsePublicV2Dto:
+      type: object
+      properties:
+        controlId:
+          type: number
+          example: 123
+          description: Control ID
+        alignedRequirements:
+          description: Requirements found in both tenant and global mappings
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
+        userMappedRequirements:
+          description: Requirements found only in tenant mappings
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
+        templateMappedRequirements:
+          description: Requirements found only in global template mappings
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
+      required:
+      - controlId
+      - alignedRequirements
+      - userMappedRequirements
+      - templateMappedRequirements
+    ControlCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        question:
+          type: string
+          maxLength: 768
+          example: A very good question
+          description: The question of the Control
+        activity:
+          type: string
+          maxLength: 768
+          example: On a quarterly schedule, generate access reports from identity providers.
+          description: The activity of the Control
+        reportIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Report IDs
+          type: array
+          items:
+            type: number
+        policyIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Policy IDs
+          type: array
+          items:
+            type: number
+        requirementIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Requirement IDs
+          type: array
+          items:
+            type: number
+        ownersIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of User IDs to make owners of the Control
+          type: array
+          items:
+            type: number
+        testIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Control Test IDs
+          type: array
+          items:
+            type: number
+        customFields:
+          description: "Custom Fields for the Control. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+        name:
+          type: string
+          maxLength: 191
+          example: Quarterly User Access Reviews
+          description: The name of the Control
+        description:
+          type: string
+          maxLength: 30000
+          example: Access to critical systems is reviewed on a quarterly basis to ensure that only authorized users retain access.
+          description: The description of the Control
+        code:
+          type: string
+          maxLength: 20
+          example: DRA-69
+          description: The Control code
+        externalEvidence:
+          description: 'External evidence files. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png'
+          example:
+          - -F 'file=<<Your-Relative-File-Path>>'
+          type: array
+          items:
+            type: string
+            format: binary
+        externalEvidenceMetadata:
+          type: string
+          example:
+          - originalFile: user-access-review-q1-2025.pdf
+            filename: excellent-filename.pdf
+            description: The file contains the results of the quarterly user access review for Q1 2015.
+            creationDate: '2025-01-06 12:00:00.000000'
+            name: Q1 2025 User Access Review
+            renewalDate: '2026-01-06'
+            renewalScheduleType: ONE_YEAR
+          description: JSON string of metadata of uploaded evidence
+        base64Files:
+          type: string
+          example:
+          - base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
+            filename: excellent-filename
+          description: JSON string with array of external evidence in Base64 format.
+      required:
+      - name
+      - description
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    ControlsResetMappingsRequestPublicV2Dto:
+      type: object
+      properties:
+        controlIds:
+          maxItems: 100
+          example:
+          - 123
+          - 456
+          - 789
+          description: Array of control IDs to reset requirement mappings for (max 100)
+          type: array
+          items:
+            type: number
+      required:
+      - controlIds
+    ControlsExpandEnum:
+      type: string
+      enum:
+      - customFields
+      - evidenceIds
+      - flags
+      - frameworkTags
+      - owners
+      - requirements
+      - testIds
+      - topics
+    TrustServiceCriteriaEnum:
+      type: string
+      enum:
+      - AVAILABILITY
+      - CONFIDENTIALITY
+      - SECURITY
+      - PRIVACY
+      - PROCESS_INTEGRITY
+      - GENERAL_RULES
+      - ADMINISTRATIVE_SAFEGUARDS
+      - PHYSICAL_SAFEGUARDS
+      - TECHNICAL_SAFEGUARDS
+      - REQUIREMENTS_ORGANIZATION
+      - REQUIREMENTS_POLICIES_PROCEDURES
+      - BASIC
+      - DERIVED
+      - NIST80053_PRIVACY
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ControlModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Quarterly User Access Reviews
+          description: The name of the Control
+        description:
+          type: string
+          maxLength: 30000
+          example: Access to critical systems is reviewed on a quarterly basis to ensure that only authorized users retain access.
+          description: The description of the Control
+        question:
+          type: string
+          maxLength: 768
+          example: A very good question
+          description: The question of the Control
+        code:
+          type: string
+          maxLength: 20
+          example: DRA-69
+          description: The Control code
+        activity:
+          type: string
+          maxLength: 768
+          example: On a quarterly schedule, generate access reports from identity providers.
+          description: The activity of the Control
+        reportIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Report IDs
+          type: array
+          items:
+            type: number
+        policyIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Policy IDs
+          type: array
+          items:
+            type: number
+        requirementIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Requirement IDs
+          type: array
+          items:
+            type: number
+        ownersIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of User IDs to make owners of the Control
+          type: array
+          items:
+            type: number
+        testIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Control Test IDs
+          type: array
+          items:
+            type: number
+        customFields:
+          description: "Custom Fields for the Control. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+    ControlExpandEnum:
+      type: string
+      enum:
+      - customFields
+      - evidenceIds
+      - flags
+      - frameworkTags
+      - owners
+      - requirements
+      - testIds
+      - topics
+    ControlsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ControlResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: '123'
+          description: Control ID
+        name:
+          type: string
+          example: Databases Monitored and Alarmed
+          description: Control name
+        code:
+          type: string
+          example: DCF-1002
+          description: Control code
+        slug:
+          type:
+          - string
+          - 'null'
+          example: databases-monitored-and-alarmed
+          description: Control slug
+        description:
+          type:
+          - string
+          - 'null'
+          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n             predetermined criteria. Incidents are escalated per policy."
+          description: Control description
+        question:
+          type:
+          - string
+          - 'null'
+          example: "Does the organization implement tools to monitor its databases and notify appropriate personnel of incidents based on predetermined\n             criteria?"
+          description: Control question
+        activity:
+          type:
+          - string
+          - 'null'
+          example: Ensure tools are implemented to monitor databases
+          description: Control activity
+        archivedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was archived or null if it's still active
+        rationale:
+          type:
+          - string
+          - 'null'
+          description: Business rationale for archiving the Control, or null if not archived
+        frameworkTags:
+          type: array
+          example:
+          - SOC_2
+          description: Framework tags associated with the Control, only returned when `expand[]=frameworkTags` is passed.
+          items:
+            $ref: '#/components/schemas/FrameworkTagEnum'
+        topics:
+          type: array
+          example:
+          - 1
+          - 2
+          description: Trust Service Criteria associated with the control, only returned when `expand[]=topics` is passed.
+          items:
+            $ref: '#/components/schemas/TrustServiceCriteriaEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was last updated
+        controlTemplateId:
+          type:
+          - number
+          - 'null'
+          example: '123'
+          description: Control template ID, used to determine if the control is custom
+        flags:
+          description: The status flags associated with this Control, only returned when `expand[]=flags` is passed.
+          allOf:
+          - $ref: '#/components/schemas/ControlFlagsResponsePublicV2Dto'
+        owners:
+          description: Control Owners with pagination information.
+          allOf:
+          - $ref: '#/components/schemas/OwnersSubcollectionResponsePublicV2Dto'
+        requirements:
+          description: Control Requirements, only returned when `expand[]=requirements` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlRequirementResponsePublicV2Dto'
+        customFields:
+          description: "Custom Fields, only returned when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+        testIds:
+          description: Test IDs associated with this Control, only returned when `expand[]=testIds` or `expand[]=evidenceIds` is passed.
+          allOf:
+          - $ref: '#/components/schemas/ControlTestIdsResponsePublicV2Dto'
+        evidenceIds:
+          description: Evidence IDs associated with this Control, only returned when `expand[]=evidenceIds` or `expand[]=testIds` is passed.
+          allOf:
+          - $ref: '#/components/schemas/ControlEvidenceIdsResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - code
+      - slug
+      - description
+      - question
+      - activity
+      - archivedAt
+      - rationale
+      - createdAt
+      - updatedAt
+      - controlTemplateId
+    ControlRequirementResponsePublicV2Dto:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the requirement was created
+        description:
+          type: string
+          example: The entity demonstrates a commitment to integrity and ethical values.
+          description: Requirement description
+        frameworkName:
+          type: string
+          example: SOC 2
+          description: The framework name this requirement is associated with
+        frameworkPill:
+          type: string
+          example: SOC 2
+          description: A pill representing the framework
+        frameworkSlug:
+          type: string
+          example: SOC 2
+          description: The framework slug this requirement is associated with
+        frameworkTag:
+          type: string
+          example: SOC_2
+          description: The framework tag this requirement is associated with
+        id:
+          type: number
+          example: '58'
+          description: Requirement ID
+        name:
+          type: string
+          example: PI1.2
+          description: Requirement name
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the requirement was updated
+        additionalInfo:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to integrity.
+          description: Additional information surrounding requirement
+        additionalInfo2:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to ethical values.
+          description: Second additional information surrounding requirement
+        additionalInfo3:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to enforcing policies.
+          description: Third additional information surrounding requirement
+        archivedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the requirement was marked out of scope
+        externalId:
+          type:
+          - string
+          - 'null'
+          example: SOC 2
+          description: An external ID associated with this requirement
+        longDescription:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to integrity and ethical values.
+          description: 'A long description of the requirement '
+        rationale:
+          type:
+          - string
+          - 'null'
+          example: This requirement is not needed.
+          description: Requirement rationale for out of scope.
+      required:
+      - createdAt
+      - description
+      - frameworkName
+      - frameworkPill
+      - frameworkSlug
+      - frameworkTag
+      - id
+      - name
+      - updatedAt
+      - additionalInfo
+      - additionalInfo2
+      - additionalInfo3
+      - archivedAt
+      - externalId
+      - longDescription
+      - rationale
+    ControlRequirementsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlRequirementResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    OwnersSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of owners. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all owners for this control.
+      required:
+      - data
+      - totalCount
+    ControlActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          example: markOutOfScope
+          description: 'Action to perform: `markOutOfScope` archives the control, `markInScope` restores it'
+          allOf:
+          - $ref: '#/components/schemas/ControlActionEnum'
+        rationale:
+          type: string
+          maxLength: 191
+          description: Required when action is `markOutOfScope`. Business rationale for archiving the control.
+      required:
+      - action
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    ControlEvidenceIdsResponsePublicV2Dto:
+      type: object
+      properties:
+        validExternalEvidenceIds:
+          example:
+          - 10
+          - 11
+          description: IDs of valid external evidence
+          type: array
+          items:
+            type: number
+        invalidExternalEvidenceIds:
+          example:
+          - 12
+          description: IDs of invalid external evidence
+          type: array
+          items:
+            type: number
+        validReportIds:
+          example:
+          - 20
+          - 21
+          description: IDs of valid reports
+          type: array
+          items:
+            type: number
+        invalidReportIds:
+          example:
+          - 22
+          description: IDs of invalid reports
+          type: array
+          items:
+            type: number
+      required:
+      - validExternalEvidenceIds
+      - invalidExternalEvidenceIds
+      - validReportIds
+      - invalidReportIds
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    CustomFieldResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
+      required:
+      - customFieldId
+      - name
+    ControlTestIdsResponsePublicV2Dto:
+      type: object
+      properties:
+        passing:
+          example:
+          - 1
+          - 2
+          - 3
+          description: IDs of passing control tests
+          type: array
+          items:
+            type: number
+        failing:
+          example:
+          - 4
+          description: IDs of failing control tests
+          type: array
+          items:
+            type: number
+        monitored:
+          example:
+          - 1
+          - 2
+          - 3
+          - 5
+          description: IDs of monitored control tests
+          type: array
+          items:
+            type: number
+      required:
+      - passing
+      - failing
+      - monitored
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
   securitySchemes:
-    bearerAuth:
-      type: http
+    bearer:
       scheme: bearer
-      bearerFormat: JWT
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml

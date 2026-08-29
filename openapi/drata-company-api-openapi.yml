@@ -1,0 +1,298 @@
+openapi: 3.2.0
+info:
+  title: Drata Company API
+  version: V2
+  contact: {}
+  description: 'Operations tagged Company across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://public-api.drata.com/public/v2
+- url: https://public-api.eu.drata.com/public/v2
+- url: https://public-api.apac.drata.com/public/v2
+tags:
+- name: Company
+  description: The Company tracks essential information about your organization. The [help docs](https://help.drata.com/en/articles/8283910) have more information on the purpose of each field.
+paths:
+  /company:
+    get:
+      operationId: CompaniesPublicV2Controller_getCompany
+      parameters: []
+      responses:
+        '200':
+          description: Successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CompanyResponsePublicV2Dto'
+        '400':
+          description: Malformed data and/or validation errors
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '403':
+          description: You are not allowed to perform this action
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponsePublicV2Dto'
+        '412':
+          description: You must accept the Drata terms and conditions to use the API
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponseDto'
+      security:
+      - bearer: []
+      summary: Get Company
+      tags:
+      - Company
+      x-drata-permissions:
+      - company-settings-get-info
+      x-product-area:
+      - COMPANY_INFO
+      description: '🔒 Requires **Company Settings: Get Company Settings** permission.'
+    servers:
+    - url: https://public-api.drata.com/public/v2
+    - url: https://public-api.eu.drata.com/public/v2
+    - url: https://public-api.apac.drata.com/public/v2
+components:
+  schemas:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    LanguageEnum:
+      type: string
+      enum:
+      - ENGLISH_US
+      - SPANISH_LA
+      - GERMAN_DE
+      - FRENCH_FR
+      - ITALIAN_IT
+      - DUTCH_NL
+      - PSEUDO
+      - PSEUDOX
+    CompanyResponsePublicV2Dto:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: The account ID for the company
+        domain:
+          type: string
+          example: domain.com
+          description: Company's domain
+        name:
+          type: string
+          example: Acme
+          description: Company's common name
+        legalName:
+          type:
+          - string
+          - 'null'
+          example: Acme Inc.
+          description: Company's full legal name
+        description:
+          type:
+          - string
+          - 'null'
+          example: We make tools
+          description: The description of the company
+        logoUrl:
+          type:
+          - string
+          - 'null'
+          example: https://domain.com/logo.png
+          description: Company avatar URL
+        securityTraining:
+          example: DRATA_PROVIDED
+          description: Security Awareness Training option
+          allOf:
+          - $ref: '#/components/schemas/SecurityTrainingTypeEnum'
+        hipaaTraining:
+          example: DRATA_PROVIDED
+          description: HIPAA Training option
+          allOf:
+          - $ref: '#/components/schemas/HipaaTrainingTypeEnum'
+        backgroundCheck:
+          example: CERTN
+          description: The backgroup check provider used for new hires
+          allOf:
+          - $ref: '#/components/schemas/BackgroundCheckTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Account created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Account updated date timestamp
+        agentEnabled:
+          type: boolean
+          example: false
+          description: Is the Drata Agent enabled
+        manualUploadEnabled:
+          type: boolean
+          example: false
+          description: Can manual evidence (Device and User Documents) be uploaded?
+        entitlements:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              description:
+                type: string
+              type:
+                type: string
+              featureId:
+                type:
+                - number
+                - 'null'
+              metadata:
+                type: object
+                additionalProperties: true
+          description: The enabled features on this account
+        language:
+          description: Account language
+          allOf:
+          - $ref: '#/components/schemas/LanguageEnum'
+      required:
+      - accountId
+      - domain
+      - name
+      - legalName
+      - description
+      - logoUrl
+      - securityTraining
+      - hipaaTraining
+      - backgroundCheck
+      - createdAt
+      - updatedAt
+      - agentEnabled
+      - manualUploadEnabled
+      - entitlements
+      - language
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    SecurityTrainingTypeEnum:
+      type: string
+      enum:
+      - ESET
+      - LINK_PROVIDED
+      - DRATA_PROVIDED
+      - MANUAL
+      - CURRICULA
+      - KNOWBE4
+      - STACKONE_EASY_LLAMA
+      - MANUAL_EVIDENCE_FIRST
+      - STACKONE_CORNERSTONE
+      - STACKONE_DOCEBO
+      - STACKONE_GO1
+      - STACKONE_LINKEDIN_LEARNING
+      - STACKONE_SAP_LEARNING
+      - STACKONE_WORKDAY_LEARNING
+      - STACKONE_360LEARNING
+      - STACKONE_BRAINIER
+      - STACKONE_COURSERA
+      - STACKONE_XYLEME
+      - STACKONE_INFOSEC
+      - STACKONE_UDEMY
+      - STACKONE_PEOPLE_FLUENT
+    HipaaTrainingTypeEnum:
+      type: string
+      enum:
+      - DRATA_PROVIDED
+      - LINK_PROVIDED
+      - MANUAL
+      - NOT_REQUIRED
+      - KNOWBE4
+      - MANUAL_EVIDENCE_FIRST
+    BackgroundCheckTypeEnum:
+      type: string
+      enum:
+      - KARMACHECK
+      - MANUAL
+      - CERTN
+      - CHECKR
+      - HRIS_RIPPLING
+      - STERLING
+      - HIRERIGHT
+      - VETTY
+  securitySchemes:
+    bearer:
+      scheme: bearer
+      bearerFormat: API_KEY
+      type: http
+x-refined-from:
+- drata-api-v2-openapi.json
+- drata-api-v2-openapi.yml
