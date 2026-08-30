@@ -107,6 +107,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Account
+  tags_raw:
   - Accounts
   properties:
   - type: OpenAPI
@@ -554,6 +556,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Event
+  tags_raw:
   - Events
   properties:
   - type: OpenAPI
@@ -668,6 +672,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Group
+  tags_raw:
   - Groups
   properties:
   - type: OpenAPI
@@ -894,6 +900,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Portal
+  tags_raw:
   - Portals
   properties:
   - type: OpenAPI
@@ -947,6 +955,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Product
+  tags_raw:
   - Products
   properties:
   - type: OpenAPI
@@ -1185,6 +1195,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Task
+  tags_raw:
   - Tasks
   properties:
   - type: OpenAPI
