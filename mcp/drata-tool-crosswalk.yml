@@ -1,0 +1,658 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/drata-api-v2-openapi.yml + https://mcp.drata.com/.well-known/oauth-protected-resource
+provider: Drata
+providerId: drata
+description: 'Crosswalk between the Drata MCP server''s published OAuth scope surface and the Public API v2 operations behind
+  it. The live MCP tools/list is auth-gated, so this maps scopes (the only machine-readable description of the MCP surface
+  Drata publishes anonymously) onto REST operationIds. Confidence is medium throughout by construction: the binding is real,
+  the tool names are not known.'
+surfaces:
+  openapi:
+    file: openapi/drata-api-v2-openapi.yml
+    operations: 197
+    gated: false
+    note: Spec harvested from the Redocly developer portal page-data; the API host itself requires a bearer key.
+  mcp:
+    url: https://mcp.drata.com/mcp/
+    gated: true
+    note: tools/list returns 401 Bearer realm="drata-mcp".
+  graphql: null
+  safebase_openapi:
+    file: openapi/drata-safebase-trust-api-openapi.yml
+    operations: 41
+    note: Separate product surface; no MCP scope maps to it.
+crosswalk:
+- tool: read:controls
+  category: Controls
+  rest:
+  - ControlsPublicV2Controller_compareControlRequirements
+  - ControlsPublicV2Controller_getControlById
+  - ControlsPublicV2Controller_getControls
+  - ControlsPublicV2Controller_getMappedRequirements
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:control
+  category: Controls
+  rest:
+  - ControlLibraryPublicV2Controller_getControlLibraryItem
+  - ControlLibraryPublicV2Controller_listControlLibrary
+  - ControlNotesPublicV2Controller_getControlNote
+  - ControlNotesPublicV2Controller_getControlNotes
+  - ControlOwnersPublicV2Controller_getControlOwnersForAControl
+  - ControlsPublicV2Controller_compareControlRequirements
+  - ControlsPublicV2Controller_getControlById
+  - ControlsPublicV2Controller_getControls
+  - ControlsPublicV2Controller_getMappedRequirements
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: create:control
+  category: Controls
+  rest:
+  - ControlsPublicV2Controller_createControl
+  - ControlsPublicV2Controller_performControlAction
+  - ControlsPublicV2Controller_resetControlRequirementMappings
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: update:control
+  category: Controls
+  rest:
+  - ControlsPublicV2Controller_modifyControl
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:policy
+  category: Policies
+  rest:
+  - PoliciesPublicV2Controller_getApprovalConfiguration
+  - PoliciesPublicV2Controller_getPolicy
+  - PoliciesPublicV2Controller_getPolicyVersion
+  - PoliciesPublicV2Controller_listPolicies
+  - PoliciesPublicV2Controller_listPolicyActions
+  - PoliciesPublicV2Controller_listPolicyVersions
+  - PolicyLanguagesPublicV2Controller_getPolicyLanguageVersion
+  - PolicyLanguagesPublicV2Controller_listPolicyLanguageSettings
+  - PolicyLanguagesPublicV2Controller_listPolicyLanguageVersions
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:assigned-policies
+  category: User's Assigned Policies
+  rest:
+  - UsersPoliciesPublicV2Controller_getPolicyVersionsForUser
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:monitor-test
+  category: Monitoring Tests
+  rest:
+  - MonitorsPublicV2Controller_getMonitor
+  - MonitorsPublicV2Controller_listMonitorExclusions
+  - MonitorsPublicV2Controller_listMonitorTestFailures
+  - MonitorsPublicV2Controller_listMonitorTestPasses
+  - MonitorsPublicV2Controller_listMonitors
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:risk
+  category: Risks
+  rest:
+  - RiskDocumentsPublicV2Controller_getRiskDocument
+  - RiskDocumentsPublicV2Controller_listRiskDocuments
+  - RiskLibraryPublicV2Controller_getRiskLibraryItem
+  - RiskLibraryPublicV2Controller_listRiskLibrary
+  - RiskManagementPublicV2Controller_getRisk
+  - RiskManagementPublicV2Controller_getRiskInsights
+  - RiskManagementPublicV2Controller_listRisks
+  - RiskManagementPublicV2Controller_searchRisks
+  - RiskManagementPublicV2Controller_searchRisksAcrossRegisters
+  - RiskNotesPublicV2Controller_getRiskNote
+  - RiskNotesPublicV2Controller_getRiskNotes
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:risk-registers
+  category: Risk Registers
+  rest:
+  - RiskRegisterPublicV2Controller_getRiskRegister
+  - RiskRegisterPublicV2Controller_listRiskRegisters
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: create:risk
+  category: Risks
+  rest:
+  - RiskManagementPublicV2Controller_createRisk
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: update:risk
+  category: Risks
+  rest:
+  - RiskManagementPublicV2Controller_updateRisk
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: delete:risk
+  category: Risks
+  rest:
+  - RiskManagementPublicV2Controller_deleteRisk
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:workspace
+  category: Workspaces
+  rest:
+  - WorkspacesPublicV2Controller_listWorkspaces
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:company
+  category: Company
+  rest:
+  - CompaniesPublicV2Controller_getCompany
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:users
+  category: Users and Roles
+  rest:
+  - RolesPublicV2Controller_getRole
+  - RolesPublicV2Controller_listRoles
+  - RolesPublicV2Controller_listUsers
+  - UsersPublicV2Controller_getUser
+  - UsersPublicV2Controller_listUsers
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:user
+  category: Users and Roles
+  rest:
+  - RolesPublicV2Controller_getRole
+  - RolesPublicV2Controller_listRoles
+  - RolesPublicV2Controller_listUsers
+  - UserDocumentsPublicV2Controller_getUserDocument
+  - UserDocumentsPublicV2Controller_listUserDocuments
+  - UsersPublicV2Controller_getUser
+  - UsersPublicV2Controller_listUsers
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:framework
+  category: Frameworks
+  rest:
+  - FrameworksPublicV2Controller_getFrameworkRequirementsLegacy
+  - FrameworksPublicV2Controller_getFrameworks
+  - FrameworksPublicV2Controller_listFrameworkRequirementControls
+  - FrameworksPublicV2Controller_listFrameworkRequirements
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:evidence
+  category: Evidence
+  rest:
+  - EvidenceLibraryPublicV2Controller_getEvidenceLibrary
+  - EvidenceLibraryPublicV2Controller_getEvidenceLibraryVersion
+  - EvidenceLibraryPublicV2Controller_listEvidenceLibrary
+  - EvidencePublicV2Controller_getEvidence
+  - EvidencePublicV2Controller_listEvidence
+  - EvidencePublicV2Controller_listEvidenceArtifacts
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: create:evidence
+  category: Evidence
+  rest:
+  - EvidenceLibraryPublicV2Controller_createEvidenceLibrary
+  - EvidencePublicV2Controller_createEvidence
+  - EvidencePublicV2Controller_createEvidenceArtifactAction
+  - EvidencePublicV2Controller_uploadArtifactFile
+  - UploadsPublicV2Controller_requestUploadUrl
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: update:evidence
+  category: Evidence
+  rest:
+  - EvidenceLibraryPublicV2Controller_updateEvidenceLibrary
+  - EvidencePublicV2Controller_updateEvidence
+  - EvidencePublicV2Controller_updateEvidenceArtifact
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: delete:evidence
+  category: Evidence
+  rest:
+  - EvidenceLibraryPublicV2Controller_deleteEvidenceLibrary
+  - EvidencePublicV2Controller_deleteEvidence
+  - EvidencePublicV2Controller_deleteEvidenceArtifact
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:vendor
+  category: Vendors
+  rest:
+  - VendorTypesPublicV2Controller_listVendorTypes
+  - VendorsPublicV2Controller_getVendor
+  - VendorsPublicV2Controller_getVendorQuestionnaire
+  - VendorsPublicV2Controller_getVendorStats
+  - VendorsPublicV2Controller_listVendorQuestionnaires
+  - VendorsPublicV2Controller_listVendors
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: create:vendor
+  category: Vendors
+  rest:
+  - VendorsPublicV2Controller_createVendor
+  - VendorsPublicV2Controller_sendQuestionnaireToVendor
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: update:vendor
+  category: Vendors
+  rest:
+  - VendorsPublicV2Controller_updateVendor
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: delete:vendor
+  category: Vendors
+  rest:
+  - VendorsPublicV2Controller_deleteVendor
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:vendor-security-review
+  category: Vendor Security Reviews
+  rest:
+  - VendorSecurityReviewsPublicV2Controller_getVendorSecurityReview
+  - VendorSecurityReviewsPublicV2Controller_listSecurityReviewActions
+  - VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviewSecurityQuestionnaires
+  - VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviews
+  - VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviewsAcrossVendors
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:vendor-document
+  category: Vendor Documents
+  rest:
+  - VendorDocumentsPublicV2Controller_getVendorDocument
+  - VendorDocumentsPublicV2Controller_getVendorDocuments
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:personnel
+  category: Personnel
+  rest:
+  - CustomHrisUserIdentitiesPublicV2Controller_getCustomHrisUserIdentity
+  - CustomHrisUserIdentitiesPublicV2Controller_listCustomHrisUserIdentities
+  - GroupsPublicV2Controller_listGroups
+  - PersonnelPublicV2Controller_getPerson
+  - PersonnelPublicV2Controller_listPersonnel
+  - PersonnelPublicV2Controller_searchPersonnel
+  - PersonnelPublicV2Controller_searchPersonnelAcrossWorkspaces
+  - ScopedPersonnelGroupsPublicV2Controller_getScopedPersonnelCounts
+  - ScopedPersonnelGroupsPublicV2Controller_listScopedPersonnelGroups
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: update:personnel
+  category: Personnel
+  rest:
+  - PersonnelPublicV2Controller_modifyPerson
+  - ScopedPersonnelGroupsPublicV2Controller_putScopedPersonnelGroups
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+- tool: read:device
+  category: Devices
+  rest:
+  - DeviceDocumentsPublicV2Controller_getDeviceDocument
+  - DeviceDocumentsPublicV2Controller_getDeviceDocuments
+  - DevicesPublicV2Controller_getDevice
+  - DevicesPublicV2Controller_getDeviceApps
+  - DevicesPublicV2Controller_getDevices
+  - DevicesPublicV2Controller_getDevicesForCustomConnection
+  - DevicesPublicV2Controller_getDevicesForPersonnel
+  binding: scope-to-tag+method
+  confidence: medium
+  note: Drata does not publish an MCP tool manifest and tools/list is auth-gated (401). Rows bind each published OAuth scope
+    to the Public API v2 operations it governs, matched on the operation tag and HTTP method. Tool NAMES are unknown; these
+    are capability bindings, not verified tool identifiers.
+mcp_only:
+- tool: (unknown)
+  reason: Tool names and inputSchemas require an authenticated tools/list; any MCP-only capability cannot be enumerated without
+    a token.
+rest_only:
+- operationId: AssetsPublicV2Controller_createAsset
+  tag: Assets
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AssetsPublicV2Controller_deleteAsset
+  tag: Assets
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AssetsPublicV2Controller_getAsset
+  tag: Assets
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AssetsPublicV2Controller_listAssets
+  tag: Assets
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AssetsPublicV2Controller_updateAsset
+  tag: Assets
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AuditRequestsPublicV2Controller_getAuditRequest
+  tag: Audit Requests
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AuditRequestsPublicV2Controller_listAuditRequests
+  tag: Audit Requests
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AuditsPublicV2Controller_getAudit
+  tag: Audits
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: AuditsPublicV2Controller_listAudits
+  tag: Audits
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: BackgroundChecksPublicV2Controller_createBackgroundCheck
+  tag: Background Checks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ControlLibraryPublicV2Controller_importControlLibrary
+  tag: Control Library
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ControlNotesPublicV2Controller_createControlNote
+  tag: Control Notes
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ControlNotesPublicV2Controller_deleteNote
+  tag: Control Notes
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ControlNotesPublicV2Controller_updateNote
+  tag: Control Notes
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ControlOwnersPublicV2Controller_createControlOwner
+  tag: Control Owners
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ControlOwnersPublicV2Controller_deleteControlOwner
+  tag: Control Owners
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ControlOwnersPublicV2Controller_modifyControlOwners
+  tag: Control Owners
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomConnectionsPublicV2Controller_createCustomConnection
+  tag: Custom Connections
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomConnectionsPublicV2Controller_deleteCustomConnection
+  tag: Custom Connections
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomConnectionsPublicV2Controller_getCustomConnection
+  tag: Custom Connections
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomConnectionsPublicV2Controller_listCustomConnections
+  tag: Custom Connections
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomConnectionsPublicV2Controller_updateCustomConnection
+  tag: Custom Connections
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomDataRecordsPublicV2Controller_createCustomData
+  tag: Custom Data Records
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomDataRecordsPublicV2Controller_deleteCustomData
+  tag: Custom Data Records
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomDataRecordsPublicV2Controller_listCustomDataRecords
+  tag: Custom Data Records
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomDataRecordsPublicV2Controller_listSessions
+  tag: Custom Data Records
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomDataRecordsPublicV2Controller_performSessionAction
+  tag: Custom Data Records
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomDataRecordsPublicV2Controller_updateCustomData
+  tag: Custom Data Records
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomDataRecordsPublicV2Controller_uploadSessionRecords
+  tag: Custom Data Records
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomFieldDefinitionsPublicV2Controller_getCustomFieldDefinition
+  tag: Custom Field Definitions
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomFieldDefinitionsPublicV2Controller_listCustomFieldDefinitions
+  tag: Custom Field Definitions
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomHrisUserIdentitiesPublicV2Controller_createCustomHrisUserIdentities
+  tag: HRIS User Identities
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: CustomHrisUserIdentitiesPublicV2Controller_deleteCustomHrisUserIdentity
+  tag: HRIS User Identities
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: DeviceDocumentsPublicV2Controller_deleteDeviceDocument
+  tag: Device Documents
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: DeviceDocumentsPublicV2Controller_uploadDocumentForDevice
+  tag: Device Documents
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: DevicesPublicV2Controller_createDeviceForCustomConnection
+  tag: Devices
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: DevicesPublicV2Controller_deleteDeviceFromCustomConnection
+  tag: Devices
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: EventsPublicV2Controller_createEventDownloadJob
+  tag: Events
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: EventsPublicV2Controller_getEvent
+  tag: Events
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: EventsPublicV2Controller_getEventDownloadJobStatus
+  tag: Events
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: EventsPublicV2Controller_listEvents
+  tag: Events
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: FrameworksPublicV2Controller_createFramework
+  tag: Frameworks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: FrameworksPublicV2Controller_createFrameworkRequirements
+  tag: Frameworks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: FrameworksPublicV2Controller_updateFramework
+  tag: Frameworks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: FrameworksPublicV2Controller_updateFrameworkRequirement
+  tag: Frameworks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: FrameworksPublicV2Controller_updateFrameworkRequirementLegacy
+  tag: Frameworks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: MonitorsPublicV2Controller_updateMonitor
+  tag: Monitoring Tests
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PersonnelPublicV2Controller_performPersonnelAction
+  tag: Personnel
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_addPolicyApprovalConfiguration
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_assignPolicyOwner
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_createPolicy
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_createPolicyVersion
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_modifyPolicy
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_performPolicyAction
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_removePolicyApprovalConfiguration
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: PoliciesPublicV2Controller_updatePolicyApprovalConfiguration
+  tag: Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ProcurementConnectionMappingsPublicV2Controller_getVendorMapping
+  tag: Procurement Connection Mappings
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ProcurementConnectionMappingsPublicV2Controller_updateVendorMapping
+  tag: Procurement Connection Mappings
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskDocumentsPublicV2Controller_deleteRiskDocument
+  tag: Risk Documents
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskDocumentsPublicV2Controller_uploadRiskDocuments
+  tag: Risk Documents
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskLibraryPublicV2Controller_copyRiskLibrary
+  tag: Risk Library
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskNotesPublicV2Controller_createRiskNote
+  tag: Risk Notes
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskNotesPublicV2Controller_deleteRiskNote
+  tag: Risk Notes
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskNotesPublicV2Controller_updateRiskNote
+  tag: Risk Notes
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskRegisterPublicV2Controller_createRiskRegister
+  tag: Risk Registers
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskRegisterPublicV2Controller_deleteRiskRegister
+  tag: Risk Registers
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: RiskRegisterPublicV2Controller_updateRiskRegister
+  tag: Risk Registers
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ScopedPersonnelGroupsPublicV2Controller_addScopedPersonnelGroup
+  tag: Personnel
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: ScopedPersonnelGroupsPublicV2Controller_removeScopedPersonnelGroup
+  tag: Personnel
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: TasksPublicV2Controller_createTask
+  tag: Tasks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: TasksPublicV2Controller_getTask
+  tag: Tasks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: TasksPublicV2Controller_listTasks
+  tag: Tasks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: TasksPublicV2Controller_performTaskAction
+  tag: Tasks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: TasksPublicV2Controller_updateTask
+  tag: Tasks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: UpcomingTasksPublicV2Controller_listUpcomingTasks
+  tag: Tasks
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: UserDocumentsPublicV2Controller_deleteUserDocument
+  tag: User Documents
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: UserDocumentsPublicV2Controller_uploadUserDocument
+  tag: User Documents
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: UsersPoliciesPublicV2Controller_acceptUserPolicyVersion
+  tag: User's Assigned Policies
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorDocumentsPublicV2Controller_uploadVendorDocument
+  tag: Vendor Documents
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorSecurityReviewsPublicV2Controller_createVendorSecurityReview
+  tag: Vendor Security Reviews
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorSecurityReviewsPublicV2Controller_createVendorSecurityReviewWithFile
+  tag: Vendor Security Reviews
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorSecurityReviewsPublicV2Controller_performSecurityReviewAction
+  tag: Vendor Security Reviews
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorSecurityReviewsPublicV2Controller_sendSecurityQuestionnaire
+  tag: Vendor Security Reviews
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorSecurityReviewsPublicV2Controller_sendSecurityQuestionnaireForSecurityReview
+  tag: Vendor Security Reviews
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorSecurityReviewsPublicV2Controller_updateVendorSecurityReview
+  tag: Vendor Security Reviews
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorTypesPublicV2Controller_createVendorType
+  tag: Vendor Types
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorTypesPublicV2Controller_deleteVendorType
+  tag: Vendor Types
+  reason: No published MCP OAuth scope covers this tag/method combination.
+- operationId: VendorTypesPublicV2Controller_updateVendorType
+  tag: Vendor Types
+  reason: No published MCP OAuth scope covers this tag/method combination.
+coverage:
+  rest_operations: 197
+  rest_operations_covered_by_a_scope: 109
+  rest_only: 88
+  scopes_mapped: 30
+  mcp_tools_verified: 0

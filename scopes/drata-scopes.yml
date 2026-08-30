@@ -1,0 +1,148 @@
+generated: '2026-08-27'
+method: searched
+source: https://mcp.drata.com/.well-known/oauth-protected-resource
+docs: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+provider: Drata
+providerId: drata
+description: >-
+  OAuth scopes for the Drata MCP OAuth configuration. The authoritative list is served
+  anonymously from the RFC 9728 protected-resource metadata document at
+  https://mcp.drata.com/.well-known/oauth-protected-resource (33 scopes); Drata's MCP OAuth
+  setup guide documents human-readable descriptions and the allowed Drata roles for eight of
+  them. Scopes are selected by a Drata administrator when creating the MCP OAuth
+  configuration under Settings -> MCP Configuration.
+enforcement: >-
+  End users can only access the intersection of what the OAuth scopes offer and what their
+  Drata roles provide. Granting a scope never widens a user's access beyond their role.
+authorization_server: https://mcp.drata.com/auth0-proxy
+issuer: https://drata-prod.us.auth0.com/
+scope_count: 33
+scopes:
+- name: openid
+  description: OpenID Connect subject identifier.
+  source: protected-resource-metadata
+- name: profile
+  description: OpenID Connect profile claims.
+  source: protected-resource-metadata
+- name: email
+  description: OpenID Connect email claim.
+  source: protected-resource-metadata
+- name: offline_access
+  description: Issue a refresh token so the client can renew access without re-consent.
+  source: protected-resource-metadata
+- name: read:controls
+  description: View Controls list
+  roles: [Admin, Control Manager, DevOps Engineer, Risk Manager, Risk Register Owner, Information Security Lead, Workspace Administrator]
+  source: docs
+- name: read:control
+  description: View Control details and requirements
+  roles: [Admin, Control Manager, DevOps Engineer, Information Security Lead, Workspace Administrator]
+  source: docs
+  note: Documented in the MCP OAuth setup guide; not present in the protected-resource metadata scope list.
+- name: create:control
+  description: Create a control.
+  source: protected-resource-metadata
+- name: update:control
+  description: Update a control.
+  source: protected-resource-metadata
+- name: read:monitor-test
+  description: View Monitoring Tests
+  roles: [Admin, Control Manager, DevOps Engineer, Information Security Lead, Workspace Administrator]
+  source: docs
+- name: read:policy
+  description: View Policies
+  roles: [Admin, Policy Manager, Information Security Lead, Workspace Administrator]
+  source: docs
+- name: read:assigned-policies
+  description: View User Assigned Policies
+  roles: [Admin, Control Manager, DevOps Engineer, Employee, Internal Auditor, Knowledge Base, People Ops, Policy Manager, Reviewer, Risk Manager, Information Security Lead, Trust Center Manager, Trust Center Reviewer, Workspace Administrator]
+  source: docs
+- name: read:risk
+  description: View Risks in Risk Registers
+  roles: [Admin, Risk Manager, Risk Register Owner, Workspace Administrator]
+  source: docs
+- name: read:risk-registers
+  description: View Risk Registers
+  roles: [Admin, Risk Manager]
+  source: docs
+- name: create:risk
+  description: Create a risk.
+  source: protected-resource-metadata
+- name: update:risk
+  description: Update a risk.
+  source: protected-resource-metadata
+- name: delete:risk
+  description: Delete a risk.
+  source: protected-resource-metadata
+- name: read:workspace
+  description: View Workspaces
+  roles: [Admin]
+  source: docs
+- name: read:company
+  description: Read company profile.
+  source: protected-resource-metadata
+- name: read:users
+  description: List users.
+  source: protected-resource-metadata
+- name: read:user
+  description: Read a single user.
+  source: protected-resource-metadata
+- name: read:framework
+  description: Read frameworks.
+  source: protected-resource-metadata
+- name: read:evidence
+  description: Read evidence.
+  source: protected-resource-metadata
+- name: create:evidence
+  description: Create evidence.
+  source: protected-resource-metadata
+- name: update:evidence
+  description: Update evidence.
+  source: protected-resource-metadata
+- name: delete:evidence
+  description: Delete evidence.
+  source: protected-resource-metadata
+- name: read:vendor
+  description: Read vendors.
+  source: protected-resource-metadata
+- name: create:vendor
+  description: Create a vendor.
+  source: protected-resource-metadata
+- name: update:vendor
+  description: Update a vendor.
+  source: protected-resource-metadata
+- name: delete:vendor
+  description: Delete a vendor.
+  source: protected-resource-metadata
+- name: read:vendor-security-review
+  description: Read vendor security reviews.
+  source: protected-resource-metadata
+- name: read:vendor-document
+  description: Read vendor documents.
+  source: protected-resource-metadata
+- name: read:personnel
+  description: Read personnel records.
+  source: protected-resource-metadata
+- name: update:personnel
+  description: Update personnel records.
+  source: protected-resource-metadata
+- name: read:device
+  description: Read devices.
+  source: protected-resource-metadata
+api_key_scopes:
+  note: >-
+    The Public API v2 uses bearer API keys rather than OAuth. Drata API keys carry their own
+    scope model, selected at key-creation time under Settings -> API Keys: "Custom" (pick
+    individual scopes), "All read" (all current and future read scopes), or "All read and
+    write". Drata does not publish the individual API-key scope names outside the product UI,
+    so they are not enumerated here.
+  docs: https://help.drata.com/en/articles/6695964-drata-public-api
+evidence:
+- url: https://mcp.drata.com/.well-known/oauth-protected-resource
+  status: 200
+- url: https://mcp.drata.com/.well-known/oauth-authorization-server
+  status: 200
+- url: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  status: 200
+- url: https://help.drata.com/en/articles/6695964-drata-public-api
+  status: 200

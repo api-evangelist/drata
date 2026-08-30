@@ -1,0 +1,134 @@
+generated: '2026-08-27'
+method: probed
+source: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+name: Drata MCP Server
+provider: Drata
+providerId: drata
+status: beta
+description: >-
+  Drata's official hosted, remote Model Context Protocol server. It exposes Drata's live
+  compliance, control, policy, monitoring-test, risk and workspace data to MCP-compatible
+  clients (Claude, ChatGPT, Cursor, Microsoft Copilot). Access is authorised per-user via
+  OAuth at connect time and is bounded by the intersection of the granted OAuth scopes and
+  the caller's Drata role — an OAuth grant alone never widens what a user can see.
+
+deployment:
+  mode: remote
+  endpoint: https://mcp.drata.com/mcp/
+  auth: oauth
+  verified: probed
+
+regions:
+- region: US
+  endpoint: https://mcp.drata.com/mcp/
+  verified: probed
+- region: EU
+  endpoint: https://mcp-euc1.drata.com/mcp/
+  verified: searched
+- region: APAC
+  endpoint: https://mcp-apse2.drata.com/mcp/
+  verified: searched
+
+authorization:
+  scheme: OAuth 2.0 / OAuth 2.1 bearer
+  www_authenticate: 'Bearer realm="drata-mcp"'
+  protected_resource_metadata: https://mcp.drata.com/.well-known/oauth-protected-resource
+  authorization_server_metadata: https://mcp.drata.com/.well-known/oauth-authorization-server
+  resource: https://mcp.drata.com
+  authorization_servers:
+  - https://mcp.drata.com/auth0-proxy
+  issuer: https://drata-prod.us.auth0.com/
+  authorization_endpoint: https://mcp.drata.com/auth0-proxy/authorize
+  token_endpoint: https://drata-prod.us.auth0.com/oauth/token
+  registration_endpoint: https://drata-prod.us.auth0.com/oidc/register
+  revocation_endpoint: https://drata-prod.us.auth0.com/oauth/revoke
+  jwks_uri: https://drata-prod.us.auth0.com/.well-known/jwks.json
+  pkce_methods: [S256, plain]
+  dynamic_client_registration: true
+  bearer_methods_supported: [header]
+  admin_setup: >-
+    A Drata administrator must first create an MCP OAuth configuration under
+    Settings -> MCP Configuration (name, optional description, optional expiration date,
+    selected scopes) before any user can connect a client.
+  scopes: scopes/drata-scopes.yml
+
+tools:
+  status: gated
+  note: >-
+    tools/list is auth-gated. An anonymous POST of
+    {"jsonrpc":"2.0","id":1,"method":"tools/list"} to https://mcp.drata.com/mcp/ returns
+    HTTP 401 with body {"error":"unauthorized","message":"Bearer token required. Use OAuth
+    to authenticate."} and header www-authenticate: Bearer realm="drata-mcp". Drata does
+    not publish a tool manifest, an llms.txt, or a tool table in its docs, so the real tool
+    names and inputSchemas require an authenticated introspection. The capability surface
+    below is derived from the published OAuth scopes and the documented prompt library,
+    NOT from a tools/list response — treat it as capability scope, not tool names.
+  capability_surface_source: https://mcp.drata.com/.well-known/oauth-protected-resource
+  capabilities:
+  - domain: Controls
+    scopes: [read:controls, read:control, create:control, update:control]
+  - domain: Policies
+    scopes: [read:policy, read:assigned-policies]
+  - domain: Monitoring Tests
+    scopes: [read:monitor-test]
+  - domain: Risks
+    scopes: [read:risk, read:risk-registers, create:risk, update:risk, delete:risk]
+  - domain: Evidence
+    scopes: [read:evidence, create:evidence, update:evidence, delete:evidence]
+  - domain: Vendors
+    scopes: [read:vendor, read:vendor-security-review, read:vendor-document, create:vendor, update:vendor, delete:vendor]
+  - domain: Personnel & Devices
+    scopes: [read:personnel, update:personnel, read:device]
+  - domain: Frameworks
+    scopes: [read:framework]
+  - domain: Workspace & Company
+    scopes: [read:workspace, read:company, read:users, read:user]
+
+clients_documented:
+- Claude (remote MCP custom connector)
+- ChatGPT (Developer Mode for full read + write tool access)
+- Cursor (Agent mode)
+- Microsoft Copilot
+
+related_surfaces:
+  openapi: openapi/drata-api-v2-openapi.yml
+  crosswalk: mcp/drata-tool-crosswalk.yml
+  gateway_openapi:
+    url: https://mcp.drata.com/openapi.json
+    status: 200
+    note: >-
+      This is the MCP gateway's own FastAPI service document (info.title "FastAPI",
+      version 0.1.0) describing only the Auth0 proxy discovery routes plus /health and
+      /ready. It is NOT the Drata API contract and is not saved to openapi/ — a
+      framework-default title is not a provider self-identification.
+
+third_party_servers:
+- name: safebase-mcp
+  registry: npm
+  version: 1.0.3
+  published: '2026-04-04'
+  official: false
+  note: >-
+    "MCP server for the SafeBase by Drata API" on npm, published by individual
+    maintainers (jsoconno, reillyjodonnell) and not by the drata_packages npm account
+    that owns the first-party `drata` package. Not linked from any Drata property.
+- name: sderosiaux/drata-mcp
+  registry: github
+  official: false
+  note: Community MCP server for Drata task management; not a Drata-published artifact.
+
+evidence:
+- url: https://mcp.drata.com/mcp
+  status: 307
+  note: redirects to https://mcp.drata.com/mcp/
+- url: https://mcp.drata.com/mcp/
+  status: 401
+  note: 'www-authenticate: Bearer realm="drata-mcp"'
+- url: https://mcp.drata.com/.well-known/oauth-protected-resource
+  status: 200
+- url: https://mcp.drata.com/.well-known/oauth-authorization-server
+  status: 200
+- url: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  status: 200
+- url: https://mcp.drata.com/.well-known/agent-card.json
+  status: 404
