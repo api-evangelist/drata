@@ -1493,6 +1493,9 @@ apis:
   - type: APIReference
     url: https://docs.safebase.io/reference/getaccounts
 common:
+- type: CapabilityMap
+  url: capabilities/drata-capability-edges.yml
+  name: Drata Business Capability Map
 - type: AgenticAccess
   url: agentic-access/drata-agentic-access.yml
 - type: TrustCenter
