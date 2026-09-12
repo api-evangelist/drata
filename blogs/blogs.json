@@ -2,21 +2,22 @@
   "repo": "drata",
   "feeds": [
     {
-      "source": "https://docs.safebase.io/reference/getaccounts",
-      "error": "HTTPError"
-    },
-    {
       "source": "https://help.drata.com/",
       "feed_url": "https://help.drata.com/feed.xml",
       "title": "",
-      "saved": 25,
-      "method": "discovered",
-      "nature": "undetermined",
-      "nature_basis": null
+      "saved": 0,
+      "method": "discovered"
+    },
+    {
+      "source": "https://help.drata.com/feed.xml",
+      "feed_url": "https://help.drata.com/feed.xml",
+      "title": "",
+      "saved": 0,
+      "method": "feed"
     }
   ],
-  "post_count": 29,
-  "fetched": "2026-08-30T22:33:40Z",
+  "post_count": 30,
+  "fetched": "2026-09-06T19:17:18Z",
   "agent_pulled": "2026-07-04",
   "feed_nature": "vendor-blog",
   "feed_nature_basis": "path_blog",
