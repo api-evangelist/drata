@@ -191,6 +191,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Audit
+  tags_raw:
   - Audits
   properties:
   - type: OpenAPI
@@ -358,6 +360,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Control
+  tags_raw:
   - Controls
   properties:
   - type: OpenAPI
@@ -645,6 +649,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Framework
+  tags_raw:
   - Frameworks
   properties:
   - type: OpenAPI
@@ -983,6 +989,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Questionnaire
+  tags_raw:
   - Questionnaires
   properties:
   - type: OpenAPI
@@ -1472,6 +1480,8 @@ apis:
   humanURL: https://developers.drata.com/openapi/reference/v2/overview/
   baseURL: https://public-api.drata.com/public/v2
   tags:
+  - Workspace
+  tags_raw:
   - Workspaces
   properties:
   - type: OpenAPI
