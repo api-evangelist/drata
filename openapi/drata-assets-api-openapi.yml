@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata Assets API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Assets across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Assets
-  description: Assets let you build an inventory of policies, personnel and computer infrastructure. The [help docs](https://help.drata.com/en/collections/10485424) have more information.
+  description: Assets let you build an inventory of policies, personnel and computer infrastructure. The help docs have more information.
 paths:
   /assets:
     get:
@@ -206,10 +212,6 @@ paths:
       - assets-post
       x-product-area:
       - ASSETS_PAGE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /assets/{assetId}:
     get:
       operationId: AssetsPublicV2Controller_getAsset
@@ -400,12 +402,268 @@ paths:
       - assets-delete
       x-product-area:
       - ASSETS_PAGE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
+    AssetReferenceTypeEnum:
+      type: string
+      enum:
+      - PERSONNEL
+      - WORKSTATION
+      - REPORT
+      - POLICY
+      - OTHER
+      - VIRTUAL
+    ComplianceCheckStatusEnum:
+      type: string
+      enum:
+      - MISCONFIGURED
+      - PASS
+      - FAIL
+      - EXCLUDED
+    AssetCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Assessment ID
+        name:
+          type: string
+          example: MacBook Pro - Space Black 16-inch
+          description: The name of the asset
+        description:
+          type: string
+          example: MacBook Pro Space Black - with 16-inch Liquid Retina XDR display
+          description: The description of the asset
+        assetType:
+          type: string
+          example: PHYSICAL
+          description: The asset type
+        assetProvider:
+          type: string
+          example: AGENT
+          description: The asset source provider
+        approvedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the asset was approved (if applicable)
+        removedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the asset stopped being tracked
+        company:
+          type: string
+          example: Acme, Inc
+          description: The owning company of the asset
+        notes:
+          type:
+          - string
+          - 'null'
+          description: The asset notes
+        assetReferenceType:
+          type:
+          - string
+          - 'null'
+          example: PERSONNEL
+          description: The asset reference type
+        uniqueId:
+          type: string
+          example: C02T6CDJGTFL
+          description: Unique Id associated with this asset
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset created timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset update timestamp
+        externalId:
+          type: string
+          example: i-0c844e3b433e4e3f
+          description: An externally sourced unique identifier for a virtual asset
+        externalOwnerId:
+          type: string
+          example: account-353
+          description: Used to track the source of virtual assets, typically an account id.
+      required:
+      - id
+      - name
+      - description
+      - assetType
+      - assetProvider
+      - approvedAt
+      - company
+      - assetReferenceType
+      - uniqueId
+      - createdAt
+      - updatedAt
+    AssetClassTypeEnum:
+      type: string
+      enum:
+      - HARDWARE
+      - POLICY
+      - DOCUMENT
+      - PERSONNEL
+      - SOFTWARE
+      - CODE
+      - CONTAINER
+      - COMPUTE
+      - NETWORKING
+      - DATABASE
+      - STORAGE
+    UserIdentityResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User identity ID
+        identityId:
+          type: string
+          example: 1a2b3c
+          description: External service unique id
+        username:
+          type:
+          - string
+          - 'null'
+          example: johndoe
+          description: External service username
+        connectedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When this external user was linked to an application user
+        disconnectedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When this external user was unlinked to an application user
+        hasMfa:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Indicates the external user MFA status
+        userId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: The user ID
+        connectionId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: The connection ID
+        connection:
+          description: Connection details
+          allOf:
+          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
+        email:
+          type:
+          - string
+          - 'null'
+          example: johndoe@example.com
+          description: Primary email for user identity
+        secondaryEmail:
+          type:
+          - string
+          - 'null'
+          example: johndoe@test.com
+          description: Secondary email for user identity
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: John
+          description: First name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Doe
+          description: Last name
+        startedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: Thu Aug 27 2026
+          description: Start (hire) date for the user.
+        separatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Separation (termination) date for the user. Null indicates a current employee.
+          example: Thu Aug 27 2026
+        isContractor:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Is the user a contractor? Null indicates no information is available.
+        jobTitle:
+          type:
+          - string
+          - 'null'
+          example: Engineer
+          description: Job title
+        managerId:
+          type:
+          - string
+          - 'null'
+          example: x00jk12-2312
+          description: Manager's identity id
+        managerName:
+          type:
+          - string
+          - 'null'
+          example: Jose Díaz
+          description: Manager's full name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User identity created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User identity last updated at
+      required:
+      - id
+      - identityId
+      - username
+      - connectedAt
+      - disconnectedAt
+      - hasMfa
+      - userId
+      - connectionId
+      - connection
+      - email
+      - secondaryEmail
+      - firstName
+      - lastName
+      - startedAt
+      - separatedAt
+      - jobTitle
+      - managerId
+      - managerName
+      - createdAt
+      - updatedAt
     DeviceDocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -448,6 +706,88 @@ components:
       - fileUrl
       - createdAt
       - updatedAt
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    UserDocumentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User document ID
+        userId:
+          type: number
+          description: The User ID the Document belongs to
+        downloadUrl:
+          description: The signed URL to download the User Document, only returned when `expand[]=downloadUrl` is passed.
+          allOf:
+          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
+        name:
+          type: string
+          example: Security Training
+          description: The name the file
+        type:
+          type: string
+          enum:
+          - SEC_TRAINING
+          - PASSWORD_MANAGER_EVIDENCE
+          - AUTO_UPDATES_EVIDENCE
+          - HARD_DRIVE_ENCRYPTION_EVIDENCE
+          - ANTIVIRUS_EVIDENCE
+          - LOCK_SCREEN_EVIDENCE
+          - MFA_EVIDENCE
+          - HIPAA_TRAINING_EVIDENCE
+          - OFFBOARDING_EVIDENCE
+          - NIST_AI_TRAINING_EVIDENCE
+          example: SEC_TRAINING
+          description: The User Document type
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          example: http://localhost:5000/download/documents/1
+          description: The secure URL to the user document
+        renewalDate:
+          type: string
+          format: date
+          example: '2026-10-27'
+          description: Document's renewal date, after which the document is no longer consider valid evidence
+        createdAt:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: Document created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: Document updated at
+      required:
+      - id
+      - userId
+      - name
+      - type
+      - fileUrl
+      - renewalDate
+      - createdAt
+      - updatedAt
     AssetExpandEnum:
       type: string
       enum:
@@ -457,6 +797,176 @@ components:
       - customFields
       - identifiers
       - owner
+    DeviceIdentifierResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Device identifier Id
+        type:
+          type: string
+          example: SERIAL_NUMBER
+          description: The identifier type
+        identifier:
+          type: string
+          example: C02CG123DC79
+          description: The identifier value
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Identifier createdAt timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Identifier updatedAt timestamp
+      required:
+      - id
+      - type
+      - identifier
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    SignedUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+      required:
+      - signedUrl
+      - fileBuffer
+      - fileName
+    DeviceComplianceCheckResponsePublicV2Dto:
+      type: object
+      properties:
+        checkFrequency:
+          example: DAILY
+          description: How often should this check be run for Compliance
+          allOf:
+          - $ref: '#/components/schemas/CheckFrequencyEnum'
+        completionDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the user completed the Compliance Check
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check creation timestamp
+        expiresAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When this Compliance Check is due for a re-verification
+        id:
+          type: number
+          example: 1
+          description: Device Compliance Check ID
+        lastCheckedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check last checked timestamp
+        status:
+          example: PASS
+          description: Denotes actual Compliance Check status
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
+        type:
+          example: PASSWORD_MANAGER
+          description: The Compliance Check type
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check updated timestamp
+      required:
+      - checkFrequency
+      - completionDate
+      - createdAt
+      - expiresAt
+      - id
+      - lastCheckedAt
+      - status
+      - type
+      - updatedAt
+    EmploymentStatusEnum:
+      type: string
+      enum:
+      - CURRENT_EMPLOYEE
+      - FORMER_EMPLOYEE
+      - CURRENT_CONTRACTOR
+      - FORMER_CONTRACTOR
+      - OUT_OF_SCOPE
+      - UNKNOWN
+      - SPECIAL_FORMER_EMPLOYEE
+      - SPECIAL_FORMER_CONTRACTOR
+      - FUTURE_HIRE
+      - SERVICE_ACCOUNT
+      x-enumDescriptions:
+        CURRENT_EMPLOYEE: Current Employee
+        FORMER_EMPLOYEE: Former Employee
+        CURRENT_CONTRACTOR: Current Contractor
+        FORMER_CONTRACTOR: Former Contractor
+        FUTURE_HIRE: Future Hire – Based on the HRIS data
+        UNKNOWN: Unknown – The personnel did not match an HRIS record
+        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
+        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
+        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
+        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
     AssetModifyRequestPublicV2Dto:
       type: object
       properties:
@@ -507,19 +1017,71 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-    AssetsResponsePublicV2Dto:
+    AssetCreateRequestPublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
+        name:
+          type: string
+          maxLength: 191
+          description: The Asset name
+        description:
+          type: string
+          maxLength: 191
+          description: The Asset description
+        notes:
+          type: string
+          maxLength: 191
+          description: The Asset notes
+        assetClassTypes:
           type: array
           items:
-            $ref: '#/components/schemas/AssetResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+            $ref: '#/components/schemas/AssetClassTypeEnum'
+          example:
+          - HARDWARE
+          - PERSONNEL
+          description: The Asset class types
+        assetType:
+          example: PHYSICAL
+          description: The Asset type
+          allOf:
+          - $ref: '#/components/schemas/AssetTypeEnum'
+        ownerId:
+          type: number
+          example: 1
+          description: The owner ID
+        associatedId:
+          type: string
+          example: C02T6CDJGTFL
+          description: An ID associated with this Asset
+        removedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Asset was removed
+        externalId:
+          type: string
+          example: i-0c844e3b433e4e3f
+          description: An externally sourced unique identifier for a virtual Asset
+        externalOwnerId:
+          type: string
+          example: account-353
+          description: Used to track the source of virtual Assets, typically an account ID
+        customFields:
+          description: "Custom Fields for the Asset. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
       required:
-      - data
-      - pagination
+      - name
+      - description
+      - assetClassTypes
+      - assetType
+      - ownerId
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     ExceptionResponseDto:
       type: object
       properties:
@@ -545,15 +1107,64 @@ components:
       - statusCode
       - message
       - code
-    AssetReferenceTypeEnum:
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    AssetProviderEnum:
       type: string
       enum:
-      - PERSONNEL
-      - WORKSTATION
-      - REPORT
-      - POLICY
-      - OTHER
-      - VIRTUAL
+      - DRATA_DEV
+      - AGENT
+      - DRATA
+      - GOOGLE
+      - MICROSOFT_365
+      - JAMF
+      - INTUNE
+      - OKTA_IDENTITY
+      - KANDJI
+      - JUMPCLOUD
+      - HEXNODE_UEM
+      - RIPPLING
+      - AWS
+      - MERGEDEV_ONELOGIN
+      - MERGEDEV_JUMPCLOUD
+      - WORKSPACE_ONE
+      - CSV_IDP
+      - AWS_GOV_CLOUD
+      - AZURE
+      - GCP
+      - MICROSOFT_365_GCC_HIGH
+      - MERGEDEV_CYBERARK
+      - KOLIDE
+      - MERGEDEV_PINGONE
+      - AWS_ORG_UNITS
+      - INTUNE_GCC_HIGH
+      - CUSTOM_XFA
+      - NINJAONE
+    CheckFrequencyEnum:
+      type: string
+      enum:
+      - ONCE
+      - HOURLY
+      - QID
+      - DAILY
+      - WEEKLY
+      - BIWEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
     UserResponsePublicV2Dto:
       type: object
       properties:
@@ -634,6 +1245,547 @@ components:
       required:
       - id
       - email
+      - createdAt
+      - updatedAt
+    AssetResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Asset ID
+        name:
+          type: string
+          example: MacBook Pro 16-inch
+          description: The name of the asset
+        description:
+          type: string
+          example: MacBook Pro 16-inch with 14-Core CPU 32-Core GPU 36GB Unified Memory 1TB SSD Storage
+          description: The description of the asset
+        assetType:
+          example: PHYSICAL
+          description: The Asset type
+          allOf:
+          - $ref: '#/components/schemas/AssetTypeEnum'
+        assetProvider:
+          example: AGENT
+          description: The Asset source provider
+          allOf:
+          - $ref: '#/components/schemas/AssetProviderEnum'
+        removedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the Asset stopped being tracked
+        assetClassTypes:
+          example: AssetClassTypeResponsePublicV2Dto[]
+          description: Asset class types associated with this Asset.  This field is only returned when `expand[]=assetClassTypes` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetClassTypeResponsePublicV2Dto'
+        owner:
+          description: The User that owns the Asset, only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserResponsePublicV2Dto'
+        notes:
+          type:
+          - string
+          - 'null'
+          description: The Asset notes
+        assetReferenceType:
+          example: PERSONNEL
+          description: The Asset reference type
+          allOf:
+          - $ref: '#/components/schemas/AssetReferenceTypeEnum'
+        associatedId:
+          type:
+          - string
+          - 'null'
+          example: C02T6CDJGTFL
+          description: An ID associated with this Asset
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Asset created timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Asset updated timestamp
+        device:
+          description: The Device associated to this Asset, only returned when `expand[]=device`, `expand[]=complianceChecks`, or `expand[]=identifiers` is passed.
+          allOf:
+          - $ref: '#/components/schemas/DeviceResponsePublicV2Dto'
+        externalId:
+          type:
+          - string
+          - 'null'
+          example: i-0c844e3b433e4e3f
+          description: An externally sourced unique identifier for a virtual Asset
+        externalOwnerId:
+          type:
+          - string
+          - 'null'
+          example: account-353
+          description: Used to track the source of virtual assets, typically an account id.
+        customFields:
+          description: "Custom Fields, only returned when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - assetType
+      - assetProvider
+      - removedAt
+      - notes
+      - assetReferenceType
+      - associatedId
+      - createdAt
+      - updatedAt
+      - device
+      - externalId
+    DeviceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Device Id
+        assetId:
+          type:
+          - number
+          - 'null'
+          example: 123
+          description: Asset Id
+        osVersion:
+          type:
+          - string
+          - 'null'
+          example: MacOS 10.15.6
+          description: The device operating system version
+        serialNumber:
+          type:
+          - string
+          - 'null'
+          example: C02T6CDJGTFL
+          description: The device serial number
+        model:
+          type:
+          - string
+          - 'null'
+          example: MacBook Pro
+          description: The device model
+        macAddress:
+          type:
+          - string
+          - 'null'
+          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
+          description: The device MAC address
+        lastCheckedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Last time device data checked by the source
+        sourceType:
+          example: AGENT
+          description: The device source type
+          allOf:
+          - $ref: '#/components/schemas/MobileDeviceManagementSourceTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device updated date timestamp
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The device deleted date timestamp
+        appsCount:
+          type:
+          - number
+          - 'null'
+          example: 20
+          description: The number of applications installed
+        isDeviceCompliant:
+          type: boolean
+          example: false
+          description: Indicates whether the Device meets all compliance requirements, only returned when `expand[]=complianceChecks` is passed.
+        complianceChecks:
+          example: []
+          description: The Device compliance checks list, only returned when `expand[]=complianceChecks` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceComplianceCheckResponsePublicV2Dto'
+        identifiers:
+          example: []
+          description: The Device identifiers list, only returned when `expand[]=identifiers` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceIdentifierResponsePublicV2Dto'
+        documents:
+          example: []
+          description: The Device documents list, only returned when `expand[]=documents` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+        screenLockTime:
+          type:
+          - number
+          - 'null'
+          example: 30
+          description: Denotes device actual screenLock time
+        screenLockExplanation:
+          type:
+          - object
+          - 'null'
+          example:
+            minutesIdleBeforeSleep: '2'
+            minutesSleepingBeforePasswordIsRequired: '2'
+          description: Screen lock explanation
+        antivirusEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual antivirus status
+        antivirusExplanation:
+          type:
+          - object
+          - 'null'
+          example: No matching app was found
+          description: Antivirus explanation
+        autoUpdateEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual auto-update status
+        autoUpdateExplanation:
+          type:
+          - object
+          - 'null'
+          example: No compliances found
+          description: Auto update explanation
+        passwordManagerEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual password manager status
+        passwordManagerExplanation:
+          type:
+          - object
+          - 'null'
+          example:
+            passwordManagerApps:
+            - 1password 7
+          description: Password manager explanation
+        encryptionEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: false
+          description: Denotes device actual encryption status
+        encryptionExplanation:
+          type:
+          - object
+          - 'null'
+          example: No encryption provided
+          description: Encryption explanation
+        firewallEnabled:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Denotes device actual firewall status
+        firewallExplanation:
+          type:
+          - object
+          - 'null'
+          example: '{}'
+          description: Firewall explanation
+        asset:
+          description: The Asset associated with this Device, only returned when `expand[]=asset` is passed.
+          allOf:
+          - $ref: '#/components/schemas/AssetCompactResponsePublicV2Dto'
+        userId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: User Id
+        personnelId:
+          type: number
+          example: 1
+          description: Personnel Id
+        externalId:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier for the device in the external system where it originated
+      required:
+      - id
+      - assetId
+      - osVersion
+      - serialNumber
+      - model
+      - macAddress
+      - lastCheckedAt
+      - sourceType
+      - createdAt
+      - updatedAt
+      - deletedAt
+      - appsCount
+      - screenLockTime
+      - screenLockExplanation
+      - antivirusEnabled
+      - antivirusExplanation
+      - autoUpdateEnabled
+      - autoUpdateExplanation
+      - passwordManagerEnabled
+      - passwordManagerExplanation
+      - encryptionEnabled
+      - encryptionExplanation
+      - firewallEnabled
+      - firewallExplanation
+      - personnelId
+      - externalId
+    AssetsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/AssetResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    AssetClassTypeResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Asset class type ID
+        assetClassType:
+          type: string
+          example: DOCUMENT
+          description: The string enum asset class type
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset class type created timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset class type update timestamp
+      required:
+      - id
+      - assetClassType
+      - createdAt
+      - updatedAt
+    BackgroundCheckResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The Background Check Id
+        userId:
+          type:
+          - number
+          - 'null'
+          description: The user ID
+        status:
+          type: string
+          enum:
+          - PENDING
+          - OK
+          - ISSUE
+          - CANCELED
+          - EXPIRED
+          - OUT_OF_SCOPE
+          example: OK
+          description: The status of the background check
+        caseId:
+          type:
+          - string
+          - 'null'
+          example: abc123
+          description: The case ID of the KarmaCheck background check
+        caseInvitationId:
+          type: string
+          example: abc123
+          description: The case invitation ID of the KarmaCheck background check
+        url:
+          type: string
+          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: The URL of the background check
+        manualCheckDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2020-07-06'
+          description: The date this background check was manually uploaded
+        manuallyCheckUrl:
+          type:
+          - string
+          - 'null'
+          example: url.com
+          description: The url of manual background check
+        type:
+          type: string
+          enum:
+          - KARMACHECK
+          - MANUAL
+          - CERTN
+          - CHECKR
+          - HRIS_RIPPLING
+          - STERLING
+          - HIRERIGHT
+          - VETTY
+          example: CERTN
+          description: The background check type
+        source:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DRATA
+          - CHECKR
+          - KARMACHECK
+          - RIPPLING_CHECKR
+          - CERTN
+          - STERLING
+          - HIRERIGHT
+          - VETTY
+          example: DRATA
+          description: The background check source
+        reportData:
+          type: string
+          description: The background check report data
+        outOfScopeReason:
+          type:
+          - string
+          - 'null'
+          example: abc123
+          description: the reason it was marked out of scope
+        outOfScopeAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When it was marked out of scope
+        invitationEmail:
+          type:
+          - string
+          - 'null'
+          example: email@email.com
+          description: Invitation email
+        linkedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the report was linked to a user
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Report created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Report updated date timestamp
+      required:
+      - id
+      - userId
+      - status
+      - caseId
+      - caseInvitationId
+      - url
+      - manualCheckDate
+      - manuallyCheckUrl
+      - type
+      - source
+      - reportData
+      - outOfScopeReason
+      - outOfScopeAt
+      - invitationEmail
+      - linkedAt
+      - createdAt
+      - updatedAt
+    AssetTypeEnum:
+      type: string
+      enum:
+      - PHYSICAL
+      - VIRTUAL
+    MobileDeviceManagementSourceTypeEnum:
+      type: string
+      enum:
+      - AGENT
+      - JAMF
+      - INTUNE
+      - KANDJI
+      - JUMPCLOUD
+      - HEXNODE_UEM
+      - UNKNOWN
+      - RIPPLING
+      - WORKSPACE_ONE
+      - KOLIDE
+      - CUSTOM
+      - INTUNE_GCC_HIGH
+      - CUSTOM_XFA
+      - NINJAONE
+    CustomFieldResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
+      required:
+      - customFieldId
+      - name
+    SortTypeLimitedEnum:
+      type: string
+      enum:
       - createdAt
       - updatedAt
     ConnectionCompactResponsePublicV2Dto:
@@ -1010,44 +2162,6 @@ components:
       - connectedAt
       - failedAt
       - deletedAt
-    ComplianceCheckStatusEnum:
-      type: string
-      enum:
-      - MISCONFIGURED
-      - PASS
-      - FAIL
-      - EXCLUDED
-    DeviceIdentifierResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Device identifier Id
-        type:
-          type: string
-          example: SERIAL_NUMBER
-          description: The identifier type
-        identifier:
-          type: string
-          example: C02CG123DC79
-          description: The identifier value
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Identifier createdAt timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Identifier updatedAt timestamp
-      required:
-      - id
-      - type
-      - identifier
-      - createdAt
-      - updatedAt
     ComplianceCheckTypeEnum:
       type: string
       enum:
@@ -1066,1127 +2180,8 @@ components:
       - HIPAA_TRAINING
       - OFFBOARDING
       - NIST_AI_TRAINING
-    DeviceResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Device Id
-        assetId:
-          type:
-          - number
-          - 'null'
-          example: 123
-          description: Asset Id
-        osVersion:
-          type:
-          - string
-          - 'null'
-          example: MacOS 10.15.6
-          description: The device operating system version
-        serialNumber:
-          type:
-          - string
-          - 'null'
-          example: C02T6CDJGTFL
-          description: The device serial number
-        model:
-          type:
-          - string
-          - 'null'
-          example: MacBook Pro
-          description: The device model
-        macAddress:
-          type:
-          - string
-          - 'null'
-          example: 65-F9-3D-85-7B-6B,99-A9-3E-14-7A-3E
-          description: The device MAC address
-        lastCheckedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Last time device data checked by the source
-        sourceType:
-          example: AGENT
-          description: The device source type
-          allOf:
-          - $ref: '#/components/schemas/MobileDeviceManagementSourceTypeEnum'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The device created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The device updated date timestamp
-        deletedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The device deleted date timestamp
-        appsCount:
-          type:
-          - number
-          - 'null'
-          example: 20
-          description: The number of applications installed
-        isDeviceCompliant:
-          type: boolean
-          example: false
-          description: Indicates whether the Device meets all compliance requirements, only returned when `expand[]=complianceChecks` is passed.
-        complianceChecks:
-          example: []
-          description: The Device compliance checks list, only returned when `expand[]=complianceChecks` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceComplianceCheckResponsePublicV2Dto'
-        identifiers:
-          example: []
-          description: The Device identifiers list, only returned when `expand[]=identifiers` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceIdentifierResponsePublicV2Dto'
-        documents:
-          example: []
-          description: The Device documents list, only returned when `expand[]=documents` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
-        screenLockTime:
-          type:
-          - number
-          - 'null'
-          example: 30
-          description: Denotes device actual screenLock time
-        screenLockExplanation:
-          type:
-          - object
-          - 'null'
-          example:
-            minutesIdleBeforeSleep: '2'
-            minutesSleepingBeforePasswordIsRequired: '2'
-          description: Screen lock explanation
-        antivirusEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual antivirus status
-        antivirusExplanation:
-          type:
-          - object
-          - 'null'
-          example: No matching app was found
-          description: Antivirus explanation
-        autoUpdateEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual auto-update status
-        autoUpdateExplanation:
-          type:
-          - object
-          - 'null'
-          example: No compliances found
-          description: Auto update explanation
-        passwordManagerEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual password manager status
-        passwordManagerExplanation:
-          type:
-          - object
-          - 'null'
-          example:
-            passwordManagerApps:
-            - 1password 7
-          description: Password manager explanation
-        encryptionEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: false
-          description: Denotes device actual encryption status
-        encryptionExplanation:
-          type:
-          - object
-          - 'null'
-          example: No encryption provided
-          description: Encryption explanation
-        firewallEnabled:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Denotes device actual firewall status
-        firewallExplanation:
-          type:
-          - object
-          - 'null'
-          example: '{}'
-          description: Firewall explanation
-        asset:
-          description: The Asset associated with this Device, only returned when `expand[]=asset` is passed.
-          allOf:
-          - $ref: '#/components/schemas/AssetCompactResponsePublicV2Dto'
-        userId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: User Id
-        personnelId:
-          type: number
-          example: 1
-          description: Personnel Id
-        externalId:
-          type:
-          - string
-          - 'null'
-          maxLength: 191
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: Unique identifier for the device in the external system where it originated
-      required:
-      - id
-      - assetId
-      - osVersion
-      - serialNumber
-      - model
-      - macAddress
-      - lastCheckedAt
-      - sourceType
-      - createdAt
-      - updatedAt
-      - deletedAt
-      - appsCount
-      - screenLockTime
-      - screenLockExplanation
-      - antivirusEnabled
-      - antivirusExplanation
-      - autoUpdateEnabled
-      - autoUpdateExplanation
-      - passwordManagerEnabled
-      - passwordManagerExplanation
-      - encryptionEnabled
-      - encryptionExplanation
-      - firewallEnabled
-      - firewallExplanation
-      - personnelId
-      - externalId
-    AssetResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Asset ID
-        name:
-          type: string
-          example: MacBook Pro 16-inch
-          description: The name of the asset
-        description:
-          type: string
-          example: MacBook Pro 16-inch with 14-Core CPU 32-Core GPU 36GB Unified Memory 1TB SSD Storage
-          description: The description of the asset
-        assetType:
-          example: PHYSICAL
-          description: The Asset type
-          allOf:
-          - $ref: '#/components/schemas/AssetTypeEnum'
-        assetProvider:
-          example: AGENT
-          description: The Asset source provider
-          allOf:
-          - $ref: '#/components/schemas/AssetProviderEnum'
-        removedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the Asset stopped being tracked
-        assetClassTypes:
-          example: AssetClassTypeResponsePublicV2Dto[]
-          description: Asset class types associated with this Asset.  This field is only returned when `expand[]=assetClassTypes` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/AssetClassTypeResponsePublicV2Dto'
-        owner:
-          description: The User that owns the Asset, only returned when `expand[]=owner` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserResponsePublicV2Dto'
-        notes:
-          type:
-          - string
-          - 'null'
-          description: The Asset notes
-        assetReferenceType:
-          example: PERSONNEL
-          description: The Asset reference type
-          allOf:
-          - $ref: '#/components/schemas/AssetReferenceTypeEnum'
-        associatedId:
-          type:
-          - string
-          - 'null'
-          example: C02T6CDJGTFL
-          description: An ID associated with this Asset
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Asset created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Asset updated timestamp
-        device:
-          description: The Device associated to this Asset, only returned when `expand[]=device`, `expand[]=complianceChecks`, or `expand[]=identifiers` is passed.
-          allOf:
-          - $ref: '#/components/schemas/DeviceResponsePublicV2Dto'
-        externalId:
-          type:
-          - string
-          - 'null'
-          example: i-0c844e3b433e4e3f
-          description: An externally sourced unique identifier for a virtual Asset
-        externalOwnerId:
-          type:
-          - string
-          - 'null'
-          example: account-353
-          description: Used to track the source of virtual assets, typically an account id.
-        customFields:
-          description: "Custom Fields, only returned when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
-      required:
-      - id
-      - name
-      - description
-      - assetType
-      - assetProvider
-      - removedAt
-      - notes
-      - assetReferenceType
-      - associatedId
-      - createdAt
-      - updatedAt
-      - device
-      - externalId
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    AssetCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          description: The Asset name
-        description:
-          type: string
-          maxLength: 191
-          description: The Asset description
-        notes:
-          type: string
-          maxLength: 191
-          description: The Asset notes
-        assetClassTypes:
-          type: array
-          items:
-            $ref: '#/components/schemas/AssetClassTypeEnum'
-          example:
-          - HARDWARE
-          - PERSONNEL
-          description: The Asset class types
-        assetType:
-          example: PHYSICAL
-          description: The Asset type
-          allOf:
-          - $ref: '#/components/schemas/AssetTypeEnum'
-        ownerId:
-          type: number
-          example: 1
-          description: The owner ID
-        associatedId:
-          type: string
-          example: C02T6CDJGTFL
-          description: An ID associated with this Asset
-        removedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Asset was removed
-        externalId:
-          type: string
-          example: i-0c844e3b433e4e3f
-          description: An externally sourced unique identifier for a virtual Asset
-        externalOwnerId:
-          type: string
-          example: account-353
-          description: Used to track the source of virtual Assets, typically an account ID
-        customFields:
-          description: "Custom Fields for the Asset. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-      required:
-      - name
-      - description
-      - assetClassTypes
-      - assetType
-      - ownerId
-    CheckFrequencyEnum:
-      type: string
-      enum:
-      - ONCE
-      - HOURLY
-      - QID
-      - DAILY
-      - WEEKLY
-      - BIWEEKLY
-      - MONTHLY
-      - QUARTERLY
-      - YEARLY
-    AssetClassTypeEnum:
-      type: string
-      enum:
-      - HARDWARE
-      - POLICY
-      - DOCUMENT
-      - PERSONNEL
-      - SOFTWARE
-      - CODE
-      - CONTAINER
-      - COMPUTE
-      - NETWORKING
-      - DATABASE
-      - STORAGE
-    SignedUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        signedUrl:
-          type: string
-          example: https://somedomain.com/filename.pdf?Signature=ABC123
-          description: The short lived signed URL to link directly to the private file
-        fileBuffer:
-          type:
-          - object
-          - 'null'
-          description: The file on buffer format. This only applies for txt files.
-          example:
-            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
-        fileName:
-          type:
-          - string
-          - 'null'
-          example: Artifact 3.png
-          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
-      required:
-      - signedUrl
-      - fileBuffer
-      - fileName
-    AssetCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Assessment ID
-        name:
-          type: string
-          example: MacBook Pro - Space Black 16-inch
-          description: The name of the asset
-        description:
-          type: string
-          example: MacBook Pro Space Black - with 16-inch Liquid Retina XDR display
-          description: The description of the asset
-        assetType:
-          type: string
-          example: PHYSICAL
-          description: The asset type
-        assetProvider:
-          type: string
-          example: AGENT
-          description: The asset source provider
-        approvedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the asset was approved (if applicable)
-        removedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the asset stopped being tracked
-        company:
-          type: string
-          example: Acme, Inc
-          description: The owning company of the asset
-        notes:
-          type:
-          - string
-          - 'null'
-          description: The asset notes
-        assetReferenceType:
-          type:
-          - string
-          - 'null'
-          example: PERSONNEL
-          description: The asset reference type
-        uniqueId:
-          type: string
-          example: C02T6CDJGTFL
-          description: Unique Id associated with this asset
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset update timestamp
-        externalId:
-          type: string
-          example: i-0c844e3b433e4e3f
-          description: An externally sourced unique identifier for a virtual asset
-        externalOwnerId:
-          type: string
-          example: account-353
-          description: Used to track the source of virtual assets, typically an account id.
-      required:
-      - id
-      - name
-      - description
-      - assetType
-      - assetProvider
-      - approvedAt
-      - company
-      - assetReferenceType
-      - uniqueId
-      - createdAt
-      - updatedAt
-    UserDocumentResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User document ID
-        userId:
-          type: number
-          description: The User ID the Document belongs to
-        downloadUrl:
-          description: The signed URL to download the User Document, only returned when `expand[]=downloadUrl` is passed.
-          allOf:
-          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
-        name:
-          type: string
-          example: Security Training
-          description: The name the file
-        type:
-          type: string
-          enum:
-          - SEC_TRAINING
-          - PASSWORD_MANAGER_EVIDENCE
-          - AUTO_UPDATES_EVIDENCE
-          - HARD_DRIVE_ENCRYPTION_EVIDENCE
-          - ANTIVIRUS_EVIDENCE
-          - LOCK_SCREEN_EVIDENCE
-          - MFA_EVIDENCE
-          - HIPAA_TRAINING_EVIDENCE
-          - OFFBOARDING_EVIDENCE
-          - NIST_AI_TRAINING_EVIDENCE
-          example: SEC_TRAINING
-          description: The User Document type
-        fileUrl:
-          type:
-          - string
-          - 'null'
-          example: http://localhost:5000/download/documents/1
-          description: The secure URL to the user document
-        renewalDate:
-          type: string
-          format: date
-          example: '2026-10-27'
-          description: Document's renewal date, after which the document is no longer consider valid evidence
-        createdAt:
-          type: string
-          format: date-time
-          example: '2020-07-06'
-          description: Document created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2020-07-06'
-          description: Document updated at
-      required:
-      - id
-      - userId
-      - name
-      - type
-      - fileUrl
-      - renewalDate
-      - createdAt
-      - updatedAt
-    BackgroundCheckResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          description: The Background Check Id
-        userId:
-          type:
-          - number
-          - 'null'
-          description: The user ID
-        status:
-          type: string
-          enum:
-          - PENDING
-          - OK
-          - ISSUE
-          - CANCELED
-          - EXPIRED
-          - OUT_OF_SCOPE
-          example: OK
-          description: The status of the background check
-        caseId:
-          type:
-          - string
-          - 'null'
-          example: abc123
-          description: The case ID of the KarmaCheck background check
-        caseInvitationId:
-          type: string
-          example: abc123
-          description: The case invitation ID of the KarmaCheck background check
-        url:
-          type: string
-          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: The URL of the background check
-        manualCheckDate:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2020-07-06'
-          description: The date this background check was manually uploaded
-        manuallyCheckUrl:
-          type:
-          - string
-          - 'null'
-          example: url.com
-          description: The url of manual background check
-        type:
-          type: string
-          enum:
-          - KARMACHECK
-          - MANUAL
-          - CERTN
-          - CHECKR
-          - HRIS_RIPPLING
-          - STERLING
-          - HIRERIGHT
-          - VETTY
-          example: CERTN
-          description: The background check type
-        source:
-          type:
-          - string
-          - 'null'
-          enum:
-          - DRATA
-          - CHECKR
-          - KARMACHECK
-          - RIPPLING_CHECKR
-          - CERTN
-          - STERLING
-          - HIRERIGHT
-          - VETTY
-          example: DRATA
-          description: The background check source
-        reportData:
-          type: string
-          description: The background check report data
-        outOfScopeReason:
-          type:
-          - string
-          - 'null'
-          example: abc123
-          description: the reason it was marked out of scope
-        outOfScopeAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When it was marked out of scope
-        invitationEmail:
-          type:
-          - string
-          - 'null'
-          example: email@email.com
-          description: Invitation email
-        linkedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the report was linked to a user
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Report created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Report updated date timestamp
-      required:
-      - id
-      - userId
-      - status
-      - caseId
-      - caseInvitationId
-      - url
-      - manualCheckDate
-      - manuallyCheckUrl
-      - type
-      - source
-      - reportData
-      - outOfScopeReason
-      - outOfScopeAt
-      - invitationEmail
-      - linkedAt
-      - createdAt
-      - updatedAt
-    CustomFieldSubmitRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: The ID of the Custom Field. Either this or the name must be provided.
-        name:
-          type: string
-          example: Compliance Status
-          description: The name of the Custom Field. Either this or the ID must be provided.
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
-      required:
-      - value
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    UserIdentityResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User identity ID
-        identityId:
-          type: string
-          example: 1a2b3c
-          description: External service unique id
-        username:
-          type:
-          - string
-          - 'null'
-          example: johndoe
-          description: External service username
-        connectedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When this external user was linked to an application user
-        disconnectedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When this external user was unlinked to an application user
-        hasMfa:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Indicates the external user MFA status
-        userId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: The user ID
-        connectionId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: The connection ID
-        connection:
-          description: Connection details
-          allOf:
-          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
-        email:
-          type:
-          - string
-          - 'null'
-          example: johndoe@example.com
-          description: Primary email for user identity
-        secondaryEmail:
-          type:
-          - string
-          - 'null'
-          example: johndoe@test.com
-          description: Secondary email for user identity
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: John
-          description: First name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Doe
-          description: Last name
-        startedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: Thu Aug 27 2026
-          description: Start (hire) date for the user.
-        separatedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: Separation (termination) date for the user. Null indicates a current employee.
-          example: Thu Aug 27 2026
-        isContractor:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Is the user a contractor? Null indicates no information is available.
-        jobTitle:
-          type:
-          - string
-          - 'null'
-          example: Engineer
-          description: Job title
-        managerId:
-          type:
-          - string
-          - 'null'
-          example: x00jk12-2312
-          description: Manager's identity id
-        managerName:
-          type:
-          - string
-          - 'null'
-          example: Jose Díaz
-          description: Manager's full name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User identity created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User identity last updated at
-      required:
-      - id
-      - identityId
-      - username
-      - connectedAt
-      - disconnectedAt
-      - hasMfa
-      - userId
-      - connectionId
-      - connection
-      - email
-      - secondaryEmail
-      - firstName
-      - lastName
-      - startedAt
-      - separatedAt
-      - jobTitle
-      - managerId
-      - managerName
-      - createdAt
-      - updatedAt
-    CustomFieldResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field
-        name:
-          type: string
-          example: Stakeholders
-          description: The name of the Custom Field
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field
-      required:
-      - customFieldId
-      - name
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    AssetTypeEnum:
-      type: string
-      enum:
-      - PHYSICAL
-      - VIRTUAL
-    EmploymentStatusEnum:
-      type: string
-      enum:
-      - CURRENT_EMPLOYEE
-      - FORMER_EMPLOYEE
-      - CURRENT_CONTRACTOR
-      - FORMER_CONTRACTOR
-      - OUT_OF_SCOPE
-      - UNKNOWN
-      - SPECIAL_FORMER_EMPLOYEE
-      - SPECIAL_FORMER_CONTRACTOR
-      - FUTURE_HIRE
-      - SERVICE_ACCOUNT
-      x-enumDescriptions:
-        CURRENT_EMPLOYEE: Current Employee
-        FORMER_EMPLOYEE: Former Employee
-        CURRENT_CONTRACTOR: Current Contractor
-        FORMER_CONTRACTOR: Former Contractor
-        FUTURE_HIRE: Future Hire – Based on the HRIS data
-        UNKNOWN: Unknown – The personnel did not match an HRIS record
-        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
-        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
-        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
-        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    DeviceComplianceCheckResponsePublicV2Dto:
-      type: object
-      properties:
-        checkFrequency:
-          example: DAILY
-          description: How often should this check be run for Compliance
-          allOf:
-          - $ref: '#/components/schemas/CheckFrequencyEnum'
-        completionDate:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the user completed the Compliance Check
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check creation timestamp
-        expiresAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When this Compliance Check is due for a re-verification
-        id:
-          type: number
-          example: 1
-          description: Device Compliance Check ID
-        lastCheckedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check last checked timestamp
-        status:
-          example: PASS
-          description: Denotes actual Compliance Check status
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
-        type:
-          example: PASSWORD_MANAGER
-          description: The Compliance Check type
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check updated timestamp
-      required:
-      - checkFrequency
-      - completionDate
-      - createdAt
-      - expiresAt
-      - id
-      - lastCheckedAt
-      - status
-      - type
-      - updatedAt
-    AssetProviderEnum:
-      type: string
-      enum:
-      - DRATA_DEV
-      - AGENT
-      - DRATA
-      - GOOGLE
-      - MICROSOFT_365
-      - JAMF
-      - INTUNE
-      - OKTA_IDENTITY
-      - KANDJI
-      - JUMPCLOUD
-      - HEXNODE_UEM
-      - RIPPLING
-      - AWS
-      - MERGEDEV_ONELOGIN
-      - MERGEDEV_JUMPCLOUD
-      - WORKSPACE_ONE
-      - CSV_IDP
-      - AWS_GOV_CLOUD
-      - AZURE
-      - GCP
-      - MICROSOFT_365_GCC_HIGH
-      - MERGEDEV_CYBERARK
-      - KOLIDE
-      - MERGEDEV_PINGONE
-      - AWS_ORG_UNITS
-      - INTUNE_GCC_HIGH
-      - CUSTOM_XFA
-      - NINJAONE
-    AssetClassTypeResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Asset class type ID
-        assetClassType:
-          type: string
-          example: DOCUMENT
-          description: The string enum asset class type
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset class type created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset class type update timestamp
-      required:
-      - id
-      - assetClassType
-      - createdAt
-      - updatedAt
-    MobileDeviceManagementSourceTypeEnum:
-      type: string
-      enum:
-      - AGENT
-      - JAMF
-      - INTUNE
-      - KANDJI
-      - JUMPCLOUD
-      - HEXNODE_UEM
-      - UNKNOWN
-      - RIPPLING
-      - WORKSPACE_ONE
-      - KOLIDE
-      - CUSTOM
-      - INTUNE_GCC_HIGH
-      - CUSTOM_XFA
-      - NINJAONE
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

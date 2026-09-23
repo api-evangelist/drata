@@ -17,7 +17,31 @@ paths:
       tags:
       - Accounts
       summary: Get accounts
-      description: "Gets all accounts that match the given criteria. \n\nFive filter query parameters can be sent and they work with an 'AND' relationship:\n 1. Account name\n 2. Member email\n 3. Domain name\n 4. Sfdc Account Id\n 5. Review Status\n \nThe following query parameters are optional and can be used to control the sorting and pagination of the results:\n - Sort Field\n - Sort Direction\n - Page Number\n - Page Size\n"
+      description: 'Gets all accounts that match the given criteria.
+
+
+        Five filter query parameters can be sent and they work with an ''AND'' relationship:
+
+        1. Account name
+
+        2. Member email
+
+        3. Domain name
+
+        4. Sfdc Account Id
+
+        5. Review Status
+
+
+        The following query parameters are optional and can be used to control the sorting and pagination of the results:
+
+        - Sort Field
+
+        - Sort Direction
+
+        - Page Number
+
+        - Page Size'
       operationId: getAccounts
       parameters:
       - in: query
@@ -310,8 +334,26 @@ paths:
       tags:
       - Accounts
       summary: Edit account
-      description: "Edits an existing account on SafeBase \n\nOne query parameter must be sent\n 1. accountId\n \n\nFive parameters can be sent in the body\n 1. name\n 2. description\n 2. sfdcAccountId\n 3. ndaProvider\n 4. ndaDocusign\n"
-      operationId: ''
+      description: 'Edits an existing account on SafeBase
+
+
+        One query parameter must be sent
+
+        1. accountId
+
+
+        Five parameters can be sent in the body
+
+        1. name
+
+        2. description
+
+        2. sfdcAccountId
+
+        3. ndaProvider
+
+        4. ndaDocusign'
+      operationId: patchAccountsById
       parameters:
       - $ref: '#/components/parameters/accountId'
       requestBody:
@@ -357,6 +399,7 @@ paths:
       security:
       - apiKey:
         - accounts:edit
+      x-operation-id-source: derived
   /accounts/{id}/url:
     get:
       tags:
@@ -415,18 +458,6 @@ components:
           type: string | null
           format: date-time
           example: '2022-01-01T12:00:00Z'
-    ApiResponseInvalidApiKeyOrMissingScope:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 403
-        error:
-          type: string
-          example: forbidden
-        message:
-          type: string
-          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
     ApiResponseInvalidRequest:
       type: object
       properties:
@@ -439,6 +470,26 @@ components:
         message:
           type: string
           example: Invalid request.
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    NdaProvider:
+      type: string
+      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
+      enum:
+      - none
+      - clickwrap
+      - docusign
+      - override
     ApiResponseNotFound:
       type: object
       properties:
@@ -451,14 +502,6 @@ components:
         message:
           type: string
           example: Not found
-    NdaProvider:
-      type: string
-      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
-      enum:
-      - none
-      - clickwrap
-      - docusign
-      - override
   responses:
     '400':
       description: Invalid request
@@ -466,6 +509,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
     '405':
       description: Method not allowed
       content:
@@ -478,12 +527,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseNotFound'
-    '403':
-      description: Invalid api key / missing scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
   parameters:
     accountId:
       name: id

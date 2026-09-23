@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata HRIS User Identities API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged HRIS User Identities across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: HRIS User Identities
-  description: HR user identity records for a Custom HRIS connection. Use the batch upsert endpoint to submit employee records keyed by your own `identityId`, then use the update endpoint to reflect employment changes (e.g. set `separatedAt` when an employee leaves). Deleting a record is intended for data submitted in error, not for offboarding. Changes are not applied immediately — they are incorporated the next time identity sync runs, which happens nightly by default. A sync can also be triggered manually from the Personnel page.
+  description: HR user identity records for a Custom HRIS connection.
 paths:
   /custom-connections/{connectionId}/hris-user-identities:
     get:
@@ -236,10 +242,6 @@ paths:
       - user-identity-hris-post
       x-product-area:
       - CUSTOM_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /custom-connections/{connectionId}/hris-user-identities/{userIdentityId}:
     get:
       description: 'Returns a single HR user identity. The `:userIdentityId` path parameter accepts two forms: a Drata-assigned internal numeric ID (e.g. `1001`), or a customer-assigned identityId prefixed with `identity-id:` (e.g. `identity-id:emp-001`).
@@ -413,73 +415,13 @@ paths:
       - user-identity-hris-delete
       x-product-area:
       - CUSTOM_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    CustomUserIdentitiesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: List of HR user identity records based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortTypeLimitedEnum:
+    SortDirectionEnum:
       type: string
       enum:
-      - createdAt
-      - updatedAt
+      - ASC
+      - DESC
     CustomUserIdentityBulkResponsePublicV2Dto:
       type: object
       properties:
@@ -502,31 +444,6 @@ components:
       required:
       - statusCode
       - data
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
     CustomUserIdentityRecordPublicV2Dto:
       type: object
       properties:
@@ -607,6 +524,74 @@ components:
           description: If `true`, this person is a `CURRENT_CONTRACTOR`; `false` means `CURRENT_EMPLOYEE`. `null` means employment type is `UNKNOWN` — the person will appear as `UNKNOWN` in Drata until an explicit value is provided.
       required:
       - identityId
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
     CustomUserIdentityResponsePublicV2Dto:
       type: object
       properties:
@@ -707,16 +692,26 @@ components:
       - isContractor
       - createdAt
       - updatedAt
-    SortDirectionEnum:
+    CustomUserIdentitiesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of HR user identity records based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

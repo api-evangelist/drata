@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata Frameworks API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Frameworks across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Frameworks
-  description: Frameworks are collections of controls that are used to assess compliance with specific standards or regulations. The [help docs](https://help.drata.com/en/articles/5329593-frameworks) have more information.
+  description: Frameworks are collections of controls that are used to assess compliance with specific standards or regulations. The help docs have more information.
 paths:
   /workspaces/{workspaceId}/frameworks:
     get:
@@ -222,10 +228,6 @@ paths:
       - workspaces-post-framework
       x-product-area:
       - REQUIREMENTS_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/framework-requirements:
     get:
       description: 'Use `GET /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements` instead.
@@ -376,10 +378,6 @@ paths:
       - get-frameworks-requirements
       x-product-area:
       - REQUIREMENTS_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/framework-requirements/{frameworkRequirementId}:
     put:
       description: 'Use `PUT /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}` instead. The replacement endpoint supports both Custom Field and structural-field updates.
@@ -468,10 +466,6 @@ paths:
       - framework-requirement-put
       x-product-area:
       - REQUIREMENTS_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements:
     get:
       description: 'List Requirements scoped to the specified Framework.
@@ -702,10 +696,6 @@ paths:
       - workspaces-post-framework-requirements
       x-product-area:
       - REQUIREMENTS_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}/controls:
     get:
       description: 'Retrieve a cursor-paginated list of all Controls mapped to the specified Framework Requirement. This is the full, paginated companion to the capped `expand[]=controls` subcollection returned by the Requirements list endpoints. Note: results are ordered by Control ID, which differs from the `expand[]=controls` preview ordering (isReady, then controlNumber).
@@ -817,10 +807,6 @@ paths:
       - get-frameworks-requirements
       x-product-area:
       - REQUIREMENTS_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}:
     put:
       description: 'Update a custom Framework Requirement, including core fields, control mappings, and Custom Field values.
@@ -917,10 +903,6 @@ paths:
       - framework-requirement-put
       x-product-area:
       - REQUIREMENTS_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/frameworks/{frameworkId}:
     put:
       description: 'Update an existing custom compliance Framework.
@@ -1015,12 +997,71 @@ paths:
       - workspaces-put-framework
       x-product-area:
       - REQUIREMENTS_FRAMEWORKS
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
+    FrameworkRequirementsExpandEnum:
+      type: string
+      enum:
+      - controls
+      - customFields
+      - framework
+    FrameworkDetailsResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 13
+          description: Framework ID
+        name:
+          type: string
+          example: NIST AI RMF
+          description: Framework name
+        description:
+          type: string
+          example: The NIST AI Risk Management Framework (AI RMF) is a set of suggestions and guidelines for incorporating trustworthiness considerations in the design, development, deployment, and use of AI systems.
+          description: Framework description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework updated date timestamp
+        enabledAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the framework was enabled
+        shortName:
+          type: string
+          example: SOC 2
+          description: Framework short name used to identify the Framework. Maps to the Framework's pill (the user-supplied Short Name).
+        tag:
+          type: string
+          example: SOC_2
+          description: Framework tag
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Framework was soft-deleted; null if not deleted
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - enabledAt
+      - shortName
+      - tag
+      - deletedAt
     FrameworkRequirementsBulkResponsePublicV2Dto:
       type: object
       properties:
@@ -1031,28 +1072,218 @@ components:
             $ref: '#/components/schemas/FrameworkRequirementPublicV2Dto'
       required:
       - data
-    FrameworkCreateRequestPublicV2Dto:
+    FrameworkUpdateRequestPublicV2Dto:
       type: object
       properties:
         name:
           type: string
           maxLength: 191
-          example: My Custom Framework 2024
-          description: Framework display name
+          example: My Updated Framework 2024
+          description: The title of the Framework
         shortName:
           type: string
           maxLength: 16
-          example: MCF-24
+          example: MUF-24
           description: Short label used as a pill/badge in the UI
         description:
           type: string
           maxLength: 30000
-          example: A custom compliance framework for internal security controls.
+          example: Updated description for the framework.
           description: Framework description
+    FrameworkRequirementControlsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlForRequirementCompactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
       - name
-      - shortName
+      - statusCode
+      - message
+      - code
+    FrameworkRequirementsListResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkRequirementPublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    FrameworkRequirementPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 58
+          description: Framework Requirement ID
+        code:
+          type: string
+          example: A.5.1.1
+          description: Unique code for this Requirement within the Framework
+        name:
+          type: string
+          example: Policies for information security
+          description: Human-readable name for this Requirement
+        description:
+          type:
+          - string
+          - 'null'
+          example: A set of policies for information security shall be defined, approved, published...
+          description: Detailed description of the Requirement
+        category:
+          type:
+          - string
+          - 'null'
+          example: General Rules
+          description: Category label for grouping Requirements within the Framework
+        additionalInfo:
+          type:
+          - string
+          - 'null'
+          example: Refer to ISO 27001:2022 Annex A.
+          description: Additional information for this Requirement
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Requirement was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Requirement was last updated
+        framework:
+          description: Framwork this Requirement belongs to. Only included when `expand[]=framework` is passed.
+          allOf:
+          - $ref: '#/components/schemas/FrameworkDetailsResponsePublicV2Dto'
+        controls:
+          description: Array of Controls mapped to this Requirement. Limited to a maximum of 10 items, ordered by isReady then controlNumber. Only included when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlForRequirementCompactResponsePublicV2Dto'
+        customFields:
+          description: "Custom Field values for this Requirement. Only included when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+      required:
+      - id
+      - code
+      - name
       - description
+      - category
+      - additionalInfo
+      - createdAt
+      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     ExceptionResponseDto:
       type: object
       properties:
@@ -1078,27 +1309,21 @@ components:
       - statusCode
       - message
       - code
-    FrameworkRequirementsListResponsePublicV2Dto:
+    PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/FrameworkRequirementPublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
-      - data
-      - pagination
-    FrameworkRequirementModifyRequestPublicV2Dto:
-      type: object
-      properties:
-        customFields:
-          description: "Custom Fields for the Requirement. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+      - cursor
     ControlForRequirementCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -1131,6 +1356,114 @@ components:
       - isReady
       - controlNumber
       - archivedAt
+    FrameworkResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: Framework ID
+        name:
+          type: string
+          example: SOC 2
+          description: Framework name
+        description:
+          type: string
+          example: Report on controls at a Service Organization
+          description: Framework description
+        slug:
+          type: string
+          example: soc-2
+          description: Framework slug used to identify the Framework. Maps to the Framework's Short Name in the UI (stored as a lowercase URL-friendly variant).
+        tag:
+          type: string
+          example: SOC_2
+          description: Framework tag
+        pill:
+          type: string
+          example: SOC 2
+          description: Framework pill label
+        numInScopeControls:
+          type: number
+          example: 42
+          description: Number of in-scope controls
+        numInScopeRequirements:
+          type: number
+          example: 42
+          description: Number of in-scope Requirements
+        numReadyInScopeRequirements:
+          type: number
+          example: 35
+          description: Number of ready in-scope Requirements
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the Framework is ready for compliance assessment
+        isEnabled:
+          type: boolean
+          example: true
+          description: Indicates if the Framework is enabled
+        color:
+          type: string
+          example: '#174880'
+          description: Framework color
+        bgColor:
+          type: string
+          example: '#E8F4FF'
+          description: Framework background color
+        activeLogo:
+          type:
+          - string
+          - 'null'
+          example: https://cdn.acme.com/frameworks/soc2-active.svg
+          description: URL of the active logo
+        inactiveLogo:
+          type:
+          - string
+          - 'null'
+          example: https://cdn.acme.com/frameworks/soc2-inactive.svg
+          description: URL of the inactive logo
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework last updated date timestamp
+      required:
+      - id
+      - name
+      - description
+      - slug
+      - tag
+      - pill
+      - numInScopeControls
+      - numInScopeRequirements
+      - numReadyInScopeRequirements
+      - isReady
+      - isEnabled
+      - color
+      - bgColor
+      - activeLogo
+      - inactiveLogo
+      - createdAt
+      - updatedAt
+    FrameworksResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/FrameworkResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     ControlsForRequirementSubcollectionResponsePublicV2Dto:
       type: object
       properties:
@@ -1146,25 +1479,60 @@ components:
       required:
       - data
       - totalCount
-    FrameworkRequirementsExpandEnum:
-      type: string
-      enum:
-      - controls
-      - customFields
-      - framework
-    FrameworksResponsePublicV2Dto:
+    FrameworkRequirementsResponsePublicV2Dto:
       type: object
       properties:
         data:
           description: Data set based on the pagination limits
           type: array
           items:
-            $ref: '#/components/schemas/FrameworkResponsePublicV2Dto'
+            $ref: '#/components/schemas/FrameworkRequirementResponsePublicV2Dto'
         pagination:
           $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
       - data
       - pagination
+    FrameworkRequirementUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 191
+          example: A.5.1.1
+          description: Unique code for this Requirement within the Framework
+        name:
+          type: string
+          maxLength: 30000
+          example: Policies for information security
+          description: Human-readable name for this Requirement
+        description:
+          type: string
+          maxLength: 30000
+          example: A set of policies for information security shall be defined, approved, published...
+          description: Detailed description of the Requirement
+        category:
+          type: string
+          maxLength: 191
+          example: General Rules
+          description: Category label for grouping Requirements within the Framework
+        additionalInfo:
+          type: string
+          maxLength: 30000
+          example: Refer to ISO 27001:2022 Annex A.
+          description: Additional information for this Requirement
+        controlIds:
+          example:
+          - 42
+          - 57
+          description: Control IDs to map to this Requirement. Providing an empty array clears all mappings. Omitting the field leaves existing mappings unchanged. All IDs must exist within the workspace.
+          type: array
+          items:
+            type: number
+        customFields:
+          description: "Custom Fields for the Requirement. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
     CreateFrameworkRequirementRequestPublicV2Dto:
       type: object
       properties:
@@ -1204,24 +1572,72 @@ components:
       required:
       - code
       - name
-    FrameworkRequirementsResponsePublicV2Dto:
+    FrameworkRequirementModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        customFields:
+          description: "Custom Fields for the Requirement. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+    CreateFrameworkRequirementsRequestPublicV2Dto:
       type: object
       properties:
         data:
-          description: Data set based on the pagination limits
+          minItems: 1
+          description: One or more Requirements to create on the Framework. Duplicate codes within a batch and unknown Control IDs cause the entire request to fail.
           type: array
           items:
-            $ref: '#/components/schemas/FrameworkRequirementResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+            $ref: '#/components/schemas/CreateFrameworkRequirementRequestPublicV2Dto'
       required:
       - data
-      - pagination
-    SortDirectionEnum:
+    CustomFieldResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
+      required:
+      - customFieldId
+      - name
+    FrameworkCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: My Custom Framework 2024
+          description: Framework display name
+        shortName:
+          type: string
+          maxLength: 16
+          example: MCF-24
+          description: Short label used as a pill/badge in the UI
+        description:
+          type: string
+          maxLength: 30000
+          example: A custom compliance framework for internal security controls.
+          description: Framework description
+      required:
+      - name
+      - shortName
+      - description
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - createdAt
+      - updatedAt
     FrameworkRequirementResponsePublicV2Dto:
       type: object
       properties:
@@ -1339,449 +1755,8 @@ components:
       - longDescription
       - rationale
       - category
-    CreateFrameworkRequirementsRequestPublicV2Dto:
-      type: object
-      properties:
-        data:
-          minItems: 1
-          description: One or more Requirements to create on the Framework. Duplicate codes within a batch and unknown Control IDs cause the entire request to fail.
-          type: array
-          items:
-            $ref: '#/components/schemas/CreateFrameworkRequirementRequestPublicV2Dto'
-      required:
-      - data
-    FrameworkRequirementUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        code:
-          type: string
-          maxLength: 191
-          example: A.5.1.1
-          description: Unique code for this Requirement within the Framework
-        name:
-          type: string
-          maxLength: 30000
-          example: Policies for information security
-          description: Human-readable name for this Requirement
-        description:
-          type: string
-          maxLength: 30000
-          example: A set of policies for information security shall be defined, approved, published...
-          description: Detailed description of the Requirement
-        category:
-          type: string
-          maxLength: 191
-          example: General Rules
-          description: Category label for grouping Requirements within the Framework
-        additionalInfo:
-          type: string
-          maxLength: 30000
-          example: Refer to ISO 27001:2022 Annex A.
-          description: Additional information for this Requirement
-        controlIds:
-          example:
-          - 42
-          - 57
-          description: Control IDs to map to this Requirement. Providing an empty array clears all mappings. Omitting the field leaves existing mappings unchanged. All IDs must exist within the workspace.
-          type: array
-          items:
-            type: number
-        customFields:
-          description: "Custom Fields for the Requirement. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-    FrameworkResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 123
-          description: Framework ID
-        name:
-          type: string
-          example: SOC 2
-          description: Framework name
-        description:
-          type: string
-          example: Report on controls at a Service Organization
-          description: Framework description
-        slug:
-          type: string
-          example: soc-2
-          description: Framework slug used to identify the Framework. Maps to the Framework's Short Name in the UI (stored as a lowercase URL-friendly variant).
-        tag:
-          type: string
-          example: SOC_2
-          description: Framework tag
-        pill:
-          type: string
-          example: SOC 2
-          description: Framework pill label
-        numInScopeControls:
-          type: number
-          example: 42
-          description: Number of in-scope controls
-        numInScopeRequirements:
-          type: number
-          example: 42
-          description: Number of in-scope Requirements
-        numReadyInScopeRequirements:
-          type: number
-          example: 35
-          description: Number of ready in-scope Requirements
-        isReady:
-          type: boolean
-          example: true
-          description: Indicates if the Framework is ready for compliance assessment
-        isEnabled:
-          type: boolean
-          example: true
-          description: Indicates if the Framework is enabled
-        color:
-          type: string
-          example: '#174880'
-          description: Framework color
-        bgColor:
-          type: string
-          example: '#E8F4FF'
-          description: Framework background color
-        activeLogo:
-          type:
-          - string
-          - 'null'
-          example: https://cdn.acme.com/frameworks/soc2-active.svg
-          description: URL of the active logo
-        inactiveLogo:
-          type:
-          - string
-          - 'null'
-          example: https://cdn.acme.com/frameworks/soc2-inactive.svg
-          description: URL of the inactive logo
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Framework created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Framework last updated date timestamp
-      required:
-      - id
-      - name
-      - description
-      - slug
-      - tag
-      - pill
-      - numInScopeControls
-      - numInScopeRequirements
-      - numReadyInScopeRequirements
-      - isReady
-      - isEnabled
-      - color
-      - bgColor
-      - activeLogo
-      - inactiveLogo
-      - createdAt
-      - updatedAt
-    FrameworkRequirementControlsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlForRequirementCompactResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    CustomFieldSubmitRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: The ID of the Custom Field. Either this or the name must be provided.
-        name:
-          type: string
-          example: Compliance Status
-          description: The name of the Custom Field. Either this or the ID must be provided.
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
-      required:
-      - value
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    CustomFieldResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field
-        name:
-          type: string
-          example: Stakeholders
-          description: The name of the Custom Field
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field
-      required:
-      - customFieldId
-      - name
-    FrameworkRequirementPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 58
-          description: Framework Requirement ID
-        code:
-          type: string
-          example: A.5.1.1
-          description: Unique code for this Requirement within the Framework
-        name:
-          type: string
-          example: Policies for information security
-          description: Human-readable name for this Requirement
-        description:
-          type:
-          - string
-          - 'null'
-          example: A set of policies for information security shall be defined, approved, published...
-          description: Detailed description of the Requirement
-        category:
-          type:
-          - string
-          - 'null'
-          example: General Rules
-          description: Category label for grouping Requirements within the Framework
-        additionalInfo:
-          type:
-          - string
-          - 'null'
-          example: Refer to ISO 27001:2022 Annex A.
-          description: Additional information for this Requirement
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Requirement was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Requirement was last updated
-        framework:
-          description: Framwork this Requirement belongs to. Only included when `expand[]=framework` is passed.
-          allOf:
-          - $ref: '#/components/schemas/FrameworkDetailsResponsePublicV2Dto'
-        controls:
-          description: Array of Controls mapped to this Requirement. Limited to a maximum of 10 items, ordered by isReady then controlNumber. Only included when `expand[]=controls` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlForRequirementCompactResponsePublicV2Dto'
-        customFields:
-          description: "Custom Field values for this Requirement. Only included when `expand[]=customFields` is passed. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
-      required:
-      - id
-      - code
-      - name
-      - description
-      - category
-      - additionalInfo
-      - createdAt
-      - updatedAt
-    FrameworkTagEnum:
-      type: string
-      enum:
-      - CUSTOM
-      - NONE
-      - SOC_2
-      - ISO27001
-      - CCPA
-      - GDPR
-      - HIPAA
-      - PCI
-      - SCF
-      - NIST80053
-      - NISTCSF
-      - CMMC
-      - NIST800171
-      - MSSSPA
-      - FFIEC
-      - ISO27701
-      - COBIT
-      - SOX_ITGC
-      - ISO270012022
-      - CCM
-      - CYBER_ESSENTIALS
-      - ISO270172015
-      - ISO270182019
-      - FEDRAMP
-      - NISTAI
-      - PCI4
-      - NISTCSF2
-      - NIS2
-      - DORA
-      - ISO420012023
-      - DRATA_ESSENTIALS
-      - NIST800171R3
-      - CIS8
-      - CYBER_ESSENTIALS_32
-      - FEDRAMP20X
-      - HITRUST
-      - MSSSPA11
-      - ESSENTIAL_EIGHT
-      - NYDFS
-      - TISAX
-      - ISO270182025
-      - CCPA2026
-      - ISO277012025
-      - CPS230
-      - CYFUN
-      - AIUC_1
-      - ALL
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    FrameworkDetailsResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 13
-          description: Framework ID
-        name:
-          type: string
-          example: NIST AI RMF
-          description: Framework name
-        description:
-          type: string
-          example: The NIST AI Risk Management Framework (AI RMF) is a set of suggestions and guidelines for incorporating trustworthiness considerations in the design, development, deployment, and use of AI systems.
-          description: Framework description
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Framework created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Framework updated date timestamp
-        enabledAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the framework was enabled
-        shortName:
-          type: string
-          example: SOC 2
-          description: Framework short name used to identify the Framework. Maps to the Framework's pill (the user-supplied Short Name).
-        tag:
-          type: string
-          example: SOC_2
-          description: Framework tag
-        deletedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Framework was soft-deleted; null if not deleted
-      required:
-      - id
-      - name
-      - description
-      - createdAt
-      - updatedAt
-      - enabledAt
-      - shortName
-      - tag
-      - deletedAt
-    FrameworkUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: My Updated Framework 2024
-          description: The title of the Framework
-        shortName:
-          type: string
-          maxLength: 16
-          example: MUF-24
-          description: Short label used as a pill/badge in the UI
-        description:
-          type: string
-          maxLength: 30000
-          example: Updated description for the framework.
-          description: Framework description
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

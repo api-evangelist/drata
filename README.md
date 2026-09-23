@@ -75,20 +75,25 @@ Drata is a continuous security and compliance automation platform supporting SOC
 - SOC 2
 - ISO 27001
 - Security
+- Risk Management
+- Trust Center
+- Audit
+- Vendor Risk Management
+- Compliance Automation
 
 ## Timestamps
 
 - **Created:** 2026-05-08
-- **Modified:** 2026-05-08
+- **Modified:** 2026-08-27
 
 ## APIs
 
 ### Drata Public API v2
 
-Public REST API for managing controls, frameworks, evidence, personnel, assets, policies, and tests. v2 expands endpoints and improves data structures over v1.
+Drata's Public REST API v2 — 197 operations across 132 paths covering assets, audits, audit requests, background checks, company, control library, controls, control notes/owners, custom connections, custom data records, custom field definitions, devices and device documents, events, evidence and the evidence library, frameworks, groups, HRIS user identities, monitoring tests, personnel, policies and policy languages, risks, risk registers, risk library, risk notes and documents, tasks, uploads, user documents, user-assigned policies, users and roles, vendors, vendor documents, vendor security reviews, vendor types, and workspaces. Bearer API-key auth, cursor pagination, and an `expand[]` query parameter for related objects. Regional bases exist for US, EU and APAC.
 
 - **Human URL:** [https://developers.drata.com/openapi/reference/v2/overview/](https://developers.drata.com/openapi/reference/v2/overview/)
-- **Base URL:** `https://public-api.drata.com`
+- **Base URL:** `https://public-api.drata.com/public/v2`
 
 #### Tags
 
@@ -98,36 +103,38 @@ Public REST API for managing controls, frameworks, evidence, personnel, assets, 
 
 #### Properties
 
+- [OpenAPI](openapi/drata-api-v2-openapi.yml)
 - [Documentation](https://developers.drata.com/openapi/reference/v2/overview/)
-- [Authentication](https://developers.drata.com/openapi/reference/v2/overview/)
-- [Postman Collection](collections/drata.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/drata.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [APIReference](https://developers.drata.com/openapi/reference/v2/overview/)
+- [GettingStarted](https://developers.drata.com/developer-portal/v2/recipes/create-an-api-key/)
+- [Authentication](authentication/drata-authentication.yml)
+- [Overlay](overlays/drata-api-v2-overlay.yaml)
 
 ### Drata Custom Connections API
 
 Build custom integrations to automate evidence collection from any internal or third-party system.
 
 - **Human URL:** [https://developers.drata.com/openapi/reference/v2/tag/Custom-Connections/](https://developers.drata.com/openapi/reference/v2/tag/Custom-Connections/)
-- **Base URL:** `https://public-api.drata.com`
+- **Base URL:** `https://public-api.drata.com/public/v2`
 
 #### Tags
 
 - GRC
-- Integrations
+- Integration
 - Evidence
 
 #### Properties
 
 - [Documentation](https://developers.drata.com/openapi/reference/v2/tag/Custom-Connections/)
-- [Postman Collection](collections/drata.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/drata.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [GettingStarted](https://developers.drata.com/developer-portal/v2/recipes/custom-connections/)
+- [OpenAPI](openapi/drata-api-v2-openapi.yml)
 
 ### SafeBase Trust API
 
-Manage SafeBase trust centers and security questionnaires programmatically; acquired by Drata and now part of the Drata platform.
+SafeBase Trust API — 41 operations for trust centers, security questionnaires, NDA settings, document libraries, knowledge-base entries, access requests and trust-center updates. SafeBase was acquired by Drata in 2024 and the API remains published on the safebase.io domain; the spec declares servers https://app.safebase.io/api/ext/v1/rest and contact support@safebase.io. Authenticated with an `x-sb-api-key` header.
 
 - **Human URL:** [https://docs.safebase.io/reference/getaccounts](https://docs.safebase.io/reference/getaccounts)
-- **Base URL:** `https://api.safebase.io`
+- **Base URL:** `https://app.safebase.io/api/ext/v1/rest`
 
 #### Tags
 
@@ -137,37 +144,74 @@ Manage SafeBase trust centers and security questionnaires programmatically; acqu
 
 #### Properties
 
+- [OpenAPI](openapi/drata-safebase-trust-api-openapi.yml)
 - [Documentation](https://docs.safebase.io/reference/getaccounts)
-- [Postman Collection](collections/drata.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/drata.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [APIReference](https://docs.safebase.io/reference/getaccounts)
 
 ### Drata MCP Server
 
-Model Context Protocol server enabling AI agents to interact with Drata for compliance workflows.
+Drata's hosted remote Model Context Protocol server (Beta). MCP-compatible clients (Claude, ChatGPT, Cursor, Microsoft Copilot) connect over OAuth 2.1 with PKCE to regional endpoints for the US, EU and APAC, and read live compliance data — controls, policies, monitoring tests, risks, risk registers, workspaces and assigned policies — bounded by the intersection of the granted OAuth scopes and the user's Drata role.
 
-- **Human URL:** [https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management](https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management)
+- **Human URL:** [https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/](https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/)
+- **Base URL:** `https://mcp.drata.com/mcp/`
 
 #### Tags
 
 - MCP
-- AI
+- Artificial Intelligence
 - Compliance
 
 #### Properties
 
-- [Blog](https://drata.com/blog/drata-mcp-built-for-ai-native-trust-management)
-- [Postman Collection](collections/drata.postman_collection.json) — [Postman Collection 2.1](https://schema.getpostman.com/json/collection/v2.1.0/collection.json)
-- [Open Collection](collections/drata.opencollection.json) — [Open Collection 1.0](https://schema.opencollection.com/opencollection/v1.0.0.json)
+- [MCPServer](mcp/drata-mcp.yml)
+- [ToolCrosswalk](mcp/drata-tool-crosswalk.yml)
+- [Documentation](https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/)
+- [OAuthScopes](scopes/drata-scopes.yml)
+- [Blog](https://drata.com/blog/introducing-mcp-built-for-ai)
 
 ## Common Properties
 
-- [GitHub Organization](https://github.com/drata)
+- [AgenticAccess](agentic-access/drata-agentic-access.yml)
+- [TrustCenter](security/drata-trust-center.yml)
+- [VulnerabilityDisclosure](security/drata-vulnerability-disclosure.yml)
+- [DomainSecurity](security/drata-domain-security.yml)
+- [Authentication](authentication/drata-authentication.yml)
+- [GitHubOrganization](https://github.com/drata)
 - [LinkedIn](https://www.linkedin.com/company/drata)
 - [Website](https://drata.com/)
 - [Developer](https://developers.drata.com/)
 - [Plans](plans/drata-plans-pricing.yml)
-- [Rate Limits](rate-limits/drata-rate-limits.yml)
-- [Fin Ops](finops/drata-finops.yml)
+- [RateLimits](rate-limits/drata-rate-limits.yml)
+- [FinOps](finops/drata-finops.yml)
+- [MCPServer](mcp/drata-mcp.yml)
+- [ToolCrosswalk](mcp/drata-tool-crosswalk.yml)
+- [OAuthScopes](scopes/drata-scopes.yml)
+- [WellKnown](well-known/drata-well-known.yml)
+- [Conventions](conventions/drata-conventions.yml)
+- [ErrorCatalog](errors/drata-problem-types.yml)
+- [Lifecycle](lifecycle/drata-lifecycle.yml)
+- [ChangeLog](changelog/drata-changelog.yml)
+- [Conformance](conformance/drata-conformance.yml)
+- [DataModel](data-model/drata-data-model.yml)
+- [Packages](packages/drata-packages.yml)
+- [LLMsTxt](llms/drata-llms.txt)
+- [Overlay](overlays/drata-api-v2-overlay.yaml)
+- [Examples](examples/drata-examples.yml)
+- [Drata Agent Skills](skills/_index.yml)
+- [StatusPage](https://status.drata.com/)
+- [Security](security/drata-vulnerability-disclosure.yml)
+- [Compliance](https://trust.drata.com/)
+- [DeveloperPortal](https://developers.drata.com/)
+- [Documentation](https://developers.drata.com/openapi/reference/v2/overview/)
+- [APIReference](https://developers.drata.com/openapi/reference/v2/overview/)
+- [GettingStarted](https://developers.drata.com/developer-portal/v2/recipes/create-an-api-key/)
+- [Support](https://help.drata.com/)
+- [Blog](https://drata.com/blog)
+- [Pricing](https://drata.com/pricing)
+- [SignUp](https://drata.com/demo)
+- [Login](https://app.drata.com/)
+- [TermsOfService](https://drata.com/terms)
+- [PrivacyPolicy](https://drata.com/privacy)
 
 ## Maintainers
 

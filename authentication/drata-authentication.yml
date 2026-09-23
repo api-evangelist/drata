@@ -1,13 +1,142 @@
-generated: '2026-07-11'
-method: derived
-source: openapi/drata-openapi.yml
+generated: '2026-08-27'
+method: searched
+source: >-
+  openapi/drata-api-v2-openapi.yml + openapi/drata-safebase-trust-api-openapi.yml +
+  https://help.drata.com/en/articles/6695964-drata-public-api +
+  https://developers.drata.com/developer-portal/v2/recipes/create-an-api-key/ +
+  https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/ +
+  https://mcp.drata.com/.well-known/oauth-authorization-server
+docs: https://help.drata.com/en/articles/6695964-drata-public-api
+provider: Drata
+providerId: drata
 summary:
   types:
   - http
+  - apiKey
+  - oauth2
+  api_key_in:
+  - header
+  note: >-
+    Three different credentials across three surfaces, and they are not interchangeable: a
+    bearer API key for the Public API v2, an x-sb-api-key header for the SafeBase Trust API,
+    and OAuth for the MCP server. An agent spanning Drata's surfaces needs all three.
+
 schemes:
-- name: bearerAuth
+- name: bearer
   type: http
   scheme: bearer
-  bearerFormat: JWT
+  bearerFormat: API_KEY
+  surface: Drata Public API v2
+  header: 'Authorization: Bearer <API_KEY>'
   sources:
-  - openapi/drata-openapi.yml
+  - openapi/drata-api-v2-openapi.yml
+  note: >-
+    Despite the bearer scheme, the credential is a long-lived API key, not a JWT — the spec's
+    own bearerFormat says "API_KEY". Applied globally via a root-level security requirement,
+    so every one of the 197 operations requires it.
+
+- name: apiKey
+  type: apiKey
+  in: header
+  parameter: x-sb-api-key
+  surface: SafeBase Trust API
+  sources:
+  - openapi/drata-safebase-trust-api-openapi.yml
+
+- name: oauth2
+  type: oauth2
+  surface: Drata MCP server
+  flows:
+    authorizationCode:
+      authorizationUrl: https://mcp.drata.com/auth0-proxy/authorize
+      tokenUrl: https://drata-prod.us.auth0.com/oauth/token
+      refreshUrl: https://drata-prod.us.auth0.com/oauth/token
+      pkce: [S256, plain]
+  issuer: https://drata-prod.us.auth0.com/
+  dynamic_client_registration: https://drata-prod.us.auth0.com/oidc/register
+  revocation_endpoint: https://drata-prod.us.auth0.com/oauth/revoke
+  metadata:
+    protected_resource: https://mcp.drata.com/.well-known/oauth-protected-resource
+    authorization_server: https://mcp.drata.com/.well-known/oauth-authorization-server
+    openid_configuration: https://mcp.drata.com/.well-known/openid-configuration
+  scopes: scopes/drata-scopes.yml
+  sources:
+  - https://mcp.drata.com/.well-known/oauth-authorization-server
+  note: >-
+    Discoverable without credentials via RFC 9728 / RFC 8414 metadata, which is what lets an
+    MCP client bootstrap the connection with no prior configuration.
+
+api_key_management:
+  where: Drata app -> Settings -> API Keys
+  creation_docs: https://developers.drata.com/developer-portal/v2/recipes/create-an-api-key/
+  shown_once: true
+  quote: >-
+    "The full API key will only be shown once when you create the key. You will not be able to
+    access it again."
+  attributes:
+  - name: Name
+    mutable: false
+    note: Cannot be changed once the key is active.
+  - name: Expiration date
+    options: [12 months (default), Never, Custom]
+  - name: Allowed IP Addresses
+    note: >-
+      Optional source-IP allowlist. Empty means all sources. Interacts with the per-source-IP
+      rate limit — pinning a key to one egress IP also pins it to one 500/min budget.
+  - name: Access / scopes
+    options: [Custom, All read, All read and write]
+    note: >-
+      "All read" and "All read and write" enable all CURRENT AND FUTURE scopes — a forward
+      grant that silently widens as Drata ships new endpoints. Prefer Custom for agents.
+  statuses:
+  - name: Active
+    description: Usable for the scopes it was provisioned for.
+  - name: Expires soon
+    description: Still usable; expires within 30 days.
+  - name: Expired
+    description: Unusable. Permanent — an expired key cannot be reactivated.
+  - name: Revoked
+    description: Unusable. Permanent — revocation cannot be undone.
+  observability: >-
+    The key table shows name, status, creator, last-used timestamp and expiry. Last-used is the
+    only usage telemetry Drata exposes for a key.
+  rotation_note: >-
+    Scopes can be edited at any time on a key that has not expired or been revoked, but the key
+    VALUE cannot be rotated in place — rotation means creating a new key and revoking the old
+    one, and revocation is irreversible.
+
+tenant_gate:
+  status: 412
+  description: >-
+    All 196 authenticated operations declare a 412 response: "You must accept the Drata terms
+    and conditions to use the API." A valid, correctly scoped key still fails until a Drata
+    administrator accepts the API terms in the app. Treat 412 as a human-escalation, not a
+    credential problem.
+
+entitlement_gate:
+  status: 402
+  operations: 37
+  description: >-
+    "You must upgrade your plan to use this feature" / "The required account entitlement is not
+    enabled." Distinct from 403 — widening scopes will never clear a 402.
+
+authorization_model:
+  layers:
+  - Credential scopes (API key scopes, or MCP OAuth scopes)
+  - Drata role-based permissions on the authenticated user
+  - Workspace scoping via the {workspaceId} path parameter
+  rule: >-
+    Effective access is the INTERSECTION of the granted scopes and the caller's Drata role.
+    Granting a scope never widens what a user can reach.
+  source: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+
+evidence:
+- url: https://help.drata.com/en/articles/6695964-drata-public-api
+  status: 200
+- url: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  status: 200
+- url: https://mcp.drata.com/.well-known/oauth-authorization-server
+  status: 200
+- url: https://public-api.drata.com/public/v2/openapi.json
+  status: 401
+  note: 'Unauthenticated probe of the API host returns {"statusCode":401,"message":"Unauthorized","code":26430}.'

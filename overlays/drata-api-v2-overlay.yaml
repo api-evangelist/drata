@@ -1,0 +1,91 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for the Drata Public API v2
+  version: 1.0.0
+extends: openapi/drata-api-v2-openapi.yml
+x-provenance:
+  generated: '2026-08-27'
+  method: generated
+  source: >-
+    Derived from openapi/drata-api-v2-openapi.yml plus Drata's own published documentation.
+    This overlay records API Evangelist annotations only; it never mutates the harvested spec.
+  spec_origin: >-
+    The base document was harvested verbatim from the Redocly developer-portal page data at
+    https://developers.drata.com/page-data/openapi/reference/v2/overview/page-data.json
+    (result.data.contentItem.data.redocStoreStr -> definition.data). Drata serves no
+    /openapi.json on either the docs host or the API host.
+actions:
+- target: $.info
+  description: Attach contact, licence-of-documentation and portal links the published spec omits.
+  update:
+    contact:
+      name: Drata Support
+      url: https://help.drata.com/
+    x-developer-portal: https://developers.drata.com/
+    x-api-reference: https://developers.drata.com/openapi/reference/v2/overview/
+    x-getting-started: https://developers.drata.com/developer-portal/v2/recipes/create-an-api-key/
+    x-status-page: https://status.drata.com/
+    x-changelog: https://drata.com/updates
+    x-trust-center: https://trust.drata.com/
+- target: $
+  description: >-
+    Record the runtime semantics that are documented outside the contract, so an agent reading
+    only the spec still learns them.
+  update:
+    x-rate-limit:
+      limit: 500
+      window: 1m
+      scope: per unique source IP
+      status: 429
+      headers: [Retry-After]
+      source: https://help.drata.com/en/articles/6695964-drata-public-api
+    x-pagination:
+      style: cursor
+      request: [cursor, size, sort, sortDir, includeTotalCount]
+      response_field: pagination.cursor
+    x-expansion:
+      param: 'expand[]'
+      operations: 70
+    x-idempotency:
+      supported: false
+      note: No idempotency-key mechanism is published; retried POSTs can duplicate.
+    x-reversibility:
+      grade: none
+      note: >-
+        20 DELETE operations, no restore/undo/unarchive counterpart anywhere in the contract
+        and no recovery window stated in the docs. Deletes destroy compliance evidence.
+    x-error-envelope:
+      schema: ExceptionResponsePublicV2Dto
+      rfc9457: false
+      note: The `code` member is a Drata-internal numeric error code with no public registry.
+    x-regions:
+      us: https://public-api.drata.com/public/v2
+      eu: https://public-api.eu.drata.com/public/v2
+      apac: https://public-api.apac.drata.com/public/v2
+    x-agent-surfaces:
+      mcp: https://mcp.drata.com/mcp/
+      mcp_scopes: https://mcp.drata.com/.well-known/oauth-protected-resource
+- target: $.paths.*.*[?(@.summary =~ /🧪/)]
+  description: >-
+    Drata marks unstable operations with a 🧪 suffix on the summary. Surface that as a
+    machine-readable flag, since the contract carries no `deprecated` or `x-beta` marker.
+  update:
+    x-stability: beta
+    x-stability-source: provider summary marker (🧪)
+- target: $.paths.*.delete
+  description: >-
+    Flag every DELETE as irreversible. Drata publishes no restore path for any of them and the
+    objects being removed are audit evidence.
+  update:
+    x-reversible: false
+    x-consequence: destructive
+    x-agent-guidance: >-
+      Read and persist the full resource body before deleting. There is no API to restore it.
+- target: $.components.securitySchemes.bearer
+  description: Clarify that the bearer credential is a long-lived API key, not a JWT.
+  update:
+    description: >-
+      Long-lived Drata API key presented as a bearer token. Created under Settings -> API Keys;
+      shown once; carries an expiry (12 months by default), an optional source-IP allowlist and
+      a scope selection (Custom / All read / All read and write). Revocation and expiry are
+      permanent.

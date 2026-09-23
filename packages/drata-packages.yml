@@ -1,0 +1,176 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  registry.npmjs.org, pypi.org, repo.packagist.org, proxy.golang.org, api.github.com/orgs/drata
+provider: Drata
+providerId: drata
+description: >-
+  Client-library situation for the Drata Public API v2. Drata ships NO working first-party SDK
+  in any language. It owns registry namespaces and SDK repositories, but every one of them is
+  an empty placeholder — which is a different and worse fact than having no SDK at all,
+  because a developer who finds `drata/sdk-go` or `drata/sdk-php` reasonably expects code.
+official_sdk_count: 0
+package_count: 8
+
+packages:
+- name: sdk-go
+  language: Go
+  registry: github
+  url: https://github.com/drata/sdk-go
+  official: true
+  status: placeholder
+  version: null
+  published: null
+  note: >-
+    Owned by the Drata GitHub org. Contains exactly two files, README.md and main.go; the
+    entire README reads "# sdk-gopher". No releases, no tags, and proxy.golang.org returns an
+    empty version list for github.com/drata/sdk-go — the module has never been published. Last
+    pushed 2024-06-18. version is null because nothing was ever released, not because the
+    registry failed to answer.
+
+- name: drata/sdk-php
+  language: PHP
+  registry: packagist
+  url: https://github.com/drata/sdk-php
+  official: true
+  status: placeholder
+  version: null
+  published: null
+  note: >-
+    composer.json declares "type": "metapackage" with an empty `require` block and the author
+    email packages+packagist@drata.com — a namespace reservation, not a library.
+    repo.packagist.org/packages/drata/sdk-php returns 404 ("no packages here"), so the package
+    is not even published to Packagist. Last pushed 2024-06-18.
+
+- name: drata
+  language: JavaScript
+  registry: npm
+  url: https://www.npmjs.com/package/drata
+  official: true
+  status: placeholder
+  version: 1.0.1
+  published: '2024-06-06'
+  license: ISC
+  note: >-
+    Published by the `drata_packages` npm account, which matches the packages+packagist@drata.com
+    identity on sdk-php, so this is first-party. Description is "Drata to API", it declares no
+    dependencies, has a single version, and has not been touched since 2024-06-06 — more than
+    two years before the V2 API surface and MCP server it would need to wrap. A first-party SDK
+    two years behind the API is the clearest abandonment signal available here.
+
+- name: drata-agent
+  language: TypeScript
+  registry: github
+  url: https://github.com/drata/drata-agent
+  official: true
+  status: released
+  version: 3.9.0
+  published: '2025-10-28'
+  license: Apache-2.0
+  note: >-
+    The Drata Agent desktop application (Electron), distributed as GitHub releases rather than
+    through a package registry. This is an end-user compliance agent, NOT an API client library,
+    so it does not count toward sdk_count.
+
+- name: compliance-as-code-action
+  language: JavaScript
+  registry: github
+  url: https://github.com/drata/compliance-as-code-action
+  official: true
+  status: released
+  version: v1.0.1
+  published: '2025-12-01'
+  license: MIT
+  note: >-
+    A first-party GitHub Action that calls the Drata API from CI. It vendors its own
+    apis/, models/ and services/ directories — Drata generated a client for this action but did
+    not publish it as a reusable SDK.
+
+- name: terraform-aws-drata-privatelink
+  language: HCL
+  registry: github
+  url: https://github.com/drata/terraform-aws-drata-privatelink
+  official: true
+  status: released
+  version: null
+  published: '2026-08-11'
+  note: >-
+    Terraform module for Drata's PrivateLink endpoint services; version null because the repo
+    publishes no tagged releases and is not registered on the Terraform Registry under this
+    name. Date is the last push. Sibling modules: terraform-aws-drata-autopilot-role,
+    gcp-terraform-drata-setup, aws-cloudformation-drata-setup, gcp-shell-drata-setup.
+
+- name: '@silkline/drata'
+  language: TypeScript
+  registry: npm
+  url: https://www.npmjs.com/package/@silkline/drata
+  official: false
+  version: 0.0.2
+  published: '2026-08-11'
+  repository: https://github.com/Silkline/drata-typescript
+  note: >-
+    Self-describes as "The official TypeScript library for the Drata API" but is published
+    under the @silkline scope by Silkline maintainers, not by Drata's `drata_packages` account,
+    and is not linked from any Drata property. Treat the word "official" in its description as
+    the publisher's claim, not Drata's. Currently the most recently updated Drata client on npm.
+
+- name: drata-cli
+  language: TypeScript
+  registry: npm
+  url: https://www.npmjs.com/package/drata-cli
+  official: false
+  version: 0.2.0
+  published: '2026-04-25'
+  repository: https://github.com/ethanolivertroy/drata-cli
+  note: Self-described "Unofficial command-line client for Drata's public API."
+
+other_community_packages:
+- name: '@rawdash/connector-drata'
+  registry: npm
+  version: 0.29.2
+  published: '2026-07-04'
+  official: false
+- name: '@pipedream/drata'
+  registry: npm
+  version: 0.2.0
+  published: '2026-05-29'
+  official: false
+- name: '@velocity-bpa/n8n-nodes-drata-compliance'
+  registry: npm
+  version: 1.0.0
+  published: '2026-04-23'
+  official: false
+- name: safebase-mcp
+  registry: npm
+  version: 1.0.3
+  published: '2026-04-04'
+  official: false
+  note: >-
+    "MCP server for the SafeBase by Drata API", published by individual maintainers. Drata
+    announced its OWN SafeBase MCP Server in Early Access on 2026-07-31; the two are not
+    established to be the same thing.
+
+registries_checked:
+- registry: npm
+  method: registry.npmjs.org search + per-package metadata
+  result: 1 first-party placeholder, 5 third-party
+- registry: pypi
+  result: pypi.org/pypi/drata/json returns 200 but the name is not a Drata client; drata-sdk and drata-api both 404. No first-party Python SDK.
+- registry: packagist
+  result: 404 for drata/sdk-php
+- registry: proxy.golang.org
+  result: empty version list for github.com/drata/sdk-go
+- registry: maven-central
+  result: not searched — Drata publishes no JVM client and none is referenced from its docs or GitHub org
+- registry: rubygems
+  result: not searched — no Ruby client referenced anywhere on Drata's surface
+- registry: nuget
+  result: not searched — no .NET client referenced anywhere on Drata's surface
+
+code_generation:
+  note: >-
+    In place of SDKs, Drata's Redocly developer portal auto-generates per-operation request
+    snippets in several languages, and Drata's API product page names that as the developer
+    experience: "auto-generated code samples for multiple programming languages". Snippets are
+    not a maintained client.
+  source: https://drata.com/products/api

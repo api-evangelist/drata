@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata Workspaces API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Workspaces across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Workspaces
-  description: Workspaces allow you to represent different products or business lines that have different compliance requirements. Each Workspace can have its own Frameworks and Controls. The [help docs](https://help.drata.com/en/articles/6598264) have more information on how create and manage Workspaces.
+  description: Workspaces allow you to represent different products or business lines that have different compliance requirements. Each Workspace can have its own Frameworks and Controls. The help docs have more information on how create and manage Workspaces.
 paths:
   /workspaces:
     get:
@@ -106,17 +112,16 @@ paths:
       x-product-area:
       - WORKSPACE_PLATFORM
       description: '🔒 Requires **Workspaces: List Workspaces** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
-    ExceptionResponsePublicV2Dto:
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
       type: object
       properties:
-        name:
-          type: string
         statusCode:
           type: number
         message:
@@ -136,10 +141,24 @@ components:
           - name
           - message
       required:
-      - name
       - statusCode
       - message
       - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
     FrameworkCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -179,34 +198,11 @@ components:
       - createdAt
       - updatedAt
       - enabledAt
-    PaginationTotalCountResponsePublicV2Dto:
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    WorkspaceExpandEnum:
-      type: string
-      enum:
-      - frameworks
-      - personnelScope
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponseDto:
-      type: object
-      properties:
+        name:
+          type: string
         statusCode:
           type: number
         message:
@@ -226,6 +222,7 @@ components:
           - name
           - message
       required:
+      - name
       - statusCode
       - message
       - code
@@ -312,16 +309,18 @@ components:
       required:
       - data
       - pagination
-    SortDirectionEnum:
+    WorkspaceExpandEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - frameworks
+      - personnelScope
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

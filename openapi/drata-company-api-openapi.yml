@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata Company API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Company across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Company
-  description: The Company tracks essential information about your organization. The [help docs](https://help.drata.com/en/articles/8283910) have more information on the purpose of each field.
+  description: The Company tracks essential information about your organization. The help docs have more information on the purpose of each field.
 paths:
   /company:
     get:
@@ -69,17 +75,46 @@ paths:
       x-product-area:
       - COMPANY_INFO
       description: '🔒 Requires **Company Settings: Get Company Settings** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
-    ExceptionResponsePublicV2Dto:
+    LanguageEnum:
+      type: string
+      enum:
+      - ENGLISH_US
+      - SPANISH_LA
+      - GERMAN_DE
+      - FRENCH_FR
+      - ITALIAN_IT
+      - DUTCH_NL
+      - PSEUDO
+      - PSEUDOX
+    SecurityTrainingTypeEnum:
+      type: string
+      enum:
+      - ESET
+      - LINK_PROVIDED
+      - DRATA_PROVIDED
+      - MANUAL
+      - CURRICULA
+      - KNOWBE4
+      - STACKONE_EASY_LLAMA
+      - MANUAL_EVIDENCE_FIRST
+      - STACKONE_CORNERSTONE
+      - STACKONE_DOCEBO
+      - STACKONE_GO1
+      - STACKONE_LINKEDIN_LEARNING
+      - STACKONE_SAP_LEARNING
+      - STACKONE_WORKDAY_LEARNING
+      - STACKONE_360LEARNING
+      - STACKONE_BRAINIER
+      - STACKONE_COURSERA
+      - STACKONE_XYLEME
+      - STACKONE_INFOSEC
+      - STACKONE_UDEMY
+      - STACKONE_PEOPLE_FLUENT
+    ExceptionResponseDto:
       type: object
       properties:
-        name:
-          type: string
         statusCode:
           type: number
         message:
@@ -99,21 +134,9 @@ components:
           - name
           - message
       required:
-      - name
       - statusCode
       - message
       - code
-    LanguageEnum:
-      type: string
-      enum:
-      - ENGLISH_US
-      - SPANISH_LA
-      - GERMAN_DE
-      - FRENCH_FR
-      - ITALIAN_IT
-      - DUTCH_NL
-      - PSEUDO
-      - PSEUDOX
     CompanyResponsePublicV2Dto:
       type: object
       properties:
@@ -219,9 +242,11 @@ components:
       - manualUploadEnabled
       - entitlements
       - language
-    ExceptionResponseDto:
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
+        name:
+          type: string
         statusCode:
           type: number
         message:
@@ -241,33 +266,10 @@ components:
           - name
           - message
       required:
+      - name
       - statusCode
       - message
       - code
-    SecurityTrainingTypeEnum:
-      type: string
-      enum:
-      - ESET
-      - LINK_PROVIDED
-      - DRATA_PROVIDED
-      - MANUAL
-      - CURRICULA
-      - KNOWBE4
-      - STACKONE_EASY_LLAMA
-      - MANUAL_EVIDENCE_FIRST
-      - STACKONE_CORNERSTONE
-      - STACKONE_DOCEBO
-      - STACKONE_GO1
-      - STACKONE_LINKEDIN_LEARNING
-      - STACKONE_SAP_LEARNING
-      - STACKONE_WORKDAY_LEARNING
-      - STACKONE_360LEARNING
-      - STACKONE_BRAINIER
-      - STACKONE_COURSERA
-      - STACKONE_XYLEME
-      - STACKONE_INFOSEC
-      - STACKONE_UDEMY
-      - STACKONE_PEOPLE_FLUENT
     HipaaTrainingTypeEnum:
       type: string
       enum:
@@ -293,6 +295,3 @@ components:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

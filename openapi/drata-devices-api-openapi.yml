@@ -1,9 +1,15 @@
 openapi: 3.2.0
 info:
   title: Drata Devices API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Devices across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
@@ -139,10 +145,6 @@ paths:
       x-product-area:
       - MDM
       description: '🔒 Requires **Devices: List Devices** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /personnel/{personnelId}/devices:
     get:
       operationId: DevicesPublicV2Controller_getDevicesForPersonnel
@@ -269,10 +271,6 @@ paths:
       x-product-area:
       - MDM
       description: '🔒 Requires **Devices: List Devices** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /devices/{deviceId}:
     get:
       operationId: DevicesPublicV2Controller_getDevice
@@ -345,10 +343,6 @@ paths:
       x-product-area:
       - MDM
       description: '🔒 Requires **Devices: List Devices** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /connections/{connectionId}/devices:
     get:
       description: 'Get a list of Devices for a given connection
@@ -482,10 +476,6 @@ paths:
       - devices-get
       x-product-area:
       - MDM
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /devices/{deviceId}/apps:
     get:
       description: 'Get a list of Apps associated with a given Device.
@@ -581,10 +571,6 @@ paths:
       - devices-get
       x-product-area:
       - MDM
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /custom-connections/{connectionId}/devices:
     post:
       description: 'Create a new device or update an existing device for a custom connection.
@@ -686,10 +672,6 @@ paths:
       - devices-post
       x-product-area:
       - MDM
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /custom-connections/{connectionId}/devices/{deviceId}:
     delete:
       description: 'Delete a Device from a Custom Connection.
@@ -758,12 +740,112 @@ paths:
       - devices-delete-from-custom-connection
       x-product-area:
       - MDM
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
+    ComplianceCheckStatusEnum:
+      type: string
+      enum:
+      - MISCONFIGURED
+      - PASS
+      - FAIL
+      - EXCLUDED
+    AssetCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Assessment ID
+        name:
+          type: string
+          example: MacBook Pro - Space Black 16-inch
+          description: The name of the asset
+        description:
+          type: string
+          example: MacBook Pro Space Black - with 16-inch Liquid Retina XDR display
+          description: The description of the asset
+        assetType:
+          type: string
+          example: PHYSICAL
+          description: The asset type
+        assetProvider:
+          type: string
+          example: AGENT
+          description: The asset source provider
+        approvedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the asset was approved (if applicable)
+        removedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the asset stopped being tracked
+        company:
+          type: string
+          example: Acme, Inc
+          description: The owning company of the asset
+        notes:
+          type:
+          - string
+          - 'null'
+          description: The asset notes
+        assetReferenceType:
+          type:
+          - string
+          - 'null'
+          example: PERSONNEL
+          description: The asset reference type
+        uniqueId:
+          type: string
+          example: C02T6CDJGTFL
+          description: Unique Id associated with this asset
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset created timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: asset update timestamp
+        externalId:
+          type: string
+          example: i-0c844e3b433e4e3f
+          description: An externally sourced unique identifier for a virtual asset
+        externalOwnerId:
+          type: string
+          example: account-353
+          description: Used to track the source of virtual assets, typically an account id.
+      required:
+      - id
+      - name
+      - description
+      - assetType
+      - assetProvider
+      - approvedAt
+      - company
+      - assetReferenceType
+      - uniqueId
+      - createdAt
+      - updatedAt
+    DeviceAppsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: The set of installed apps for this device based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceAppResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     DeviceDocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -806,53 +888,77 @@ components:
       - fileUrl
       - createdAt
       - updatedAt
-    AppTypeRequestPublicV2Dto:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    DeviceIdentifierResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Device identifier Id
+        type:
+          type: string
+          example: SERIAL_NUMBER
+          description: The identifier type
+        identifier:
+          type: string
+          example: C02CG123DC79
+          description: The identifier value
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Identifier createdAt timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Identifier updatedAt timestamp
+      required:
+      - id
+      - type
+      - identifier
+      - createdAt
+      - updatedAt
+    DeviceExpandEnum:
+      type: string
+      enum:
+      - asset
+      - complianceChecks
+      - documents
+      - identifiers
+    WindowsServiceRequestPublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 191
+          example: Security feature that monitors and controls network traffic entering and exiting the device
+          description: Windows service description.
         name:
           type: string
           maxLength: 191
-          example: Microsoft Defender Antivirus
-          description: Name of application
-        version:
+          example: Windows Firewall
+          description: Windows service name
+        startType:
           type: string
           maxLength: 191
-          example: 1.421.12.0
-          description: Version of application
-        description:
-          type:
-          - string
-          - 'null'
-          example: Microsoft Defender Antivirus
-          description: Protects against new malware and attack techniques.
-      required:
-      - name
-      - version
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
+          example: Automatic
+          description: Windows service
+        status:
           type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+          maxLength: 191
+          example: Running
+          description: Windows service status
       required:
-      - statusCode
-      - message
-      - code
+      - description
+      - name
+      - startType
+      - status
     DeviceCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -989,103 +1095,6 @@ components:
       - personnelId
       - platformName
       - platformVersion
-    WindowsServiceRequestPublicV2Dto:
-      type: object
-      properties:
-        description:
-          type: string
-          maxLength: 191
-          example: Security feature that monitors and controls network traffic entering and exiting the device
-          description: Windows service description.
-        name:
-          type: string
-          maxLength: 191
-          example: Windows Firewall
-          description: Windows service name
-        startType:
-          type: string
-          maxLength: 191
-          example: Automatic
-          description: Windows service
-        status:
-          type: string
-          maxLength: 191
-          example: Running
-          description: Windows service status
-      required:
-      - description
-      - name
-      - startType
-      - status
-    ComplianceCheckStatusEnum:
-      type: string
-      enum:
-      - MISCONFIGURED
-      - PASS
-      - FAIL
-      - EXCLUDED
-    DeviceIdentifierResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Device identifier Id
-        type:
-          type: string
-          example: SERIAL_NUMBER
-          description: The identifier type
-        identifier:
-          type: string
-          example: C02CG123DC79
-          description: The identifier value
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Identifier createdAt timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Identifier updatedAt timestamp
-      required:
-      - id
-      - type
-      - identifier
-      - createdAt
-      - updatedAt
-    DevicesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    ComplianceCheckTypeEnum:
-      type: string
-      enum:
-      - FULL_COMPLIANCE
-      - ACCEPTED_POLICIES
-      - IDENTITY_MFA
-      - BG_CHECK
-      - AGENT_INSTALLED
-      - PASSWORD_MANAGER
-      - HDD_ENCRYPTION
-      - ANTIVIRUS
-      - AUTO_UPDATES
-      - LOCK_SCREEN
-      - SECURITY_TRAINING
-      - LOCATION_SERVICES
-      - HIPAA_TRAINING
-      - OFFBOARDING
-      - NIST_AI_TRAINING
     DeviceAppResponsePublicV2Dto:
       type: object
       properties:
@@ -1100,13 +1109,191 @@ components:
       required:
       - id
       - installedApp
-    DeviceExpandEnum:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    SignedUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+      required:
+      - signedUrl
+      - fileBuffer
+      - fileName
+    DeviceComplianceCheckResponsePublicV2Dto:
+      type: object
+      properties:
+        checkFrequency:
+          example: DAILY
+          description: How often should this check be run for Compliance
+          allOf:
+          - $ref: '#/components/schemas/CheckFrequencyEnum'
+        completionDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the user completed the Compliance Check
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check creation timestamp
+        expiresAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When this Compliance Check is due for a re-verification
+        id:
+          type: number
+          example: 1
+          description: Device Compliance Check ID
+        lastCheckedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check last checked timestamp
+        status:
+          example: PASS
+          description: Denotes actual Compliance Check status
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
+        type:
+          example: PASSWORD_MANAGER
+          description: The Compliance Check type
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Compliance Check updated timestamp
+      required:
+      - checkFrequency
+      - completionDate
+      - createdAt
+      - expiresAt
+      - id
+      - lastCheckedAt
+      - status
+      - type
+      - updatedAt
+    SortDirectionEnum:
       type: string
       enum:
-      - asset
-      - complianceChecks
-      - documents
-      - identifiers
+      - ASC
+      - DESC
+    DevicesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    CheckFrequencyEnum:
+      type: string
+      enum:
+      - ONCE
+      - HOURLY
+      - QID
+      - DAILY
+      - WEEKLY
+      - BIWEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
     DeviceResponsePublicV2Dto:
       type: object
       properties:
@@ -1325,144 +1512,14 @@ components:
       - firewallExplanation
       - personnelId
       - externalId
-    DeviceAppsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: The set of installed apps for this device based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceAppResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortDirectionEnum:
+    AgentPlatformEnum:
       type: string
       enum:
-      - ASC
-      - DESC
-    CheckFrequencyEnum:
-      type: string
-      enum:
-      - ONCE
-      - HOURLY
-      - QID
-      - DAILY
-      - WEEKLY
-      - BIWEEKLY
-      - MONTHLY
-      - QUARTERLY
-      - YEARLY
-    SignedUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        signedUrl:
-          type: string
-          example: https://somedomain.com/filename.pdf?Signature=ABC123
-          description: The short lived signed URL to link directly to the private file
-        fileBuffer:
-          type:
-          - object
-          - 'null'
-          description: The file on buffer format. This only applies for txt files.
-          example:
-            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
-        fileName:
-          type:
-          - string
-          - 'null'
-          example: Artifact 3.png
-          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
-      required:
-      - signedUrl
-      - fileBuffer
-      - fileName
-    AssetCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Assessment ID
-        name:
-          type: string
-          example: MacBook Pro - Space Black 16-inch
-          description: The name of the asset
-        description:
-          type: string
-          example: MacBook Pro Space Black - with 16-inch Liquid Retina XDR display
-          description: The description of the asset
-        assetType:
-          type: string
-          example: PHYSICAL
-          description: The asset type
-        assetProvider:
-          type: string
-          example: AGENT
-          description: The asset source provider
-        approvedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the asset was approved (if applicable)
-        removedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the asset stopped being tracked
-        company:
-          type: string
-          example: Acme, Inc
-          description: The owning company of the asset
-        notes:
-          type:
-          - string
-          - 'null'
-          description: The asset notes
-        assetReferenceType:
-          type:
-          - string
-          - 'null'
-          example: PERSONNEL
-          description: The asset reference type
-        uniqueId:
-          type: string
-          example: C02T6CDJGTFL
-          description: Unique Id associated with this asset
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: asset update timestamp
-        externalId:
-          type: string
-          example: i-0c844e3b433e4e3f
-          description: An externally sourced unique identifier for a virtual asset
-        externalOwnerId:
-          type: string
-          example: account-353
-          description: Used to track the source of virtual assets, typically an account id.
-      required:
-      - id
-      - name
-      - description
-      - assetType
-      - assetProvider
-      - approvedAt
-      - company
-      - assetReferenceType
-      - uniqueId
-      - createdAt
-      - updatedAt
+      - MACOS
+      - WINDOWS
+      - LINUX
+      - UNIX
+      - ANDROID
     DeviceResponseIdPublicV2Dto:
       type: object
       properties:
@@ -1686,125 +1743,6 @@ components:
       - firewallExplanation
       - personnelId
       - externalId
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    AgentPlatformEnum:
-      type: string
-      enum:
-      - MACOS
-      - WINDOWS
-      - LINUX
-      - UNIX
-      - ANDROID
-    DeviceComplianceCheckResponsePublicV2Dto:
-      type: object
-      properties:
-        checkFrequency:
-          example: DAILY
-          description: How often should this check be run for Compliance
-          allOf:
-          - $ref: '#/components/schemas/CheckFrequencyEnum'
-        completionDate:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the user completed the Compliance Check
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check creation timestamp
-        expiresAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When this Compliance Check is due for a re-verification
-        id:
-          type: number
-          example: 1
-          description: Device Compliance Check ID
-        lastCheckedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check last checked timestamp
-        status:
-          example: PASS
-          description: Denotes actual Compliance Check status
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
-        type:
-          example: PASSWORD_MANAGER
-          description: The Compliance Check type
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Compliance Check updated timestamp
-      required:
-      - checkFrequency
-      - completionDate
-      - createdAt
-      - expiresAt
-      - id
-      - lastCheckedAt
-      - status
-      - type
-      - updatedAt
     MobileDeviceManagementSourceTypeEnum:
       type: string
       enum:
@@ -1822,11 +1760,48 @@ components:
       - INTUNE_GCC_HIGH
       - CUSTOM_XFA
       - NINJAONE
+    AppTypeRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Microsoft Defender Antivirus
+          description: Name of application
+        version:
+          type: string
+          maxLength: 191
+          example: 1.421.12.0
+          description: Version of application
+        description:
+          type:
+          - string
+          - 'null'
+          example: Microsoft Defender Antivirus
+          description: Protects against new malware and attack techniques.
+      required:
+      - name
+      - version
+    ComplianceCheckTypeEnum:
+      type: string
+      enum:
+      - FULL_COMPLIANCE
+      - ACCEPTED_POLICIES
+      - IDENTITY_MFA
+      - BG_CHECK
+      - AGENT_INSTALLED
+      - PASSWORD_MANAGER
+      - HDD_ENCRYPTION
+      - ANTIVIRUS
+      - AUTO_UPDATES
+      - LOCK_SCREEN
+      - SECURITY_TRAINING
+      - LOCATION_SERVICES
+      - HIPAA_TRAINING
+      - OFFBOARDING
+      - NIST_AI_TRAINING
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

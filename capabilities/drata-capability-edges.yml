@@ -1,0 +1,208 @@
+slug: drata
+provider: Drata
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Software & Technology
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 19
+edges:
+- tag: Policies
+  spec_file: drata-policies-api-openapi.yml
+  capability_id: BC-130.20
+  capability_id_l1: BC-130
+  capability_name: Policy Management
+  confidence: 0.92
+  evidence: POST /policies  Create Policy; POST /policies/{policyId}/policy-versions  Create Policy Version;
+    PUT /policies/{policyId}/owner  Assign Policy Owner; Get Policy Approval Configuration
+  reason: Full internal policy lifecycle — authoring, versioning, ownership, approval/review groups —
+    which is exactly Policy Management.
+- tag: User's Assigned Policies
+  spec_file: drata-user-s-assigned-policies-api-openapi.yml
+  capability_id: BC-130.20
+  capability_id_l1: BC-130
+  capability_name: Policy Management
+  confidence: 0.87
+  evidence: POST /users/{userId}/assigned-policies/{policyId}/action-acknowledge  Acknowledge User's Assigned
+    Policy; PolicyVersionCompactResponsePublicV2Dto
+  reason: Policy version assignment and per-user attestation/acknowledgement is squarely the policy lifecycle
+    (drafting, approval, attestation) sub-capability.
+- tag: Frameworks
+  spec_file: drata-frameworks-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.85
+  evidence: POST /workspaces/{workspaceId}/frameworks  Create Custom Framework; GET /frameworks/{frameworkId}/requirements/{requirementId}/controls  List
+    Controls for a Framework Requirement
+  reason: Manages compliance frameworks, their requirements, and the controls mapped to each requirement
+    — the core of regulatory compliance framework management for SOC 2/ISO 27001 etc.
+- tag: Trust Center Updates
+  spec_file: drata-trust-center-updates-api-openapi.yml
+  capability_id: BC-4290.30
+  capability_id_l1: BC-4290
+  capability_name: Trust Portal & Public Disclosure
+  confidence: 0.85
+  evidence: POST /tcu/topics/{topicId}/updates  createTrustCenterUpdate  Create update; schema TrustCenterTopicResponse
+  reason: Authoring and publishing topics and updates on the SafeBase trust center is operation of the
+    customer-facing trust portal and public disclosure surface.
+- tag: Vendor Security Reviews
+  spec_file: drata-vendor-security-reviews-api-openapi.yml
+  capability_id: BC-510.30
+  capability_id_l1: BC-510
+  capability_name: Supplier Risk Management
+  confidence: 0.85
+  evidence: POST /vendors/{vendorId}/security-reviews  Create Vendor Security Review; POST /vendors/{vendorId}/security-questionnaires  Upload
+    Security Questionnaire; SocReviewFindingsSectionResponsePublicV2Dto
+  reason: Third-party security assessment of vendors via questionnaires and SOC report review with findings
+    and finalisation decisions is supplier (cyber) risk management.
+- tag: Risk Registers
+  spec_file: drata-risk-registers-api-openapi.yml
+  capability_id: BC-120
+  capability_id_l1: BC-120
+  capability_name: Enterprise Risk Management
+  confidence: 0.82
+  evidence: POST /risk-registers  RiskRegisterPublicV2Controller_createRiskRegister  Create Risk Register
+  reason: CRUD over risk registers, the structural container for an organisation's risk taxonomy — Enterprise
+    Risk Management at L1; register-level scaffolding spans framework and identification sub-capabilities.
+- tag: Questionnaires
+  spec_file: drata-questionnaires-api-openapi.yml
+  capability_id: BC-4290.20
+  capability_id_l1: BC-4290
+  capability_name: Customer Security Questionnaire Management
+  confidence: 0.8
+  evidence: POST /questionnaires/  submitQnrFile  Upload Questionnaire; GET /questionnaires/{id}/  getCompletedQuestionnaireUrl  Get
+    completed questionnaire
+  reason: SafeBase trust-centre questionnaire intake and completed-response retrieval is customer security
+    questionnaire management.
+- tag: Vendors
+  spec_file: drata-vendors-api-openapi.yml
+  capability_id: BC-510.30
+  capability_id_l1: BC-510
+  capability_name: Supplier Risk Management
+  confidence: 0.8
+  evidence: POST /vendors/{vendorId}/questionnaires 'Send Questionnaire to Vendor'; schemas VendorCriticalityEnum,
+    VendorOperationalImpactEnum, VendorReviewFindingResponsePublicDto
+  reason: Operations manage third-party vendor records with criticality/impact scoring, security questionnaires
+    and review findings — this is supplier/third-party risk due diligence, not procurement or accounts
+    payable. Questionnaires here are sent TO vendors (outbound diligence), distinguishing it from customer
+    security questionnaire response.
+- tag: Evidence
+  spec_file: drata-evidence-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.75
+  evidence: POST /workspaces/{workspaceId}/evidence  Create Evidence; EvidenceControlsSubcollectionResponsePublicV2Dto,
+    ControlCompactResponsePublicV2Dto
+  reason: Management of compliance evidence artifacts linked to controls, in a platform explicitly for
+    SOC 2/ISO 27001/HIPAA compliance. Best fits regulatory compliance management (control evidence); some
+    overlap with audit execution.
+- tag: Policy Languages
+  spec_file: drata-policy-languages-api-openapi.yml
+  capability_id: BC-130.20
+  capability_id_l1: BC-130
+  capability_name: Policy Management
+  confidence: 0.75
+  evidence: GET /policy-language-versions  List Policy Language Versions; schemas PolicyLanguageSettingsResponsePublicV2Dto,
+    PolicyVersionStatusEnum
+  reason: Language variants/versions of internal policy documents are part of the policy lifecycle; supporting
+    surface of Policy Management rather than a separate capability.
+- tag: Risk Notes
+  spec_file: drata-risk-notes-api-openapi.yml
+  capability_id: BC-120
+  capability_id_l1: BC-120
+  capability_name: Enterprise Risk Management
+  confidence: 0.75
+  evidence: GET /risk-registers/{riskRegisterId}/risks/{riskId}/notes  List Risk Notes
+  reason: Notes attached to risks inside a risk register — annotation of enterprise risk records. Clearly
+    within Enterprise Risk Management, but too generic to pin a sub-capability (assessment vs. monitoring).
+- tag: Audits
+  spec_file: drata-audits-api-openapi.yml
+  capability_id: BC-4290.10
+  capability_id_l1: BC-4290
+  capability_name: Service Attestation Management
+  confidence: 0.72
+  evidence: '"GET /workspaces/{workspaceId}/audits  AuditsPublicV2Controller_listAudits"; schemas AuditorCompactResponsePublicV2Dto,
+    AuditorFrameworkTypeEnum, AuditTypeEnum'
+  reason: Audits here are framework certification/attestation engagements run with an external auditor
+    against a framework type (SOC 2, ISO 27001 per the vendor description), matching Service Attestation
+    Management. Internal Audit Management (BC-140) is the competing reading but the auditor-framework
+    schemas point at external attestations.
+- tag: Risk Documents
+  spec_file: drata-risk-documents-api-openapi.yml
+  capability_id: BC-120
+  capability_id_l1: BC-120
+  capability_name: Enterprise Risk Management
+  confidence: 0.72
+  evidence: GET /risk-registers/{riskRegisterId}/risks/{riskId}/documents  List Risk Documents
+  reason: Document attachments scoped to risks within a risk register support enterprise risk management;
+    the operations are file CRUD so no specific sub-capability is claimed.
+- tag: Risks
+  spec_file: drata-risks-api-openapi.yml
+  capability_id: BC-120.20
+  capability_id_l1: BC-120
+  capability_name: Risk Identification & Assessment
+  confidence: 0.72
+  evidence: POST /risk-registers/{riskRegisterId}/risks  Create Risk ... RiskTreatmentPlanEnum, RiskDashboardResponsePublicV2Dto
+  reason: Creation, scoring, search and insights over individual risks is risk identification and assessment;
+    treatment-plan and dashboard schemas mean adjacent sub-capabilities are also touched, hence moderate
+    confidence on the L2.
+- tag: Audit Requests
+  spec_file: drata-audit-requests-api-openapi.yml
+  capability_id: BC-4290.10
+  capability_id_l1: BC-4290
+  capability_name: Service Attestation Management
+  confidence: 0.7
+  evidence: '"GET /workspaces/{workspaceId}/audits/{auditId}/requests  List Audit Requests"; schemas AuditRequestItemResponsePublicV2Dto,
+    CustomerRequestStatusEnum, AuditControlCompactResponsePublicV2Dto'
+  reason: These are auditor evidence requests raised inside an external framework audit (requests linked
+    to audit controls, with customer request status), i.e. coordination of attestation audits such as
+    SOC 2/ISO 27001 for the buyer's service. Not internal audit fieldwork by an internal audit function,
+    though that reading is possible, so confidence is 0.7.
+- tag: Evidence Library
+  spec_file: drata-evidence-library-api-openapi.yml
+  capability_id: BC-130.10
+  capability_id_l1: BC-130
+  capability_name: Regulatory Compliance Management
+  confidence: 0.7
+  evidence: POST /workspaces/{workspaceId}/evidence-library  Create Evidence Library Item; RenewalSchemaCompactResponsePublicV2Dto,
+    ControlCompactResponsePublicV2Dto
+  reason: Versioned repository of compliance evidence documents with renewal schedules tied to controls
+    — compliance evidence stewardship. Could alternatively be read as audit evidence gathering, so confidence
+    is moderate.
+- tag: Knowledge Base
+  spec_file: drata-knowledge-base-api-openapi.yml
+  capability_id: BC-4290.20
+  capability_id_l1: BC-4290
+  capability_name: Customer Security Questionnaire Management
+  confidence: 0.7
+  evidence: GET /kb/search  Search Knowledge Base; POST /kb/entries  Create Knowledge Base Entry
+  reason: SafeBase (Drata's trust-center product) knowledge base of security answers used to respond to
+    customer security questionnaires. Plausibly could be generic self-service knowledge, hence 0.7.
+- tag: Monitoring Tests
+  spec_file: drata-monitoring-tests-api-openapi.yml
+  capability_id: BC-130
+  capability_id_l1: BC-130
+  capability_name: Compliance Management
+  confidence: 0.7
+  evidence: GET /workspaces/{workspaceId}/monitoring-tests/{testId}/failures  List Monitoring Test Failures;
+    schemas ControlCompactResponsePublicV2Dto, CheckTypeEnum
+  reason: Drata's monitoring tests are automated continuous control checks tied to compliance controls
+    (pass/fail/exclusions), i.e. compliance monitoring rather than IT observability. Mapped at L1 since
+    evidence does not name a specific regulation or policy sub-process.
+- tag: Risk Library
+  spec_file: drata-risk-library-api-openapi.yml
+  capability_id: BC-120.20
+  capability_id_l1: BC-120
+  capability_name: Risk Identification & Assessment
+  confidence: 0.7
+  evidence: POST /risk-library/action-copy  Copies Risk Library Items to a Risk Register; RiskCategoryCompactResponsePublicV2Dto
+  reason: A curated library of risk items and categories copied into a risk register underpins risk identification
+    and assessment; L2 chosen but the taxonomy/framework reading is also plausible.

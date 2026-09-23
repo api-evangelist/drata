@@ -1,0 +1,134 @@
+generated: '2026-08-27'
+method: probed
+source: live GET of /.well-known/* on every apis.yml baseURL host, every OpenAPI servers[] host, and the docs host
+provider: Drata
+providerId: drata
+note: >-
+  Only the MCP host serves well-known documents. mcp.drata.com publishes RFC 9728
+  protected-resource metadata, RFC 8414 authorization-server metadata and an OpenID
+  configuration — real, parseable JSON, saved verbatim. drata.com, trust.drata.com and
+  api.safebase.io sit behind a Cloudflare bot challenge that answers 403 "Just a moment..."
+  to every /.well-known/ path, so those are recorded as challenged rather than absent.
+  developers.drata.com and docs.safebase.io return 404 (the SPA 404 shell on some paths).
+  public-api.drata.com answers 401 to everything, including /.well-known/*, because the
+  whole host requires a bearer API key. No security.txt and no api-catalog is served
+  anywhere on Drata's estate.
+hosts:
+- host: mcp.drata.com
+  documents:
+  - path: /.well-known/oauth-protected-resource
+    status: 200
+    file: drata-mcp-oauth-protected-resource.json
+  - path: /.well-known/oauth-authorization-server
+    status: 200
+    file: drata-mcp-oauth-authorization-server.json
+  - path: /.well-known/openid-configuration
+    status: 200
+    file: drata-mcp-openid-configuration.json
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: drata.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    note: Cloudflare bot challenge ("Just a moment..." interstitial), not a served document.
+  - path: /.well-known/openid-configuration
+    status: 403
+  - path: /.well-known/oauth-authorization-server
+    status: 403
+  - path: /.well-known/oauth-protected-resource
+    status: 403
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/ai-plugin.json
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+- host: developers.drata.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/openid-configuration
+    status: 404
+  - path: /.well-known/oauth-authorization-server
+    status: 404
+  - path: /.well-known/oauth-protected-resource
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/ai-plugin.json
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+  - path: /.well-known/agent.json
+    status: 404
+- host: public-api.drata.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 401
+    note: The entire host requires a bearer API key; every path answers the same 401 envelope.
+  - path: /.well-known/openid-configuration
+    status: 401
+  - path: /.well-known/oauth-authorization-server
+    status: 401
+  - path: /.well-known/oauth-protected-resource
+    status: 401
+  - path: /.well-known/api-catalog
+    status: 401
+  - path: /.well-known/ai-plugin.json
+    status: 401
+  - path: /.well-known/agent-card.json
+    status: 401
+  - path: /.well-known/agent.json
+    status: 401
+- host: trust.drata.com
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    note: Cloudflare bot challenge.
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+- host: api.safebase.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 403
+    note: Cloudflare bot challenge.
+  - path: /.well-known/api-catalog
+    status: 403
+  - path: /.well-known/agent-card.json
+    status: 403
+  - path: /.well-known/agent.json
+    status: 403
+- host: docs.safebase.io
+  documents:
+  - path: /.well-known/security.txt
+    status: 404
+  - path: /.well-known/api-catalog
+    status: 404
+  - path: /.well-known/agent-card.json
+    status: 404
+    note: 404 served as the docs SPA shell, not a document.
+  - path: /.well-known/agent.json
+    status: 404
+security_txt:
+  served: false
+  note: >-
+    No /.well-known/security.txt on any Drata or SafeBase host. Drata does publish a
+    vulnerability disclosure page and a security contact (security@drata.com, named in the
+    drata/drata-claude-plugin README) — see security/drata-vulnerability-disclosure.yml.
+api_catalog:
+  served: false
+agent_card:
+  served: false
+  note: >-
+    Probed /.well-known/agent-card.json and the legacy /.well-known/agent.json on all seven
+    hosts. No host returned a 200 carrying an AgentCard-shaped JSON object, so no a2a/
+    artifact and no AgentCard pointer was written.

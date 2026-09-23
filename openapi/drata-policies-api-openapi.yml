@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata Policies API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Policies across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Policies
-  description: A policy is a document that outlines an organization’s commitment to following standards relevant to its operations. The [help docs](https://help.drata.com/en/articles/9202419-policy-center-overview) have more information.
+  description: A policy is a document that outlines an organization’s commitment to following standards relevant to its operations. The help docs have more information.
 paths:
   /policies:
     get:
@@ -216,10 +222,6 @@ paths:
       - policies-post
       x-product-area:
       - POLICY_CENTER
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /policies/{policyId}/policy-versions:
     get:
       description: 'List Policy Versions for a specific Policy matching the provided filters. Language variants are not expandable here — `languages` is a one-to-many that would multiply rows inside a paginated result set. Use `GET /policy-language-versions?policyId=` for language variants across a whole Policy, or expand `languages` on the single Policy Version endpoint.
@@ -422,10 +424,6 @@ paths:
       - policies-post-policy-version
       x-product-area:
       - POLICY_CENTER
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /policies/{policyId}:
     get:
       description: 'Get a specific published Policy.
@@ -568,10 +566,6 @@ paths:
       x-product-area:
       - POLICY_CENTER
       description: '🔒 Requires **Policies: Modify Policy** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /policies/{policyId}/owner:
     put:
       operationId: PoliciesPublicV2Controller_assignPolicyOwner
@@ -636,10 +630,6 @@ paths:
       x-product-area:
       - POLICY_CENTER
       description: '🔒 Requires **Policies: Assign Policy Owner** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /policies/{policyId}/approval-configuration:
     get:
       operationId: PoliciesPublicV2Controller_getApprovalConfiguration
@@ -760,10 +750,6 @@ paths:
       - policies-post-review-group-configuration
       x-product-area:
       - POLICY_CENTER
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /policies/{policyId}/approval-configuration/{approvalConfigurationTier}:
     put:
       description: 'Updates a single review group configuration by its tier position (1-based). Other tiers are not affected. Returns 404 if the tier does not exist.
@@ -905,10 +891,6 @@ paths:
       - policies-delete-review-group-configuration
       x-product-area:
       - POLICY_CENTER
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /policies/{policyId}/actions:
     get:
       description: 'List available actions the authenticated user can perform on this Policy based on its current state.
@@ -1052,10 +1034,6 @@ paths:
       - policies-reset-to-template
       x-product-area:
       - POLICY_CENTER
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /policies/{policyId}/policy-versions/{policyVersionId}:
     get:
       description: 'Get a specific Policy Version. Returns policy version details (default) or policy version HTML content based on Accept header.
@@ -1101,10 +1079,6 @@ paths:
       - policies-get-policies
       x-product-area:
       - POLICY_CENTER
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
     PolicyVersionExpandEnum:
@@ -1117,222 +1091,23 @@ components:
       - downloadUrl
       - downloadPdfUrl
       - languages
-    CreatePolicyResponsePublicV2Dto:
+    PolicyVersionHtmlResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 99
-          description: Policy ID
-        name:
-          type: string
-          example: Data Backup Policy
-          description: Policy name
-        description:
+        content:
           type:
           - string
           - 'null'
-          example: null
-          description: Policy description
-        ownerId:
-          type: number
-          example: 42
-          description: User ID of the policy owner
-        status:
-          type: string
-          example: ACTIVE
-          description: Top-level policy status
-        requiresAcknowledgement:
-          type: boolean
-          example: true
-          description: Whether this policy requires user acknowledgement
-        assignedTo:
-          type:
-          - string
-          - 'null'
-          example: ALL
-          description: Assignment mode for acknowledgement
-        renewalDate:
-          type: string
-          format: date
-          example: '2020-07-06'
-          description: Policy renewal date
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy creation timestamp
-        latestVersion:
-          description: Initial draft version metadata
-          allOf:
-          - $ref: '#/components/schemas/PolicyVersionSummaryResponsePublicV2Dto'
+          example: <h1>Hello</h1>
+          description: The HTML content with signed URL images of a Policy Version
       required:
-      - id
-      - name
-      - description
-      - ownerId
-      - status
-      - requiresAcknowledgement
-      - assignedTo
-      - renewalDate
-      - createdAt
-      - latestVersion
-    ControlCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Control ID
-        code:
-          type: string
-          example: AC-1
-          description: Control code
-        name:
-          type: string
-          example: Access Control
-          description: Control name
-        description:
-          type:
-          - string
-          - 'null'
-          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
-          description: Control description
-        isReady:
-          type: boolean
-          example: true
-          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was last updated
-      required:
-      - id
-      - code
-      - name
-      - description
-      - createdAt
-      - updatedAt
-    RenewalScheduleEnum:
+      - content
+    PolicyScopeEnum:
       type: string
       enum:
-      - ONE_MONTH
-      - TWO_MONTHS
-      - THREE_MONTHS
-      - SIX_MONTHS
-      - ONE_YEAR
-    PolicyWeekTimeFrameSlaCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Policy Week Time Frame SLA ID
-        timeFrame:
-          type: string
-          example: '1'
-          description: Policy Week Time Frame SLA time frame
-        label:
-          type: string
-          example: Weekly Review
-          description: Policy Week Time Frame SLA label
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Updated date timestamp
-      required:
-      - id
-      - timeFrame
-      - label
-      - createdAt
-      - updatedAt
-    CreatePolicyRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: Data Backup Policy
-          description: Human-readable policy title shown in Drata
-        ownerId:
-          type: number
-          example: 42
-          description: User ID assigned as the owner of this policy
-        sourceType:
-          example: UPLOADED
-          description: Determines how policy content is sourced. UPLOADED requires a file attachment; EXTERNAL requires externalFileId.
-          allOf:
-          - $ref: '#/components/schemas/CreatePolicySourceTypeEnum'
-        renewalDate:
-          type: string
-          format: date
-          example: '2020-07-06'
-          description: Date when the policy is next due for review/renewal. Must be today or a future date.
-        description:
-          type: string
-          maxLength: 30000
-          example: Defines procedures for data backup and recovery.
-          description: Short description of the policy purpose
-        disclaimer:
-          type: string
-          maxLength: 1000
-          example: This policy is subject to change.
-          description: Legal disclaimer text shown with the Policy
-        externalFileId:
-          type: number
-          example: 2055
-          description: ID of an existing external file record in Drata. Required when sourceType is EXTERNAL. Must belong to the caller's tenant.
-        fileName:
-          type: string
-          maxLength: 191
-          example: data-backup-policy.pdf
-          description: Friendly file name for display in the UI
-        file:
-          type: string
-          format: binary
-          description: 'Policy file. Required when `sourceType` is `UPLOADED`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
-        requiresAcknowledgement:
-          type: boolean
-          example: false
-          description: Whether this policy requires user acknowledgement once published
-        assignedTo:
-          example: ALL
-          description: Assignment mode for policy acknowledgement
-          allOf:
-          - $ref: '#/components/schemas/PolicyScopeEnum'
-        groupIds:
-          minItems: 1
-          example:
-          - 1
-          - 2
-          - 3
-          description: IDs of groups who must acknowledge the policy. Required when assignedTo is GROUP.
-          type: array
-          items:
-            type: number
-      required:
-      - name
-      - ownerId
-      - sourceType
-      - renewalDate
-      - description
-    CreatePolicySourceTypeEnum:
-      type: string
-      enum:
-      - UPLOADED
-      - EXTERNAL
+      - ALL
+      - GROUP
+      - NONE
     PolicyGracePeriodSlaCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -1364,7 +1139,154 @@ components:
       - gracePeriod
       - createdAt
       - updatedAt
-    ExceptionResponseDto:
+    PolicyVersionLanguageCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Version Language ID. Pass this to `GET /policy-language-versions/{policyLanguageVersionId}` to retrieve this specific language variant.
+        language:
+          example: en-US
+          description: The language of this variant, as a BCP-47 locale code
+          allOf:
+          - $ref: '#/components/schemas/PolicyLanguageEnum'
+        default:
+          type: boolean
+          example: false
+          description: 'Whether this variant is the default language for its Policy Version. Recorded on the version itself, so it reflects the default at the time the version was published rather than the organization default as it stands today. Reserved: no current flow records a per-version default, so this is `false` for every variant until per-version defaults are written. Do not branch on it yet.'
+        hasFile:
+          type: boolean
+          example: true
+          description: Whether this language variant has an uploaded file available for download in its original format
+        hasPdf:
+          type: boolean
+          example: true
+          description: Whether this language variant has a PDF rendering available for download
+        hasHtml:
+          type: boolean
+          example: false
+          description: Whether this language variant has authored HTML content
+        originalFileName:
+          type:
+          - string
+          - 'null'
+          example: information-security-policy-es.pdf
+          description: Original file name of the uploaded document for this language variant
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
+      required:
+      - id
+      - language
+      - default
+      - hasFile
+      - hasPdf
+      - hasHtml
+      - originalFileName
+      - createdAt
+      - updatedAt
+    CreatePolicySourceTypeEnum:
+      type: string
+      enum:
+      - UPLOADED
+      - EXTERNAL
+    PayloadSchemaResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: reason
+          description: Field name
+        type:
+          type: string
+          example: string
+          description: Field type (string, number, boolean)
+        required:
+          type: boolean
+          example: true
+          description: Whether the field is required
+        description:
+          type: string
+          example: Reason for requesting changes
+          description: Field description
+      required:
+      - name
+      - type
+      - required
+      - description
+    PolicyCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy ID
+        name:
+          type: string
+          example: Acceptable Use Policy
+          description: The Policy name
+        description:
+          type: string
+          description: The Policy description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy last updated date timestamp
+        assignedTo:
+          example: ALL
+          description: The scope of Users the Policy is assigned to
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        policyStatus:
+          example: ACTIVE
+          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyStatusEnum'
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy renewal date
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - policyStatus
+      - renewalDate
+    PolicyActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          example: SubmitForApproval
+          description: The action to perform on the Policy
+          allOf:
+          - $ref: '#/components/schemas/PolicyApprovalAction'
+        reason:
+          type: string
+          description: Required when action is `RequestChanges`. The reason for requesting changes.
+        overrideReason:
+          type: string
+          description: Required when action is `OverrideApprove`. The reason for overriding approval.
+      required:
+      - action
+    ExceptionResponsePublicDto:
       type: object
       properties:
         statusCode:
@@ -1389,145 +1311,35 @@ components:
       - statusCode
       - message
       - code
-    PolicyActionResultResponsePublicV2Dto:
-      type: object
-      properties:
-        success:
-          type: boolean
-          example: true
-          description: Whether the action was successful
-        newStatus:
-          type: string
-          example: NEEDS_APPROVAL
-          description: The new status of the Policy Version after the action
-        message:
-          type: string
-          example: Policy submitted for approval
-          description: A human-readable message about the result
-      required:
-      - success
-      - message
-    PolicyModifyRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: My Custom Policy
-          description: Policy name. Only updatable for custom policies. Drata template policies return 400.
-        description:
-          type: string
-          maxLength: 30000
-          example: This policy covers data backup procedures.
-          description: Policy description.
-        disclaimer:
-          type:
-          - string
-          - 'null'
-          maxLength: 1000
-          example: This policy is subject to change.
-          description: Legal disclaimer text. Pass null to clear.
-        renewalDate:
-          type: string
-          example: '2020-07-06'
-          description: Policy renewal date. Mutually exclusive with `renewalSchedule`.
-        renewalSchedule:
-          example: ONE_YEAR
-          description: Renewal schedule type. Auto-computes `renewalDate` as today + N months. Mutually exclusive with `renewalDate`.
-          allOf:
-          - $ref: '#/components/schemas/RenewalScheduleEnum'
-        assignedTo:
-          example: GROUP
-          description: Personnel assignment scope.
-          allOf:
-          - $ref: '#/components/schemas/PolicyScopeEnum'
-        groupIds:
-          uniqueItems: true
-          minItems: 1
-          example:
-          - 1
-          - 2
-          - 3
-          description: Fully replaces existing group assignments. Required when assignedTo=GROUP. Must not be set when `assignedTo` is not GROUP. Must contain at least one valid group ID.
-          type: array
-          items:
-            type: number
-        notifyGroups:
-          type: boolean
-          example: true
-          description: Notify group members of this Policy. Only valid when assignedTo=GROUP, defaults to false if not provided.
-        controlIds:
-          example:
-          - 10
-          - 20
-          - 30
-          description: Fully replaces existing control assignments. Pass an empty array to remove all.
-          type: array
-          items:
-            type: number
-    ConsensusRulePublicV2:
-      type: string
-      enum:
-      - ALL
-      - ONE_OF
-    PolicyActionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Available actions for the current policy state
-          type: array
-          items:
-            $ref: '#/components/schemas/PolicyActionItemResponsePublicV2Dto'
-      required:
-      - data
-    PolicyApprovalAction:
-      type: string
-      enum:
-      - SubmitForApproval
-      - Approve
-      - RequestChanges
-      - OverrideApprove
-      - Publish
-      - Discard
-      - ResetToTemplate
-    UserCompactResponsePublicV2Dto:
+    PolicyP3MatrixSlaCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: User ID
-        email:
+          description: Policy P3 Matrix SLA ID
+        label:
           type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
+          example: P3 Matrix Review
+          description: Policy P3 Matrix SLA label
+        timeFrame:
+          type: string
+          example: '1'
+          description: Policy P3 Matrix SLA time frame
         createdAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: User created at
+          description: Created date timestamp
         updatedAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
+          description: Updated date timestamp
       required:
       - id
-      - email
-      - firstName
-      - lastName
+      - label
+      - timeFrame
       - createdAt
       - updatedAt
     PolicyResponsePublicV2Dto:
@@ -1653,240 +1465,66 @@ components:
       - renewalDate
       - publishedAt
       - approvedAt
-    CreatePolicyVersionRequestPublicV2Dto:
+    CreatePolicyResponsePublicV2Dto:
       type: object
       properties:
-        sourceType:
-          example: UPLOADED
-          description: Determines how the new version content is sourced. UPLOADED requires a file attachment; EXTERNAL requires externalFileId.
-          allOf:
-          - $ref: '#/components/schemas/CreatePolicySourceTypeEnum'
+        id:
+          type: number
+          example: 99
+          description: Policy ID
+        name:
+          type: string
+          example: Data Backup Policy
+          description: Policy name
+        description:
+          type:
+          - string
+          - 'null'
+          example: null
+          description: Policy description
         ownerId:
           type: number
           example: 42
-          description: User ID assigned as the owner of this Policy Version
-        isMaterialChange:
+          description: User ID of the policy owner
+        status:
+          type: string
+          example: ACTIVE
+          description: Top-level policy status
+        requiresAcknowledgement:
           type: boolean
           example: true
-          description: 'Whether this is a material change: a substantive change to the policy content (as opposed to a typo or formatting fix). A material change bumps the major version (e.g. 1.x → 2.0), always requires approval, and requires every assigned user to re-accept the policy once it is published. A non-material change bumps the minor version (e.g. 1.0 → 1.1) and does not trigger re-acceptance.'
-        requiresApproval:
-          type: boolean
-          example: true
-          description: Whether a non-material version must be approved before it is published. Defaults to `false`, which publishes a non-material change immediately. Ignored when `isMaterialChange` is `true`, since a material change always requires approval.
+          description: Whether this policy requires user acknowledgement
+        assignedTo:
+          type:
+          - string
+          - 'null'
+          example: ALL
+          description: Assignment mode for acknowledgement
         renewalDate:
           type: string
           format: date
           example: '2020-07-06'
-          description: Date when this Policy Version is next due for review/renewal. Must be today or a future date.
-        externalFileId:
-          type: number
-          example: 2055
-          description: ID of an existing external file record in Drata. Required when sourceType is EXTERNAL. Must belong to the caller's tenant.
-        fileName:
-          type: string
-          maxLength: 191
-          example: data-backup-policy-v2.pdf
-          description: Friendly file name for display in the UI
-        description:
-          type: string
-          maxLength: 30000
-          example: Defines procedures for data backup and recovery.
-          description: Short description of this Policy Version
-        changeSummary:
-          type: string
-          maxLength: 30000
-          example: Clarified acceptable use for remote access
-          description: A short summary of the changes made in this version
-        changesExplanation:
-          type: string
-          maxLength: 768
-          example: Rewrote section 3 to cover offsite backups.
-          description: Detailed explanation of what changed in this version
-        requiresAcknowledgement:
-          type: boolean
-          example: false
-          description: Whether users must acknowledge this Policy Version once published
-        file:
-          type: string
-          format: binary
-          description: 'Policy file. Required when `sourceType` is `UPLOADED`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
-      required:
-      - sourceType
-      - ownerId
-      - isMaterialChange
-      - renewalDate
-    PolicyStatusEnum:
-      type: string
-      enum:
-      - ACTIVE
-      - ARCHIVED
-      - REPLACED
-      - UNACCEPTABLE
-      - OUTDATED
-    PolicyVersionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/PolicyVersionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PolicyP3MatrixSlaCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Policy P3 Matrix SLA ID
-        label:
-          type: string
-          example: P3 Matrix Review
-          description: Policy P3 Matrix SLA label
-        timeFrame:
-          type: string
-          example: '1'
-          description: Policy P3 Matrix SLA time frame
+          description: Policy renewal date
         createdAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Updated date timestamp
-      required:
-      - id
-      - label
-      - timeFrame
-      - createdAt
-      - updatedAt
-    PoliciesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/PolicyResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    GroupCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Group ID
-        name:
-          type: string
-          example: Engineering Team
-          description: Group name
-        externalId:
-          type: string
-          example: external-group-123
-          description: External ID from Group identity provider
-        source:
-          type: string
-          example: GOOGLE
-          description: 'Identity source. DEPRECATED: This field will be removed in a future release.'
-          deprecated: true
-        connectionId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: The ID of the identity provider connection that synced this group. Use Get Connection to retrieve connection details including `clientType` and `clientAlias`.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Updated date timestamp
+          description: Policy creation timestamp
+        latestVersion:
+          description: Initial draft version metadata
+          allOf:
+          - $ref: '#/components/schemas/PolicyVersionSummaryResponsePublicV2Dto'
       required:
       - id
       - name
-      - externalId
-      - source
-      - createdAt
-      - updatedAt
-    PolicyVersionSummaryResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 201
-          description: Policy version ID
-        version:
-          type: number
-          example: 1
-          description: Major version number (always 1 on initial create)
-        subVersion:
-          type: number
-          example: 0
-          description: Minor version number (always 0 on initial create)
-        status:
-          type: string
-          example: DRAFT
-          description: Policy version status (always DRAFT on creation)
-        sourceType:
-          type: string
-          example: UPLOADED
-          description: How the policy content is sourced
-        externalFileId:
-          type:
-          - number
-          - 'null'
-          example: null
-          description: ID of the referenced external file record (EXTERNAL only)
-        fileName:
-          type:
-          - string
-          - 'null'
-          example: data-backup-policy.pdf
-          description: Display name for the file
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Version creation timestamp
-      required:
-      - id
-      - version
-      - subVersion
+      - description
+      - ownerId
       - status
-      - sourceType
-      - externalFileId
-      - fileName
+      - requiresAcknowledgement
+      - assignedTo
+      - renewalDate
       - createdAt
-    PolicyApprovalConfigurationResponsePublicV2Dto:
-      type: object
-      properties:
-        reviewGroups:
-          description: Approval tiers that make up the policy approval workflow, ordered by `hierarchyLevel`. Each tier must be fully completed before the next tier begins.
-          type: array
-          items:
-            $ref: '#/components/schemas/ReviewGroupResponsePublicV2Dto'
-      required:
-      - reviewGroups
+      - latestVersion
     PolicyLanguageEnum:
       type: string
       enum:
@@ -1982,17 +1620,627 @@ components:
       - zu-ZA
       - xx-LS
       - en-XA
-    PolicyVersionHtmlResponsePublicV2Dto:
+    PolicyActionsResponsePublicV2Dto:
       type: object
       properties:
-        content:
+        data:
+          description: Available actions for the current policy state
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyActionItemResponsePublicV2Dto'
+      required:
+      - data
+    RenewalScheduleEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+    PolicyExpandEnum:
+      type: string
+      enum:
+      - groups
+      - controls
+      - weekTimeFrameSlas
+      - gracePeriodSlas
+      - p3MatrixSlas
+      - owner
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PolicyActionResultResponsePublicV2Dto:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+          description: Whether the action was successful
+        newStatus:
+          type: string
+          example: NEEDS_APPROVAL
+          description: The new status of the Policy Version after the action
+        message:
+          type: string
+          example: Policy submitted for approval
+          description: A human-readable message about the result
+      required:
+      - success
+      - message
+    CreatePolicyVersionRequestPublicV2Dto:
+      type: object
+      properties:
+        sourceType:
+          example: UPLOADED
+          description: Determines how the new version content is sourced. UPLOADED requires a file attachment; EXTERNAL requires externalFileId.
+          allOf:
+          - $ref: '#/components/schemas/CreatePolicySourceTypeEnum'
+        ownerId:
+          type: number
+          example: 42
+          description: User ID assigned as the owner of this Policy Version
+        isMaterialChange:
+          type: boolean
+          example: true
+          description: 'Whether this is a material change: a substantive change to the policy content (as opposed to a typo or formatting fix). A material change bumps the major version (e.g. 1.x → 2.0), always requires approval, and requires every assigned user to re-accept the policy once it is published. A non-material change bumps the minor version (e.g. 1.0 → 1.1) and does not trigger re-acceptance.'
+        requiresApproval:
+          type: boolean
+          example: true
+          description: Whether a non-material version must be approved before it is published. Defaults to `false`, which publishes a non-material change immediately. Ignored when `isMaterialChange` is `true`, since a material change always requires approval.
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Date when this Policy Version is next due for review/renewal. Must be today or a future date.
+        externalFileId:
+          type: number
+          example: 2055
+          description: ID of an existing external file record in Drata. Required when sourceType is EXTERNAL. Must belong to the caller's tenant.
+        fileName:
+          type: string
+          maxLength: 191
+          example: data-backup-policy-v2.pdf
+          description: Friendly file name for display in the UI
+        description:
+          type: string
+          maxLength: 30000
+          example: Defines procedures for data backup and recovery.
+          description: Short description of this Policy Version
+        changeSummary:
+          type: string
+          maxLength: 30000
+          example: Clarified acceptable use for remote access
+          description: A short summary of the changes made in this version
+        changesExplanation:
+          type: string
+          maxLength: 768
+          example: Rewrote section 3 to cover offsite backups.
+          description: Detailed explanation of what changed in this version
+        requiresAcknowledgement:
+          type: boolean
+          example: false
+          description: Whether users must acknowledge this Policy Version once published
+        file:
+          type: string
+          format: binary
+          description: 'Policy file. Required when `sourceType` is `UPLOADED`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
+      required:
+      - sourceType
+      - ownerId
+      - isMaterialChange
+      - renewalDate
+    PolicyVersionSummaryResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 201
+          description: Policy version ID
+        version:
+          type: number
+          example: 1
+          description: Major version number (always 1 on initial create)
+        subVersion:
+          type: number
+          example: 0
+          description: Minor version number (always 0 on initial create)
+        status:
+          type: string
+          example: DRAFT
+          description: Policy version status (always DRAFT on creation)
+        sourceType:
+          type: string
+          example: UPLOADED
+          description: How the policy content is sourced
+        externalFileId:
+          type:
+          - number
+          - 'null'
+          example: null
+          description: ID of the referenced external file record (EXTERNAL only)
+        fileName:
           type:
           - string
           - 'null'
-          example: <h1>Hello</h1>
-          description: The HTML content with signed URL images of a Policy Version
+          example: data-backup-policy.pdf
+          description: Display name for the file
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Version creation timestamp
       required:
-      - content
+      - id
+      - version
+      - subVersion
+      - status
+      - sourceType
+      - externalFileId
+      - fileName
+      - createdAt
+    CreatePolicyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Data Backup Policy
+          description: Human-readable policy title shown in Drata
+        ownerId:
+          type: number
+          example: 42
+          description: User ID assigned as the owner of this policy
+        sourceType:
+          example: UPLOADED
+          description: Determines how policy content is sourced. UPLOADED requires a file attachment; EXTERNAL requires externalFileId.
+          allOf:
+          - $ref: '#/components/schemas/CreatePolicySourceTypeEnum'
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Date when the policy is next due for review/renewal. Must be today or a future date.
+        description:
+          type: string
+          maxLength: 30000
+          example: Defines procedures for data backup and recovery.
+          description: Short description of the policy purpose
+        disclaimer:
+          type: string
+          maxLength: 1000
+          example: This policy is subject to change.
+          description: Legal disclaimer text shown with the Policy
+        externalFileId:
+          type: number
+          example: 2055
+          description: ID of an existing external file record in Drata. Required when sourceType is EXTERNAL. Must belong to the caller's tenant.
+        fileName:
+          type: string
+          maxLength: 191
+          example: data-backup-policy.pdf
+          description: Friendly file name for display in the UI
+        file:
+          type: string
+          format: binary
+          description: 'Policy file. Required when `sourceType` is `UPLOADED`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
+        requiresAcknowledgement:
+          type: boolean
+          example: false
+          description: Whether this policy requires user acknowledgement once published
+        assignedTo:
+          example: ALL
+          description: Assignment mode for policy acknowledgement
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        groupIds:
+          minItems: 1
+          example:
+          - 1
+          - 2
+          - 3
+          description: IDs of groups who must acknowledge the policy. Required when assignedTo is GROUP.
+          type: array
+          items:
+            type: number
+      required:
+      - name
+      - ownerId
+      - sourceType
+      - renewalDate
+      - description
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ConsensusRulePublicV2:
+      type: string
+      enum:
+      - ALL
+      - ONE_OF
+    PolicyVersionListExpandEnum:
+      type: string
+      enum:
+      - owner
+      - weekTimeFrameSlas
+      - p3MatrixSlas
+      - gracePeriodSlas
+      - downloadUrl
+      - downloadPdfUrl
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    PolicyListExpandEnum:
+      type: string
+      enum:
+      - groups
+      - weekTimeFrameSlas
+      - gracePeriodSlas
+      - p3MatrixSlas
+      - owner
+    PoliciesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    PolicyVersionStatusEnum:
+      type: string
+      enum:
+      - NEEDS_APPROVAL
+      - APPROVED
+      - PUBLISHED
+      - DRAFT
+      - DISCARDED
+    PolicyActionItemResponsePublicV2Dto:
+      type: object
+      properties:
+        action:
+          type: string
+          example: SubmitForApproval
+          description: Name of the action
+        label:
+          type: string
+          example: Submit for Approval
+          description: Human-readable label for the action
+        description:
+          type: string
+          example: Submit this Policy Version for approval review
+          description: Description of what the action does
+        payloadSchema:
+          description: Describes additional payload fields required for this action. Only present when the action requires extra fields.
+          type: array
+          items:
+            $ref: '#/components/schemas/PayloadSchemaResponsePublicV2Dto'
+      required:
+      - action
+      - label
+      - description
+    PolicyStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    PolicyApprovalAction:
+      type: string
+      enum:
+      - SubmitForApproval
+      - Approve
+      - RequestChanges
+      - OverrideApprove
+      - Publish
+      - Discard
+      - ResetToTemplate
+    PolicyVersionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyVersionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    PolicyApprovalConfigurationResponsePublicV2Dto:
+      type: object
+      properties:
+        reviewGroups:
+          description: Approval tiers that make up the policy approval workflow, ordered by `hierarchyLevel`. Each tier must be fully completed before the next tier begins.
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewGroupResponsePublicV2Dto'
+      required:
+      - reviewGroups
+    PolicyOwnerModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        userId:
+          type: number
+          minimum: 1
+          example: 42
+          description: 'ID of the user to assign as the policy owner. The user must have one of the following roles: Admin, Tech/Gov, Workspace Administrator, Policy Manager, or Control Manager.'
+      required:
+      - userId
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    ReviewGroupRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Legal Review
+          description: Name of this approval tier.
+        userIds:
+          minItems: 1
+          example:
+          - 12
+          - 34
+          description: Approver user IDs for this tier.
+          type: array
+          items:
+            type: number
+            minimum: 1
+        consensusRule:
+          example: ALL
+          description: Voting rule for this tier. `ALL` requires every approver to approve; `ONE_OF` requires any one approver.
+          allOf:
+          - $ref: '#/components/schemas/ConsensusRulePublicV2'
+        timeline:
+          type: number
+          minimum: 1
+          example: 7
+          description: Number of days allowed to complete this approval tier.
+      required:
+      - name
+      - userIds
+      - consensusRule
+      - timeline
+    PolicyModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: My Custom Policy
+          description: Policy name. Only updatable for custom policies. Drata template policies return 400.
+        description:
+          type: string
+          maxLength: 30000
+          example: This policy covers data backup procedures.
+          description: Policy description.
+        disclaimer:
+          type:
+          - string
+          - 'null'
+          maxLength: 1000
+          example: This policy is subject to change.
+          description: Legal disclaimer text. Pass null to clear.
+        renewalDate:
+          type: string
+          example: '2020-07-06'
+          description: Policy renewal date. Mutually exclusive with `renewalSchedule`.
+        renewalSchedule:
+          example: ONE_YEAR
+          description: Renewal schedule type. Auto-computes `renewalDate` as today + N months. Mutually exclusive with `renewalDate`.
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleEnum'
+        assignedTo:
+          example: GROUP
+          description: Personnel assignment scope.
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        groupIds:
+          uniqueItems: true
+          minItems: 1
+          example:
+          - 1
+          - 2
+          - 3
+          description: Fully replaces existing group assignments. Required when assignedTo=GROUP. Must not be set when `assignedTo` is not GROUP. Must contain at least one valid group ID.
+          type: array
+          items:
+            type: number
+        notifyGroups:
+          type: boolean
+          example: true
+          description: Notify group members of this Policy. Only valid when assignedTo=GROUP, defaults to false if not provided.
+        controlIds:
+          example:
+          - 10
+          - 20
+          - 30
+          description: Fully replaces existing control assignments. Pass an empty array to remove all.
+          type: array
+          items:
+            type: number
+    ControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: AC-1
+          description: Control code
+        name:
+          type: string
+          example: Access Control
+          description: Control name
+        description:
+          type:
+          - string
+          - 'null'
+          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
+          description: Control description
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was last updated
+      required:
+      - id
+      - code
+      - name
+      - description
+      - createdAt
+      - updatedAt
+    ReviewGroupResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Legal Review
+          description: Name of the approval tier.
+        tier:
+          type: number
+          example: 1
+          description: Position of this tier in the sequential approval workflow. Tier 1 runs first; each subsequent tier only begins once the previous tier is fully approved. Use this value as the `:tier` path parameter when updating this tier via PUT.
+          minimum: 1
+        consensusRule:
+          example: ALL
+          description: Voting rule for this tier. `ALL` requires every approver to approve; `ONE_OF` requires any one approver.
+          allOf:
+          - $ref: '#/components/schemas/ConsensusRulePublicV2'
+        timeline:
+          type: number
+          example: 7
+          description: Number of days allowed to complete this approval tier.
+        approvers:
+          description: Users assigned as approvers for this tier.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - name
+      - tier
+      - consensusRule
+      - timeline
+      - approvers
     PolicyVersionResponsePublicV2Dto:
       type: object
       properties:
@@ -2127,47 +2375,21 @@ components:
       - type
       - updatedAt
       - version
-    ReviewStatusEnum:
-      type: string
-      enum:
-      - READY_FOR_REVIEW
-      - APPROVED
-      - CHANGES_REQUESTED
-      - DEADLINE_EXCEEDED
-    PolicyVersionLanguageCompactResponsePublicV2Dto:
+    PolicyWeekTimeFrameSlaCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Policy Version Language ID. Pass this to `GET /policy-language-versions/{policyLanguageVersionId}` to retrieve this specific language variant.
-        language:
-          example: en-US
-          description: The language of this variant, as a BCP-47 locale code
-          allOf:
-          - $ref: '#/components/schemas/PolicyLanguageEnum'
-        default:
-          type: boolean
-          example: false
-          description: 'Whether this variant is the default language for its Policy Version. Recorded on the version itself, so it reflects the default at the time the version was published rather than the organization default as it stands today. Reserved: no current flow records a per-version default, so this is `false` for every variant until per-version defaults are written. Do not branch on it yet.'
-        hasFile:
-          type: boolean
-          example: true
-          description: Whether this language variant has an uploaded file available for download in its original format
-        hasPdf:
-          type: boolean
-          example: true
-          description: Whether this language variant has a PDF rendering available for download
-        hasHtml:
-          type: boolean
-          example: false
-          description: Whether this language variant has authored HTML content
-        originalFileName:
-          type:
-          - string
-          - 'null'
-          example: information-security-policy-es.pdf
-          description: Original file name of the uploaded document for this language variant
+          description: Policy Week Time Frame SLA ID
+        timeFrame:
+          type: string
+          example: '1'
+          description: Policy Week Time Frame SLA time frame
+        label:
+          type: string
+          example: Weekly Review
+          description: Policy Week Time Frame SLA label
         createdAt:
           type: string
           format: date-time
@@ -2180,324 +2402,73 @@ components:
           description: Updated date timestamp
       required:
       - id
-      - language
-      - default
-      - hasFile
-      - hasPdf
-      - hasHtml
-      - originalFileName
+      - timeFrame
+      - label
       - createdAt
       - updatedAt
-    PolicyOwnerModifyRequestPublicV2Dto:
+    GroupCompactResponsePublicV2Dto:
       type: object
       properties:
-        userId:
+        id:
           type: number
-          minimum: 1
-          example: 42
-          description: 'ID of the user to assign as the policy owner. The user must have one of the following roles: Admin, Tech/Gov, Workspace Administrator, Policy Manager, or Control Manager.'
-      required:
-      - userId
-    PolicyScopeEnum:
-      type: string
-      enum:
-      - ALL
-      - GROUP
-      - NONE
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
+          example: 1
+          description: Group ID
         name:
           type: string
-        statusCode:
-          type: number
-        message:
+          example: Engineering Team
+          description: Group name
+        externalId:
           type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
+          example: external-group-123
+          description: External ID from Group identity provider
+        source:
+          type: string
+          example: GOOGLE
+          description: 'Identity source. DEPRECATED: This field will be removed in a future release.'
+          deprecated: true
+        connectionId:
           type:
           - number
           - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    PayloadSchemaResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          example: reason
-          description: Field name
-        type:
-          type: string
-          example: string
-          description: Field type (string, number, boolean)
-        required:
-          type: boolean
-          example: true
-          description: Whether the field is required
-        description:
-          type: string
-          example: Reason for requesting changes
-          description: Field description
-      required:
-      - name
-      - type
-      - required
-      - description
-    ReviewGroupResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          example: Legal Review
-          description: Name of the approval tier.
-        tier:
-          type: number
           example: 1
-          description: Position of this tier in the sequential approval workflow. Tier 1 runs first; each subsequent tier only begins once the previous tier is fully approved. Use this value as the `:tier` path parameter when updating this tier via PUT.
-          minimum: 1
-        consensusRule:
-          example: ALL
-          description: Voting rule for this tier. `ALL` requires every approver to approve; `ONE_OF` requires any one approver.
-          allOf:
-          - $ref: '#/components/schemas/ConsensusRulePublicV2'
-        timeline:
-          type: number
-          example: 7
-          description: Number of days allowed to complete this approval tier.
-        approvers:
-          description: Users assigned as approvers for this tier.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-      required:
-      - name
-      - tier
-      - consensusRule
-      - timeline
-      - approvers
-    ReviewGroupRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
+          description: The ID of the identity provider connection that synced this group. Use Get Connection to retrieve connection details including `clientType` and `clientAlias`.
+        createdAt:
           type: string
-          example: Legal Review
-          description: Name of this approval tier.
-        userIds:
-          minItems: 1
-          example:
-          - 12
-          - 34
-          description: Approver user IDs for this tier.
-          type: array
-          items:
-            type: number
-            minimum: 1
-        consensusRule:
-          example: ALL
-          description: Voting rule for this tier. `ALL` requires every approver to approve; `ONE_OF` requires any one approver.
-          allOf:
-          - $ref: '#/components/schemas/ConsensusRulePublicV2'
-        timeline:
-          type: number
-          minimum: 1
-          example: 7
-          description: Number of days allowed to complete this approval tier.
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
       required:
+      - id
       - name
-      - userIds
-      - consensusRule
-      - timeline
+      - externalId
+      - source
+      - createdAt
+      - updatedAt
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    PolicyActionItemResponsePublicV2Dto:
-      type: object
-      properties:
-        action:
-          type: string
-          example: SubmitForApproval
-          description: Name of the action
-        label:
-          type: string
-          example: Submit for Approval
-          description: Human-readable label for the action
-        description:
-          type: string
-          example: Submit this Policy Version for approval review
-          description: Description of what the action does
-        payloadSchema:
-          description: Describes additional payload fields required for this action. Only present when the action requires extra fields.
-          type: array
-          items:
-            $ref: '#/components/schemas/PayloadSchemaResponsePublicV2Dto'
-      required:
-      - action
-      - label
-      - description
-    PolicyActionRequestPublicV2Dto:
-      type: object
-      properties:
-        action:
-          example: SubmitForApproval
-          description: The action to perform on the Policy
-          allOf:
-          - $ref: '#/components/schemas/PolicyApprovalAction'
-        reason:
-          type: string
-          description: Required when action is `RequestChanges`. The reason for requesting changes.
-        overrideReason:
-          type: string
-          description: Required when action is `OverrideApprove`. The reason for overriding approval.
-      required:
-      - action
-    ExceptionResponsePublicDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    PolicyListExpandEnum:
-      type: string
-      enum:
-      - groups
-      - weekTimeFrameSlas
-      - gracePeriodSlas
-      - p3MatrixSlas
-      - owner
     PolicyTypeEnum:
       type: string
       enum:
       - BUILDER
       - UPLOADED
       - EXTERNAL
-    PolicyCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Policy ID
-        name:
-          type: string
-          example: Acceptable Use Policy
-          description: The Policy name
-        description:
-          type: string
-          description: The Policy description
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy last updated date timestamp
-        assignedTo:
-          example: ALL
-          description: The scope of Users the Policy is assigned to
-          allOf:
-          - $ref: '#/components/schemas/PolicyScopeEnum'
-        policyStatus:
-          example: ACTIVE
-          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
-          allOf:
-          - $ref: '#/components/schemas/PolicyStatusEnum'
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy renewal date
-      required:
-      - id
-      - name
-      - description
-      - createdAt
-      - updatedAt
-      - policyStatus
-      - renewalDate
-    PolicyExpandEnum:
+    ReviewStatusEnum:
       type: string
       enum:
-      - groups
-      - controls
-      - weekTimeFrameSlas
-      - gracePeriodSlas
-      - p3MatrixSlas
-      - owner
-    PolicyVersionStatusEnum:
-      type: string
-      enum:
-      - NEEDS_APPROVAL
+      - READY_FOR_REVIEW
       - APPROVED
-      - PUBLISHED
-      - DRAFT
-      - DISCARDED
-    PolicyVersionListExpandEnum:
-      type: string
-      enum:
-      - owner
-      - weekTimeFrameSlas
-      - p3MatrixSlas
-      - gracePeriodSlas
-      - downloadUrl
-      - downloadPdfUrl
+      - CHANGES_REQUESTED
+      - DEADLINE_EXCEEDED
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

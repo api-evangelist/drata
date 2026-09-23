@@ -1,0 +1,114 @@
+generated: '2026-08-27'
+method: searched
+source: >-
+  https://status.drata.com/ + https://drata.com/updates +
+  https://developers.drata.com/openapi/reference/v2/overview/ +
+  https://help.drata.com/en/articles/6695964-drata-public-api
+provider: Drata
+providerId: drata
+
+versioning:
+  scheme: path
+  current_version: v2
+  path_segment: /public/v2
+  spec_declared_version: V2
+  previous_versions: [v1]
+  policy_published: false
+  note: >-
+    Drata versions the API in the URL path and documents the V1 -> V2 differences inside the
+    OpenAPI description, but publishes no written versioning policy, no support window for V1,
+    and no sunset date.
+
+deprecation:
+  policy_published: false
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  deprecated_operations: []
+  note: >-
+    Zero of the 197 operations carry the OpenAPI `deprecated` flag, and the spec declares no
+    Sunset or Deprecation response headers. Drata does mark unstable operations with a 🧪
+    test-tube emoji in the operation summary (Delete HRIS User Identity 🧪, Remove Personnel
+    Group From Workspace Scope 🧪, and others) — a real beta marker, but a prose one that no
+    tooling reads, and the opposite end of the lifecycle from deprecation.
+  gap: >-
+    An agent has no machine-readable warning before an operation changes or disappears. This is
+    the single clearest lifecycle gap on this API.
+
+beta_program:
+  marker: 🧪 emoji suffix on the operation summary
+  machine_readable: false
+  mcp_status: >-
+    The Drata MCP Server is itself labelled Beta / early access and is gated behind a request
+    form; the SafeBase MCP Server entered Early Access on 2026-07-31.
+
+status_page:
+  url: https://status.drata.com/
+  provider: Atlassian Statuspage
+  machine_readable: true
+  api:
+    status: https://status.drata.com/api/v2/status.json
+    summary: https://status.drata.com/api/v2/summary.json
+    incidents: https://status.drata.com/api/v2/incidents.json
+    history_feed: https://status.drata.com/history.rss
+  components_include:
+  - Public API US
+  - Public API EU
+  - Public API APAC
+  - API US
+  - API EU
+  - API APAC
+  - Agent API US
+  - Agent API EU
+  - AGENT API APAC
+  - Auditor API US
+  - Auditor API EU
+  - Auditor API APAC
+  - Incoming Webhooks US
+  - Incoming Webhooks EU
+  - Incoming Webhooks APAC
+  - Trust Center Pages
+  - Trust Center Admin Page
+  - Web Application
+  - AIQA
+  note: >-
+    The status page decomposes the API estate by product AND region — the Public API, the
+    Agent API, the Auditor API and Incoming Webhooks each have separate US/EU/APAC components.
+    That is a materially better operational signal than the single "API" component most
+    providers publish, and it reveals API surfaces (Agent API, Auditor API) that Drata does
+    not document publicly.
+  recent_incidents_sampled:
+  - date: '2026-08-26'
+    impact: major
+    name: Public API in US region degraded
+  - date: '2026-08-20'
+    impact: critical
+    name: Brief SafeBase App Request Failures
+  - date: '2026-08-11'
+    impact: major
+    name: Report and export downloads not being delivered to some users
+  incident_history_depth: 50 incidents available via the JSON API at the time of probe
+
+sla:
+  published: false
+  note: >-
+    No public uptime SLA or availability target. Contractual SLAs, if any, are negotiated in
+    the enterprise agreement.
+
+changelog:
+  url: https://drata.com/updates
+  artifact: changelog/drata-changelog.yml
+
+support:
+  help_center: https://help.drata.com/
+  security_contact: security@drata.com
+
+evidence:
+- url: https://status.drata.com/api/v2/summary.json
+  status: 200
+- url: https://status.drata.com/api/v2/incidents.json
+  status: 200
+- url: https://drata.com/updates
+  status: 200
+- url: https://help.drata.com/en/articles/6695964-drata-public-api
+  status: 200

@@ -1,9 +1,15 @@
 openapi: 3.2.0
 info:
   title: Drata Custom Field Definitions API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Custom Field Definitions across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
@@ -117,10 +123,6 @@ paths:
       - custom-field-definition-get
       x-product-area:
       - CUSTOM_FIELDS_ENGINE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /custom-field-definitions/{customFieldId}:
     get:
       description: 'Returns a single Custom Field Definition. The path parameter accepts either the numeric `customFieldId` or the field name prefixed with `name:` (e.g. `name:Regulatory%20Owner`). For durable integrations, store the numeric `customFieldId` from a previous response and address by ID — names may change if an admin renames the field. The `name:` form is a convenience for exploratory use and when you only know the name from the admin UI.
@@ -208,61 +210,8 @@ paths:
       - custom-field-definition-get
       x-product-area:
       - CUSTOM_FIELDS_ENGINE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    CustomFieldTypeEnum:
-      type: string
-      enum:
-      - TEXT
-      - NUMBER
-      - CURRENCY
-      - OPTIONS
-      - FORMULA
-      - OPTIONS_NUMERIC
-      - LONG_TEXT
-      - URL
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
     FrameworkTagEnum:
       type: string
       enum:
@@ -313,22 +262,6 @@ components:
       - CYFUN
       - AIUC_1
       - ALL
-    CustomFieldDefinitionFrameworkScopeResponsePublicV2Dto:
-      type: object
-      properties:
-        frameworkTags:
-          type: array
-          description: Built-in framework tags this Custom Field Definition applies to. Empty array when the field is not scoped by built-in framework tags.
-          items:
-            $ref: '#/components/schemas/FrameworkTagEnum'
-        frameworkIds:
-          description: Custom Framework IDs this Custom Field Definition applies to. Empty array when the field is not scoped by custom frameworks.
-          type: array
-          items:
-            type: number
-      required:
-      - frameworkTags
-      - frameworkIds
     CustomFieldsEntityTypeEnum:
       type: string
       enum:
@@ -338,57 +271,6 @@ components:
       - PERSONNEL
       - VENDOR
       - FRAMEWORK_REQUIREMENTS
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    CustomFieldDefinitionOptionResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldOptionId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field Option. Use this value when writing OPTIONS or OPTIONS_NUMERIC values on resources.
-        value:
-          oneOf:
-          - type: string
-          - type: number
-          example: Security & IT
-          description: The display value of this option. For OPTIONS fields this is a string; for OPTIONS_NUMERIC fields this is a number.
-      required:
-      - customFieldOptionId
-      - value
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
     CustomFieldDefinitionResponsePublicV2Dto:
       type: object
       properties:
@@ -451,6 +333,21 @@ components:
       - isHidden
       - readOnly
       - entityTypes
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     CustomFieldCurrencyCodeEnum:
       type: string
       enum:
@@ -506,6 +403,59 @@ components:
       - USD
       - UYU
       - ZAR
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
     CustomFieldDefinitionsResponsePublicV2Dto:
       type: object
       properties:
@@ -519,11 +469,56 @@ components:
       required:
       - data
       - pagination
+    CustomFieldDefinitionOptionResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldOptionId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field Option. Use this value when writing OPTIONS or OPTIONS_NUMERIC values on resources.
+        value:
+          oneOf:
+          - type: string
+          - type: number
+          example: Security & IT
+          description: The display value of this option. For OPTIONS fields this is a string; for OPTIONS_NUMERIC fields this is a number.
+      required:
+      - customFieldOptionId
+      - value
+    CustomFieldTypeEnum:
+      type: string
+      enum:
+      - TEXT
+      - NUMBER
+      - CURRENCY
+      - OPTIONS
+      - FORMULA
+      - OPTIONS_NUMERIC
+      - LONG_TEXT
+      - URL
+    CustomFieldDefinitionFrameworkScopeResponsePublicV2Dto:
+      type: object
+      properties:
+        frameworkTags:
+          type: array
+          description: Built-in framework tags this Custom Field Definition applies to. Empty array when the field is not scoped by built-in framework tags.
+          items:
+            $ref: '#/components/schemas/FrameworkTagEnum'
+        frameworkIds:
+          description: Custom Framework IDs this Custom Field Definition applies to. Empty array when the field is not scoped by custom frameworks.
+          type: array
+          items:
+            type: number
+      required:
+      - frameworkTags
+      - frameworkIds
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

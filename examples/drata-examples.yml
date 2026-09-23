@@ -1,0 +1,46 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/drata-api-v2-openapi.yml
+provider: Drata
+providerId: drata
+description: 'Index of the examples Drata publishes INSIDE its OpenAPI contract. The document carries 1,823 `example` keys,
+  but their distribution matters: they sit almost entirely at the SCHEMA level — 284 of the 520 component schemas carry field-level
+  examples, and 82 operations carry parameter examples — while only 2 operations declare an example directly on a response
+  and NONE declares one on a request body. Because responses $ref those schemas, a client that resolves refs does get worked
+  example values for most payload fields; a client that reads only the operation object sees almost nothing. That density
+  is genuinely useful here because Drata publishes no sandbox at all, so schema-level examples are the only way to construct
+  a plausible request without a live paid tenant. The document uses the OpenAPI 3.0 singular `example` keyword throughout
+  and never the plural `examples` map, so there are no named example variants and no multi-scenario examples.'
+counts:
+  example_keys_total: 1823
+  examples_maps: 0
+  operations_total: 197
+  operations_with_request_example: 0
+  operations_with_response_example: 2
+  operations_with_parameter_example: 82
+  component_schemas_with_examples: 284
+  component_schemas_total: 520
+keyword: example (OpenAPI 3.0 singular form)
+inline_examples_in_prose:
+- name: fetchAll cursor pagination loop
+  language: javascript
+  location: info.description
+  note: A complete working paging loop against /public/v2/users, published in the spec description.
+operations:
+- operationId: CustomDataRecordsPublicV2Controller_createCustomData
+  method: POST
+  path: /custom-connections/{connectionId}/resources/{resourceId}/records
+  request_example: false
+  response_example: true
+- operationId: CustomDataRecordsPublicV2Controller_uploadSessionRecords
+  method: POST
+  path: /custom-connections/{connectionId}/resources/{resourceId}/sessions/{sessionId}
+  request_example: false
+  response_example: true
+note: operations[] lists only the 2 operations with an example declared directly on the operation object; the bulk of the
+  examples are reached through component-schema $refs and are not enumerated here.
+distribution:
+  schema_level: 284/520 component schemas
+  parameter_level: 82/197 operations
+  response_level: 2/197 operations
+  request_body_level: 0/197 operations

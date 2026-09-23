@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata Risk Library API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Risk Library across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Risk Library
-  description: The Risk Library is a collection of Risks that can be copied into a Risk Register. The [help docs](https://help.drata.com/en/articles/13371089-drata-s-risk-library-new-experience) have more information.
+  description: The Risk Library is a collection of Risks that can be copied into a Risk Register. The help docs have more information.
 paths:
   /risk-registers/{riskRegisterId}/risk-library:
     get:
@@ -148,10 +154,6 @@ paths:
       - risk-management-get
       x-product-area:
       - RISK_MANAGEMENT
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /risk-registers/{riskRegisterId}/risk-library/{riskLibraryId}:
     get:
       description: 'Get Risk Library
@@ -239,7 +241,7 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponseDto'
       security:
       - bearer: []
-      summary: Get Risk Library Item by ID.
+      summary: Get Risk Library Item by ID
       tags:
       - Risk Library
       x-drata-entitlement:
@@ -248,10 +250,6 @@ paths:
       - risk-management-get-risk-details
       x-product-area:
       - RISK_MANAGEMENT
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /risk-library/action-copy:
     post:
       description: 'Copy Risk Library Items to Register
@@ -314,7 +312,7 @@ paths:
                 $ref: '#/components/schemas/ExceptionResponseDto'
       security:
       - bearer: []
-      summary: Copies Risk Library Items to a Risk Register.
+      summary: Copies Risk Library Items to a Risk Register
       tags:
       - Risk Library
       x-drata-entitlement:
@@ -323,89 +321,13 @@ paths:
       - risk-management-post
       x-product-area:
       - RISK_MANAGEMENT
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    RiskLibraryResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    RiskCategoryCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Risk Category ID
-        name:
-          type: string
-          example: Access Control
-          description: Risk Category name used to group and organize related Risks
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was last updated
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     RiskCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -435,11 +357,31 @@ components:
       - title
       - description
       - registerId
-    SortTypeLimitedEnum:
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    RiskLibraryCopyResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of created risk objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
+      required:
+      - data
+    RiskLibraryExpandEnum:
       type: string
       enum:
-      - createdAt
-      - updatedAt
+      - controls
+      - categories
     ExceptionResponseDto:
       type: object
       properties:
@@ -465,6 +407,68 @@ components:
       - statusCode
       - message
       - code
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RiskLibraryItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier for the Risk Library Item
+        riskId:
+          type: string
+          example: AC-04
+          description: Human-readable Risk Identifier
+        title:
+          type: string
+          example: Password Management - Password Cracking
+          description: Title of the Risk Library Item
+        description:
+          type: string
+          example: An attacker attempts to gain access to organizational information by guessing passwords.
+          description: Detailed description of the Risk Library Item
+        controls:
+          description: Associated Controls in compact format, only returned when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskControlCompactResponsePublicV2Dto'
+        categories:
+          description: Associated Categories in compact format, only returned when `expand[]=categories` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
+      required:
+      - id
+      - riskId
+      - title
+      - description
     RiskLibraryCopyRequestPublicV2Dto:
       type: object
       properties:
@@ -512,11 +516,6 @@ components:
       - riskIds
       - riskGroups
       - registerId
-    RiskLibraryExpandEnum:
-      type: string
-      enum:
-      - controls
-      - categories
     RiskControlCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -548,60 +547,52 @@ components:
       - name
       - createdAt
       - updatedAt
-    RiskLibraryItemResponsePublicV2Dto:
+    RiskCategoryCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Unique identifier for the Risk Library Item
-        riskId:
+          description: Risk Category ID
+        name:
           type: string
-          example: AC-04
-          description: Human-readable Risk Identifier
-        title:
+          example: Access Control
+          description: Risk Category name used to group and organize related Risks
+        createdAt:
           type: string
-          example: Password Management - Password Cracking
-          description: Title of the Risk Library Item
-        description:
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was created
+        updatedAt:
           type: string
-          example: An attacker attempts to gain access to organizational information by guessing passwords.
-          description: Detailed description of the Risk Library Item
-        controls:
-          description: Associated Controls in compact format, only returned when `expand[]=controls` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskControlCompactResponsePublicV2Dto'
-        categories:
-          description: Associated Categories in compact format, only returned when `expand[]=categories` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was last updated
       required:
       - id
-      - riskId
-      - title
-      - description
-    RiskLibraryCopyResponsePublicV2Dto:
+      - name
+      - createdAt
+      - updatedAt
+    RiskLibraryResponsePublicV2Dto:
       type: object
       properties:
         data:
-          description: Array of created risk objects.
+          description: Data set based on the pagination limits
           type: array
           items:
-            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
+            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
       required:
       - data
-    SortDirectionEnum:
+      - pagination
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

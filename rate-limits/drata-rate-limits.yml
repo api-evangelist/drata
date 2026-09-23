@@ -4,36 +4,79 @@ schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main
 provider: Drata
 providerId: drata
 created: '2026-05-08'
-# Provenance stamped 2026-08-11: this artifact was written by the API Evangelist
-# bulk sweep dated 2026-05-08, not harvested from the provider. See roadmap#35.
-method: generated
-modified: '2026-05-08'
-reconciled: false
+modified: '2026-08-27'
+generated: '2026-08-27'
+method: searched
+source: https://help.drata.com/en/articles/6695964-drata-public-api
+reconciled: true
 tags:
 - GRC
 - Compliance
-- SOC 2
-- ISO 27001
-- Security
 - Rate Limiting
 - Quotas
 - Throttling
-description: Drata Public API v2 rate limits. Specific request-per-minute thresholds are not
-  publicly published. Drata returns standard HTTP 429 with retry guidance.
-notes: Specific quotas not published in public docs; contact Drata for tenant-specific limits.
-sources:
-- https://developers.drata.com/openapi/reference/v2/overview/
+description: >-
+  Drata publishes exactly one rate limit for the Public API v2 and it is stated verbatim in the
+  help-centre API article: "A rate limit of 500 requests / minute will be enforced per unique
+  source IP." Drata declares no RateLimit-* or X-RateLimit-* response headers in the OpenAPI
+  document and documents none, so the only runtime signal an agent gets is the 429 status and a
+  Retry-After header.
+limit_count: 1
 responseCodes:
   throttled: 429
 limits:
-- name: Default Public API
-  scope: tenant
+- name: Public API v2 default
+  scope: source-ip
   metric: requests
-  limit: not publicly documented
-  notes: HTTP 429 returned on throttling; honor Retry-After header.
+  limit: 500
+  window: 1m
+  burst: null
+  timeFrame: minute
+  status_on_exhaustion: 429
+  headers:
+  - Retry-After
+  source: https://help.drata.com/en/articles/6695964-drata-public-api
+  quote: A rate limit of 500 requests / minute will be enforced per unique source IP.
+  note: >-
+    Per SOURCE IP, not per API key and not per tenant. Two consequences an integrator has to
+    plan for: several API keys behind one egress IP share a single 500/min budget, so minting
+    more keys buys no throughput; and several independent agents behind one NAT or one CI
+    runner throttle each other. Conversely, distributing callers across egress IPs multiplies
+    the effective budget, which is unusual enough to be worth stating.
+headers:
+  documented: [Retry-After]
+  ratelimit_draft_headers: false
+  x_ratelimit_headers: false
+  note: >-
+    Zero occurrences of "RateLimit", "X-RateLimit" or "Retry-After" in the 197-operation
+    OpenAPI document; Retry-After is documented in prose only, and no 429 response is declared
+    on any operation in the spec. An agent cannot learn its remaining budget before it is
+    exhausted.
 policies:
-- name: Backoff Strategy
-  description: Clients should implement exponential backoff with jitter and honor any Retry-After header.
+- name: Backoff strategy
+  description: >-
+    Honour Retry-After when present, then exponential backoff with jitter. For bulk Custom
+    Connection syncs prefer session-based batch uploads over per-record POSTs — the record
+    endpoints are where the 500/min ceiling actually bites.
+- name: Source-IP allowlisting
+  description: >-
+    Drata API keys support an optional allowed-IP list. That interacts directly with the
+    per-source-IP limit: pinning a key to one egress IP also pins it to one 500/min budget.
+  source: https://help.drata.com/en/articles/6695964-drata-public-api
+other_surfaces:
+- surface: SafeBase Trust API
+  base: https://app.safebase.io/api/ext/v1/rest
+  limits_published: false
+  note: No rate limit documented for the SafeBase surface.
+- surface: Drata MCP server
+  base: https://mcp.drata.com/mcp/
+  limits_published: false
+  note: No rate limit documented for the MCP surface.
+evidence:
+- url: https://help.drata.com/en/articles/6695964-drata-public-api
+  status: 200
+- url: https://developers.drata.com/openapi/reference/v2/overview/
+  status: 200
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com

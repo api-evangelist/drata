@@ -1,9 +1,15 @@
 openapi: 3.2.0
 info:
   title: Drata Control Library API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Control Library across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
@@ -194,10 +200,6 @@ paths:
       - controls-get
       x-product-area:
       - CONTROL_LIBRARY
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /control-library/{templateId}:
     get:
       description: 'Returns a single Control Template by id with optional expand-gated relations.
@@ -282,10 +284,6 @@ paths:
       - controls-get
       x-product-area:
       - CONTROL_LIBRARY
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /control-library/action-import:
     post:
       description: 'Provisions one or more tenant Controls from Control Library templates. All-or-nothing semantics: any invalid spec rejects the whole request with no writes. Each provisioned Control includes the template default mappings (tests, policies, evidence, requirements).
@@ -357,12 +355,751 @@ paths:
       - controls-post
       x-product-area:
       - CONTROL_LIBRARY
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
+    ControlLibraryImportAssociationsResponsePublicV2Dto:
+      type: object
+      properties:
+        tests:
+          description: Test associations created or linked during import.
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+        policies:
+          description: Policy associations created or linked during import.
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+        evidence:
+          description: Evidence associations created or linked during import (mass noun — covers any number of evidence items).
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+        requirements:
+          description: Requirement associations created or linked during import.
+          allOf:
+          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
+      required:
+      - tests
+      - policies
+      - evidence
+      - requirements
+    ControlLibraryTenantControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        controlId:
+          type: number
+          example: 8801
+          description: Unique identifier of the tenant Control row.
+        code:
+          type: string
+          example: DCF-042
+          description: Tenant-side Control code. May be suffixed (e.g. `DCF-042.1`) when multiple copies of the same template exist in a Workspace.
+        workspaceId:
+          type: number
+          example: 100
+          description: Identifier of the Workspace this Control belongs to.
+        workspaceName:
+          type: string
+          example: Production
+          description: Display name of the Workspace.
+      required:
+      - controlId
+      - code
+      - workspaceId
+      - workspaceName
+    ControlLibraryImportResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Per-input outcomes in the same order as the request `data` array. Each outcome reports status, resulting controlId, and per-association-type provisioning buckets.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryImportOutcomeResponsePublicV2Dto'
+      required:
+      - data
+    ControlAssociationFailurePublicV2Dto:
+      type: object
+      properties:
+        identifier:
+          oneOf:
+          - type: number
+          - type: string
+          description: Identifier of the entity that failed (id or code).
+        reason:
+          type: string
+          description: Human-readable reason this entity failed. Prefixed with `Creation failed:` or `Mapping failed:` to indicate which phase encountered the error.
+      required:
+      - identifier
+      - reason
+    ControlLibraryImportRequestPublicV2Dto:
+      type: object
+      properties:
+        data:
+          minItems: 1
+          description: 'List of import inputs. Each input provisions one tenant Control from a Control Library template. Defaults from the template are applied; per-input fields override them. Limits: at most 100 inputs per request, spanning no more than 10 distinct workspaceIds.'
+          maxItems: 100
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryImportInputPublicV2Dto'
+        allowDuplicates:
+          type: boolean
+          default: false
+          description: When true, a template already provisioned in the target workspace produces an additional copy with a suffixed code. When false (default), duplicate inputs reject the entire request.
+      required:
+      - data
+    ControlLibraryImportInputPublicV2Dto:
+      type: object
+      properties:
+        workspaceId:
+          type: number
+          example: 100
+          description: The workspace where the Control will be provisioned.
+        templateId:
+          type: number
+          example: 1042
+          description: The Control Library template id to provision from.
+        name:
+          type: string
+          maxLength: 191
+          example: Quarterly User Access Reviews
+          description: Override the name on the provisioned Control. Defaults to the template name.
+        description:
+          type: string
+          maxLength: 30000
+          example: Access to critical systems is reviewed on a quarterly basis to ensure that only authorized users retain access.
+          description: Override the description on the provisioned Control. Defaults to the template description.
+        question:
+          type: string
+          maxLength: 768
+          example: Is the access review performed on a quarterly basis?
+          description: Override the question on the provisioned Control. Defaults to the template question.
+        activity:
+          type: string
+          maxLength: 768
+          example: On a quarterly schedule, generate access reports from identity providers.
+          description: Override the activity on the provisioned Control. Defaults to the template activity.
+        customFields:
+          description: Custom Field submissions to apply to the provisioned Control. Each entry must reference the Custom Field by `id` or `name` and provide a `value`. Any Custom Field marked as required must be present; invalid or missing required fields cause the entire import to be rejected.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+      required:
+      - workspaceId
+      - templateId
+    ControlLibraryRequirementTemplateCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 501
+          description: Unique identifier of the Requirement Template.
+        name:
+          type: string
+          example: CC6.1
+          description: Display name of the Requirement Template.
+        description:
+          type: string
+          example: The entity implements logical access security software, infrastructure, and architectures...
+          description: Detailed description of the Requirement Template.
+        longDescription:
+          type:
+          - string
+          - 'null'
+          example: Extended narrative covering scope and exceptions...
+          description: Extended description of the Requirement Template, if available.
+        additionalInfo:
+          type:
+          - string
+          - 'null'
+          example: Additional context for auditors.
+          description: Free-form supplemental info for this Requirement Template.
+        additionalInfo2:
+          type:
+          - string
+          - 'null'
+          description: Second free-form supplemental info field for this Requirement Template.
+        additionalInfo3:
+          type:
+          - string
+          - 'null'
+          description: Third free-form supplemental info field for this Requirement Template.
+        framework:
+          description: The Framework this Requirement Template belongs to.
+          allOf:
+          - $ref: '#/components/schemas/ControlLibraryRequirementFrameworkCompactResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - longDescription
+      - additionalInfo
+      - additionalInfo2
+      - additionalInfo3
+      - framework
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ControlLibraryResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ControlAssociationProvisioningResponsePublicV2Dto:
+      type: object
+      properties:
+        created:
+          description: IDs of entities newly created during this import. Every id here is also in `mapped` — a freshly created entity is also freshly linked to this control.
+          type: array
+          items:
+            type: number
+        mapped:
+          description: IDs of entities now linked to this control via the junction row, whether newly created or pre-existing. An existing entity newly mapped to this control appears here but NOT in `created`.
+          type: array
+          items:
+            type: number
+        failures:
+          description: Per-entity failures encountered while creating or mapping this association. Each entry includes the entity identifier and a reason whose prefix names the failure type (creation vs mapping).
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlAssociationFailurePublicV2Dto'
+      required:
+      - created
+      - mapped
+      - failures
+    ControlDomainEnum:
+      type: string
+      enum:
+      - DATA_AND_PRIVACY
+      - INTERNAL_SECURITY_PROCEDURES
+      - ORGANIZATIONAL_SECURITY
+      - PRODUCT_SECURITY
+      - INFRASTRUCTURE_SECURITY
+      - PHYSICAL_SECURITY
+      - AVAILABILITY
+      - CONFIDENTIALITY
+      - PROCESSING_INTEGRITY
+      - PRIVACY
+      - GENERAL
+    ControlLibraryPolicyTemplateCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 201
+          description: Unique identifier of the Policy Template.
+        name:
+          type: string
+          example: Access Control Policy
+          description: Display name of the Policy Template.
+        description:
+          type: string
+          example: Documents the company approach to provisioning, reviewing, and revoking access...
+          description: Detailed description of the Policy Template.
+      required:
+      - id
+      - name
+      - description
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ControlLibraryTestTemplateCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 305
+          description: Unique identifier of the Test Template.
+        name:
+          type: string
+          example: MFA Enabled Across Workforce
+          description: Display name of the Test Template.
+        description:
+          type:
+          - string
+          - 'null'
+          example: Verifies multi-factor authentication is enabled for all workforce identities.
+          description: Detailed description of the Test Template.
+        rating:
+          type: string
+          example: RECOMMENDED
+          description: Drata-assigned rating that signals how strongly this Test is recommended (e.g. `RECOMMENDED`, `STRONGLY_RECOMMENDED`).
+        source:
+          type: string
+          example: DRATA
+          description: Origin of the Test Template (e.g. `DRATA`, `CUSTOM`, `EXTERNAL`, `ACORN`, `DRATA_LIBRARY`).
+      required:
+      - id
+      - name
+      - description
+      - rating
+      - source
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    ControlLibraryDetailResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1042
+          description: Unique identifier of the Control Template.
+        code:
+          type: string
+          example: DCF-42
+          description: Human-readable Control code.
+        controlNumber:
+          type: number
+          example: 42
+          description: Sequential Control number used for sorting and display.
+        name:
+          type: string
+          example: Access Control Policy
+          description: Display name of the Control Template.
+        description:
+          type:
+          - string
+          - 'null'
+          example: Documented policy describing access controls...
+          description: Description of the Control Template.
+        question:
+          type:
+          - string
+          - 'null'
+          example: Does the company enforce documented access controls?
+          description: Audit-prep question presented to the Control owner for this Control Template.
+        activity:
+          type:
+          - string
+          - 'null'
+          example: Review and approve access requests at least quarterly.
+          description: Recommended ongoing activity for personnel responsible for this Control.
+        domain:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DATA_AND_PRIVACY
+          - INTERNAL_SECURITY_PROCEDURES
+          - ORGANIZATIONAL_SECURITY
+          - PRODUCT_SECURITY
+          - INFRASTRUCTURE_SECURITY
+          - PHYSICAL_SECURITY
+          - AVAILABILITY
+          - CONFIDENTIALITY
+          - PROCESSING_INTEGRITY
+          - PRIVACY
+          - GENERAL
+          description: Domain classification of the Control Template.
+        category:
+          type:
+          - string
+          - 'null'
+          enum:
+          - CUSTOMER_DATA_POLICIES
+          - INTERNAL_ADMIN_TOOL
+          - SOFTWARE_DEVELOPMENT_LIFE_CYCLE
+          - RESPONSIBLE_DISCLOSURE_POLICY
+          - ACCESS_CONTROL
+          - VULNERABILITY_MANAGEMENT
+          - SECURITY_ISSUES
+          - BUSINESS_CONTINUITY
+          - INCIDENT_RESPONSE_PLAN
+          - SECURITY_POLICIES
+          - SECURITY_PROGRAM
+          - PERSONNEL_SECURITY
+          - ENDPOINTS_LAPTOPS
+          - DATA_ENCRYPTION
+          - VENDOR_MANAGEMENT
+          - SOFTWARE_APPLICATION_SECURITY
+          - CUSTOMER_COMMUNICATION
+          - AUTHENTICATION_AND_AUTHORIZATION
+          - AVAILABILITY
+          - STORAGE
+          - BACKUP
+          - LOGGING
+          - MONITORING
+          - NETWORK
+          - PROTECTING_SECRETS
+          - DATA_CENTER_SECURITY
+          - SCALING
+          - BACKUPS
+          - DATA
+          - EMPLOYEE_RESPONSIBILITIES
+          - REGRESSION_TESTING
+          - APPLICATION_AND_SYSTEM_EDITS
+          - COMMUNICATION_OF_OBJECTIVES_RELATED_TO_PRIVACY_PRACTICES
+          - PRIVACY_RELATED_TO_CHOICE_AND_CONSENT
+          - PRIVACY_RELATED_TO_COLLECTION
+          - PRIVACY_RELATED_TO_USE_RETENTION_AND_DISPOSAL
+          - PRIVACY_CRITERIA_RELATED_TO_ACCESS
+          - PRIVACY_CRITERIA_RELATED_TO_DISCLOSURE_AND_NOTIFICATION
+          - PRIVACY_RELATED_TO_QUALITY
+          - PRIVACY_RELATED_TO_MONITORING_AND_ENFORCEMENT
+          - DEFINITIONS
+          - BREACH_NOTIFICATIONS
+          - TECHNICAL
+          - OPERATIONAL
+          - MANAGEMENT
+          description: Category classification of the Control Template.
+        inUse:
+          type: boolean
+          example: true
+          description: True when at least one Control derived from this Template exists in the caller account.
+        testTemplates:
+          description: Default Test Templates mapped to this Control. Only returned when `expand[]=testTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryTestTemplateCompactResponsePublicV2Dto'
+        policyTemplates:
+          description: Default Policy Templates mapped to this Control. Only returned when `expand[]=policyTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryPolicyTemplateCompactResponsePublicV2Dto'
+        evidenceTemplates:
+          description: Default Evidence Templates mapped to this Control. Only returned when `expand[]=evidenceTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryEvidenceTemplateCompactResponsePublicV2Dto'
+        requirementTemplates:
+          description: Requirement Templates mapped to this Control, each with its parent Framework. Only returned when `expand[]=requirementTemplates` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryRequirementTemplateCompactResponsePublicV2Dto'
+        controlsUsingTemplate:
+          description: Tenant Controls derived from this Template, one row per (Control × Workspace) edge. Includes archived Controls; excludes soft-deleted. Only returned when `expand[]=controlsUsingTemplate` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlLibraryTenantControlCompactResponsePublicV2Dto'
+      required:
+      - id
+      - code
+      - controlNumber
+      - name
+      - description
+      - question
+      - activity
+      - domain
+      - category
+      - inUse
+    ControlLibraryItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1042
+          description: Unique identifier of the Control Template.
+        code:
+          type: string
+          example: DCF-42
+          description: Human-readable Control code.
+        controlNumber:
+          type: number
+          example: 42
+          description: Sequential Control number used for sorting and display.
+        name:
+          type: string
+          example: Access Control Policy
+          description: Display name of the Control Template.
+        description:
+          type:
+          - string
+          - 'null'
+          example: Documented policy describing access controls...
+          description: Description of the Control Template.
+        question:
+          type:
+          - string
+          - 'null'
+          example: Does the company enforce documented access controls?
+          description: Audit-prep question presented to the Control owner for this Control Template.
+        activity:
+          type:
+          - string
+          - 'null'
+          example: Review and approve access requests at least quarterly.
+          description: Recommended ongoing activity for personnel responsible for this Control.
+        domain:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DATA_AND_PRIVACY
+          - INTERNAL_SECURITY_PROCEDURES
+          - ORGANIZATIONAL_SECURITY
+          - PRODUCT_SECURITY
+          - INFRASTRUCTURE_SECURITY
+          - PHYSICAL_SECURITY
+          - AVAILABILITY
+          - CONFIDENTIALITY
+          - PROCESSING_INTEGRITY
+          - PRIVACY
+          - GENERAL
+          description: Domain classification of the Control Template.
+        category:
+          type:
+          - string
+          - 'null'
+          enum:
+          - CUSTOMER_DATA_POLICIES
+          - INTERNAL_ADMIN_TOOL
+          - SOFTWARE_DEVELOPMENT_LIFE_CYCLE
+          - RESPONSIBLE_DISCLOSURE_POLICY
+          - ACCESS_CONTROL
+          - VULNERABILITY_MANAGEMENT
+          - SECURITY_ISSUES
+          - BUSINESS_CONTINUITY
+          - INCIDENT_RESPONSE_PLAN
+          - SECURITY_POLICIES
+          - SECURITY_PROGRAM
+          - PERSONNEL_SECURITY
+          - ENDPOINTS_LAPTOPS
+          - DATA_ENCRYPTION
+          - VENDOR_MANAGEMENT
+          - SOFTWARE_APPLICATION_SECURITY
+          - CUSTOMER_COMMUNICATION
+          - AUTHENTICATION_AND_AUTHORIZATION
+          - AVAILABILITY
+          - STORAGE
+          - BACKUP
+          - LOGGING
+          - MONITORING
+          - NETWORK
+          - PROTECTING_SECRETS
+          - DATA_CENTER_SECURITY
+          - SCALING
+          - BACKUPS
+          - DATA
+          - EMPLOYEE_RESPONSIBILITIES
+          - REGRESSION_TESTING
+          - APPLICATION_AND_SYSTEM_EDITS
+          - COMMUNICATION_OF_OBJECTIVES_RELATED_TO_PRIVACY_PRACTICES
+          - PRIVACY_RELATED_TO_CHOICE_AND_CONSENT
+          - PRIVACY_RELATED_TO_COLLECTION
+          - PRIVACY_RELATED_TO_USE_RETENTION_AND_DISPOSAL
+          - PRIVACY_CRITERIA_RELATED_TO_ACCESS
+          - PRIVACY_CRITERIA_RELATED_TO_DISCLOSURE_AND_NOTIFICATION
+          - PRIVACY_RELATED_TO_QUALITY
+          - PRIVACY_RELATED_TO_MONITORING_AND_ENFORCEMENT
+          - DEFINITIONS
+          - BREACH_NOTIFICATIONS
+          - TECHNICAL
+          - OPERATIONAL
+          - MANAGEMENT
+          description: Category classification of the Control Template.
+        inUse:
+          type: boolean
+          example: true
+          description: True when at least one Control derived from this Template exists in the caller account.
+      required:
+      - id
+      - code
+      - controlNumber
+      - name
+      - description
+      - question
+      - activity
+      - domain
+      - category
+      - inUse
+    ControlLibraryRequirementFrameworkCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        slug:
+          type: string
+          example: soc2
+          description: Stable slug identifier for the Framework.
+        name:
+          type: string
+          example: SOC 2
+          description: Display name of the Framework.
+      required:
+      - slug
+      - name
+    ControlLibraryImportOutcomeResponsePublicV2Dto:
+      type: object
+      properties:
+        inputIndex:
+          type: number
+          description: Index of the corresponding input in the request's `data` array. Use to correlate outcomes back to inputs.
+        templateIdentifier:
+          oneOf:
+          - type: number
+          - type: string
+          description: Template identifier echoed from the input (id or code).
+        workspaceId:
+          type: number
+          description: Workspace the input targeted.
+        controlId:
+          type: number
+          description: Resulting tenant Control id. Present for `created` and `skipped` (echoes the existing control); absent for `failed`.
+        code:
+          type: string
+          example: DCF-042
+          description: Resulting tenant Control code. For `created` outputs this is the code persisted on the new row, which may carry a duplicate-suffix (e.g. `DCF-042.1`) when `allowDuplicates` was set. For `skipped` outputs this echoes the existing control. Absent for `failed`.
+        status:
+          type: string
+          enum:
+          - created
+          - skipped
+          - failed
+          description: '`created`: new control provisioned. `skipped`: template already present in workspace and `allowDuplicates` was false (echoes the existing controlId). `failed`: input couldn''t be provisioned — see `failureReason`.'
+        failureReason:
+          type: string
+          description: Human-readable reason this input failed. Present only when `status` is `failed`.
+        associations:
+          description: Per-association-type outcome buckets. Each bucket reports the entities `created`, those now `mapped` to this control (whether newly created or pre-existing), and any per-entity `failures`.
+          allOf:
+          - $ref: '#/components/schemas/ControlLibraryImportAssociationsResponsePublicV2Dto'
+        customFields:
+          description: Custom Field values written onto the newly provisioned Control. Echoes the post-submission state — same shape returned by the Control GET endpoints. Present only when the input supplied `customFields` and `status` is `created`.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+      required:
+      - inputIndex
+      - templateIdentifier
+      - workspaceId
+      - status
+      - associations
     ControlLibraryImportValidationErrorPublicV2Dto:
       type: object
       properties:
@@ -972,336 +1709,6 @@ components:
       - templateIdentifier
       - reason
       - code
-    ControlLibraryDetailResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1042
-          description: Unique identifier of the Control Template.
-        code:
-          type: string
-          example: DCF-42
-          description: Human-readable Control code.
-        controlNumber:
-          type: number
-          example: 42
-          description: Sequential Control number used for sorting and display.
-        name:
-          type: string
-          example: Access Control Policy
-          description: Display name of the Control Template.
-        description:
-          type:
-          - string
-          - 'null'
-          example: Documented policy describing access controls...
-          description: Description of the Control Template.
-        question:
-          type:
-          - string
-          - 'null'
-          example: Does the company enforce documented access controls?
-          description: Audit-prep question presented to the Control owner for this Control Template.
-        activity:
-          type:
-          - string
-          - 'null'
-          example: Review and approve access requests at least quarterly.
-          description: Recommended ongoing activity for personnel responsible for this Control.
-        domain:
-          type:
-          - string
-          - 'null'
-          enum:
-          - DATA_AND_PRIVACY
-          - INTERNAL_SECURITY_PROCEDURES
-          - ORGANIZATIONAL_SECURITY
-          - PRODUCT_SECURITY
-          - INFRASTRUCTURE_SECURITY
-          - PHYSICAL_SECURITY
-          - AVAILABILITY
-          - CONFIDENTIALITY
-          - PROCESSING_INTEGRITY
-          - PRIVACY
-          - GENERAL
-          description: Domain classification of the Control Template.
-        category:
-          type:
-          - string
-          - 'null'
-          enum:
-          - CUSTOMER_DATA_POLICIES
-          - INTERNAL_ADMIN_TOOL
-          - SOFTWARE_DEVELOPMENT_LIFE_CYCLE
-          - RESPONSIBLE_DISCLOSURE_POLICY
-          - ACCESS_CONTROL
-          - VULNERABILITY_MANAGEMENT
-          - SECURITY_ISSUES
-          - BUSINESS_CONTINUITY
-          - INCIDENT_RESPONSE_PLAN
-          - SECURITY_POLICIES
-          - SECURITY_PROGRAM
-          - PERSONNEL_SECURITY
-          - ENDPOINTS_LAPTOPS
-          - DATA_ENCRYPTION
-          - VENDOR_MANAGEMENT
-          - SOFTWARE_APPLICATION_SECURITY
-          - CUSTOMER_COMMUNICATION
-          - AUTHENTICATION_AND_AUTHORIZATION
-          - AVAILABILITY
-          - STORAGE
-          - BACKUP
-          - LOGGING
-          - MONITORING
-          - NETWORK
-          - PROTECTING_SECRETS
-          - DATA_CENTER_SECURITY
-          - SCALING
-          - BACKUPS
-          - DATA
-          - EMPLOYEE_RESPONSIBILITIES
-          - REGRESSION_TESTING
-          - APPLICATION_AND_SYSTEM_EDITS
-          - COMMUNICATION_OF_OBJECTIVES_RELATED_TO_PRIVACY_PRACTICES
-          - PRIVACY_RELATED_TO_CHOICE_AND_CONSENT
-          - PRIVACY_RELATED_TO_COLLECTION
-          - PRIVACY_RELATED_TO_USE_RETENTION_AND_DISPOSAL
-          - PRIVACY_CRITERIA_RELATED_TO_ACCESS
-          - PRIVACY_CRITERIA_RELATED_TO_DISCLOSURE_AND_NOTIFICATION
-          - PRIVACY_RELATED_TO_QUALITY
-          - PRIVACY_RELATED_TO_MONITORING_AND_ENFORCEMENT
-          - DEFINITIONS
-          - BREACH_NOTIFICATIONS
-          - TECHNICAL
-          - OPERATIONAL
-          - MANAGEMENT
-          description: Category classification of the Control Template.
-        inUse:
-          type: boolean
-          example: true
-          description: True when at least one Control derived from this Template exists in the caller account.
-        testTemplates:
-          description: Default Test Templates mapped to this Control. Only returned when `expand[]=testTemplates` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryTestTemplateCompactResponsePublicV2Dto'
-        policyTemplates:
-          description: Default Policy Templates mapped to this Control. Only returned when `expand[]=policyTemplates` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryPolicyTemplateCompactResponsePublicV2Dto'
-        evidenceTemplates:
-          description: Default Evidence Templates mapped to this Control. Only returned when `expand[]=evidenceTemplates` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryEvidenceTemplateCompactResponsePublicV2Dto'
-        requirementTemplates:
-          description: Requirement Templates mapped to this Control, each with its parent Framework. Only returned when `expand[]=requirementTemplates` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryRequirementTemplateCompactResponsePublicV2Dto'
-        controlsUsingTemplate:
-          description: Tenant Controls derived from this Template, one row per (Control × Workspace) edge. Includes archived Controls; excludes soft-deleted. Only returned when `expand[]=controlsUsingTemplate` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryTenantControlCompactResponsePublicV2Dto'
-      required:
-      - id
-      - code
-      - controlNumber
-      - name
-      - description
-      - question
-      - activity
-      - domain
-      - category
-      - inUse
-    ControlLibrarySortEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-      - name
-      - controlNumber
-    ControlLibraryTestTemplateCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 305
-          description: Unique identifier of the Test Template.
-        name:
-          type: string
-          example: MFA Enabled Across Workforce
-          description: Display name of the Test Template.
-        description:
-          type:
-          - string
-          - 'null'
-          example: Verifies multi-factor authentication is enabled for all workforce identities.
-          description: Detailed description of the Test Template.
-        rating:
-          type: string
-          example: RECOMMENDED
-          description: Drata-assigned rating that signals how strongly this Test is recommended (e.g. `RECOMMENDED`, `STRONGLY_RECOMMENDED`).
-        source:
-          type: string
-          example: DRATA
-          description: Origin of the Test Template (e.g. `DRATA`, `CUSTOM`, `EXTERNAL`, `ACORN`, `DRATA_LIBRARY`).
-      required:
-      - id
-      - name
-      - description
-      - rating
-      - source
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    ControlLibraryImportOutcomeResponsePublicV2Dto:
-      type: object
-      properties:
-        inputIndex:
-          type: number
-          description: Index of the corresponding input in the request's `data` array. Use to correlate outcomes back to inputs.
-        templateIdentifier:
-          oneOf:
-          - type: number
-          - type: string
-          description: Template identifier echoed from the input (id or code).
-        workspaceId:
-          type: number
-          description: Workspace the input targeted.
-        controlId:
-          type: number
-          description: Resulting tenant Control id. Present for `created` and `skipped` (echoes the existing control); absent for `failed`.
-        code:
-          type: string
-          example: DCF-042
-          description: Resulting tenant Control code. For `created` outputs this is the code persisted on the new row, which may carry a duplicate-suffix (e.g. `DCF-042.1`) when `allowDuplicates` was set. For `skipped` outputs this echoes the existing control. Absent for `failed`.
-        status:
-          type: string
-          enum:
-          - created
-          - skipped
-          - failed
-          description: '`created`: new control provisioned. `skipped`: template already present in workspace and `allowDuplicates` was false (echoes the existing controlId). `failed`: input couldn''t be provisioned — see `failureReason`.'
-        failureReason:
-          type: string
-          description: Human-readable reason this input failed. Present only when `status` is `failed`.
-        associations:
-          description: Per-association-type outcome buckets. Each bucket reports the entities `created`, those now `mapped` to this control (whether newly created or pre-existing), and any per-entity `failures`.
-          allOf:
-          - $ref: '#/components/schemas/ControlLibraryImportAssociationsResponsePublicV2Dto'
-        customFields:
-          description: Custom Field values written onto the newly provisioned Control. Echoes the post-submission state — same shape returned by the Control GET endpoints. Present only when the input supplied `customFields` and `status` is `created`.
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
-      required:
-      - inputIndex
-      - templateIdentifier
-      - workspaceId
-      - status
-      - associations
-    ControlAssociationFailurePublicV2Dto:
-      type: object
-      properties:
-        identifier:
-          oneOf:
-          - type: number
-          - type: string
-          description: Identifier of the entity that failed (id or code).
-        reason:
-          type: string
-          description: Human-readable reason this entity failed. Prefixed with `Creation failed:` or `Mapping failed:` to indicate which phase encountered the error.
-      required:
-      - identifier
-      - reason
-    ControlLibraryImportResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Per-input outcomes in the same order as the request `data` array. Each outcome reports status, resulting controlId, and per-association-type provisioning buckets.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryImportOutcomeResponsePublicV2Dto'
-      required:
-      - data
-    ControlLibraryResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    ControlLibraryImportInputPublicV2Dto:
-      type: object
-      properties:
-        workspaceId:
-          type: number
-          example: 100
-          description: The workspace where the Control will be provisioned.
-        templateId:
-          type: number
-          example: 1042
-          description: The Control Library template id to provision from.
-        name:
-          type: string
-          maxLength: 191
-          example: Quarterly User Access Reviews
-          description: Override the name on the provisioned Control. Defaults to the template name.
-        description:
-          type: string
-          maxLength: 30000
-          example: Access to critical systems is reviewed on a quarterly basis to ensure that only authorized users retain access.
-          description: Override the description on the provisioned Control. Defaults to the template description.
-        question:
-          type: string
-          maxLength: 768
-          example: Is the access review performed on a quarterly basis?
-          description: Override the question on the provisioned Control. Defaults to the template question.
-        activity:
-          type: string
-          maxLength: 768
-          example: On a quarterly schedule, generate access reports from identity providers.
-          description: Override the activity on the provisioned Control. Defaults to the template activity.
-        customFields:
-          description: Custom Field submissions to apply to the provisioned Control. Each entry must reference the Custom Field by `id` or `name` and provide a `value`. Any Custom Field marked as required must be present; invalid or missing required fields cause the entire import to be rejected.
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-      required:
-      - workspaceId
-      - templateId
     ControlLibraryDetailExpandEnum:
       type: string
       enum:
@@ -1310,169 +1717,6 @@ components:
       - evidenceTemplates
       - requirementTemplates
       - controlsUsingTemplate
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ControlLibraryRequirementFrameworkCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        slug:
-          type: string
-          example: soc2
-          description: Stable slug identifier for the Framework.
-        name:
-          type: string
-          example: SOC 2
-          description: Display name of the Framework.
-      required:
-      - slug
-      - name
-    ControlLibraryTenantControlCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        controlId:
-          type: number
-          example: 8801
-          description: Unique identifier of the tenant Control row.
-        code:
-          type: string
-          example: DCF-042
-          description: Tenant-side Control code. May be suffixed (e.g. `DCF-042.1`) when multiple copies of the same template exist in a Workspace.
-        workspaceId:
-          type: number
-          example: 100
-          description: Identifier of the Workspace this Control belongs to.
-        workspaceName:
-          type: string
-          example: Production
-          description: Display name of the Workspace.
-      required:
-      - controlId
-      - code
-      - workspaceId
-      - workspaceName
-    ControlLibraryItemResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1042
-          description: Unique identifier of the Control Template.
-        code:
-          type: string
-          example: DCF-42
-          description: Human-readable Control code.
-        controlNumber:
-          type: number
-          example: 42
-          description: Sequential Control number used for sorting and display.
-        name:
-          type: string
-          example: Access Control Policy
-          description: Display name of the Control Template.
-        description:
-          type:
-          - string
-          - 'null'
-          example: Documented policy describing access controls...
-          description: Description of the Control Template.
-        question:
-          type:
-          - string
-          - 'null'
-          example: Does the company enforce documented access controls?
-          description: Audit-prep question presented to the Control owner for this Control Template.
-        activity:
-          type:
-          - string
-          - 'null'
-          example: Review and approve access requests at least quarterly.
-          description: Recommended ongoing activity for personnel responsible for this Control.
-        domain:
-          type:
-          - string
-          - 'null'
-          enum:
-          - DATA_AND_PRIVACY
-          - INTERNAL_SECURITY_PROCEDURES
-          - ORGANIZATIONAL_SECURITY
-          - PRODUCT_SECURITY
-          - INFRASTRUCTURE_SECURITY
-          - PHYSICAL_SECURITY
-          - AVAILABILITY
-          - CONFIDENTIALITY
-          - PROCESSING_INTEGRITY
-          - PRIVACY
-          - GENERAL
-          description: Domain classification of the Control Template.
-        category:
-          type:
-          - string
-          - 'null'
-          enum:
-          - CUSTOMER_DATA_POLICIES
-          - INTERNAL_ADMIN_TOOL
-          - SOFTWARE_DEVELOPMENT_LIFE_CYCLE
-          - RESPONSIBLE_DISCLOSURE_POLICY
-          - ACCESS_CONTROL
-          - VULNERABILITY_MANAGEMENT
-          - SECURITY_ISSUES
-          - BUSINESS_CONTINUITY
-          - INCIDENT_RESPONSE_PLAN
-          - SECURITY_POLICIES
-          - SECURITY_PROGRAM
-          - PERSONNEL_SECURITY
-          - ENDPOINTS_LAPTOPS
-          - DATA_ENCRYPTION
-          - VENDOR_MANAGEMENT
-          - SOFTWARE_APPLICATION_SECURITY
-          - CUSTOMER_COMMUNICATION
-          - AUTHENTICATION_AND_AUTHORIZATION
-          - AVAILABILITY
-          - STORAGE
-          - BACKUP
-          - LOGGING
-          - MONITORING
-          - NETWORK
-          - PROTECTING_SECRETS
-          - DATA_CENTER_SECURITY
-          - SCALING
-          - BACKUPS
-          - DATA
-          - EMPLOYEE_RESPONSIBILITIES
-          - REGRESSION_TESTING
-          - APPLICATION_AND_SYSTEM_EDITS
-          - COMMUNICATION_OF_OBJECTIVES_RELATED_TO_PRIVACY_PRACTICES
-          - PRIVACY_RELATED_TO_CHOICE_AND_CONSENT
-          - PRIVACY_RELATED_TO_COLLECTION
-          - PRIVACY_RELATED_TO_USE_RETENTION_AND_DISPOSAL
-          - PRIVACY_CRITERIA_RELATED_TO_ACCESS
-          - PRIVACY_CRITERIA_RELATED_TO_DISCLOSURE_AND_NOTIFICATION
-          - PRIVACY_RELATED_TO_QUALITY
-          - PRIVACY_RELATED_TO_MONITORING_AND_ENFORCEMENT
-          - DEFINITIONS
-          - BREACH_NOTIFICATIONS
-          - TECHNICAL
-          - OPERATIONAL
-          - MANAGEMENT
-          description: Category classification of the Control Template.
-        inUse:
-          type: boolean
-          example: true
-          description: True when at least one Control derived from this Template exists in the caller account.
-      required:
-      - id
-      - code
-      - controlNumber
-      - name
-      - description
-      - question
-      - activity
-      - domain
-      - category
-      - inUse
     ControlCategoryEnum:
       type: string
       enum:
@@ -1521,39 +1765,6 @@ components:
       - TECHNICAL
       - OPERATIONAL
       - MANAGEMENT
-    ControlLibraryEvidenceTemplateCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 412
-          description: Unique identifier of the Evidence Template.
-        evidenceTemplateCode:
-          type: string
-          example: DEC-12
-          description: Human-readable Evidence Template code.
-        name:
-          type: string
-          example: Quarterly Access Review
-          description: Display name of the Evidence Template.
-        requestDescription:
-          type:
-          - string
-          - 'null'
-          example: Upload a signed copy of the most recent quarterly access review.
-          description: Customer-facing description of what evidence to collect for this Evidence Template.
-        implementationGuidance:
-          type:
-          - string
-          - 'null'
-          example: Export the access list from your IdP and have a Control owner sign-off.
-          description: Internal guidance on how to satisfy this Evidence Template.
-      required:
-      - id
-      - evidenceTemplateCode
-      - name
-      - requestDescription
-      - implementationGuidance
     ControlLibraryImportErrorResponsePublicV2Dto:
       type: object
       properties:
@@ -1588,68 +1799,46 @@ components:
       - message
       - code
       - invalidInputs
-    CustomFieldSubmitRequestPublicV2Dto:
+    ControlLibraryEvidenceTemplateCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
-          example: 1
-          description: The ID of the Custom Field. Either this or the name must be provided.
+          example: 412
+          description: Unique identifier of the Evidence Template.
+        evidenceTemplateCode:
+          type: string
+          example: DEC-12
+          description: Human-readable Evidence Template code.
         name:
           type: string
-          example: Compliance Status
-          description: The name of the Custom Field. Either this or the ID must be provided.
-        value:
+          example: Quarterly Access Review
+          description: Display name of the Evidence Template.
+        requestDescription:
           type:
           - string
           - 'null'
-          example: Security & IT
-          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+          example: Upload a signed copy of the most recent quarterly access review.
+          description: Customer-facing description of what evidence to collect for this Evidence Template.
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          example: Export the access list from your IdP and have a Control owner sign-off.
+          description: Internal guidance on how to satisfy this Evidence Template.
       required:
-      - value
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
+      - id
+      - evidenceTemplateCode
       - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
+      - requestDescription
+      - implementationGuidance
+    ControlLibrarySortEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+      - name
+      - controlNumber
     CustomFieldResponsePublicV2Dto:
       type: object
       properties:
@@ -1670,206 +1859,8 @@ components:
       required:
       - customFieldId
       - name
-    ControlLibraryImportAssociationsResponsePublicV2Dto:
-      type: object
-      properties:
-        tests:
-          description: Test associations created or linked during import.
-          allOf:
-          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
-        policies:
-          description: Policy associations created or linked during import.
-          allOf:
-          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
-        evidence:
-          description: Evidence associations created or linked during import (mass noun — covers any number of evidence items).
-          allOf:
-          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
-        requirements:
-          description: Requirement associations created or linked during import.
-          allOf:
-          - $ref: '#/components/schemas/ControlAssociationProvisioningResponsePublicV2Dto'
-      required:
-      - tests
-      - policies
-      - evidence
-      - requirements
-    ControlLibraryPolicyTemplateCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 201
-          description: Unique identifier of the Policy Template.
-        name:
-          type: string
-          example: Access Control Policy
-          description: Display name of the Policy Template.
-        description:
-          type: string
-          example: Documents the company approach to provisioning, reviewing, and revoking access...
-          description: Detailed description of the Policy Template.
-      required:
-      - id
-      - name
-      - description
-    FrameworkTagEnum:
-      type: string
-      enum:
-      - CUSTOM
-      - NONE
-      - SOC_2
-      - ISO27001
-      - CCPA
-      - GDPR
-      - HIPAA
-      - PCI
-      - SCF
-      - NIST80053
-      - NISTCSF
-      - CMMC
-      - NIST800171
-      - MSSSPA
-      - FFIEC
-      - ISO27701
-      - COBIT
-      - SOX_ITGC
-      - ISO270012022
-      - CCM
-      - CYBER_ESSENTIALS
-      - ISO270172015
-      - ISO270182019
-      - FEDRAMP
-      - NISTAI
-      - PCI4
-      - NISTCSF2
-      - NIS2
-      - DORA
-      - ISO420012023
-      - DRATA_ESSENTIALS
-      - NIST800171R3
-      - CIS8
-      - CYBER_ESSENTIALS_32
-      - FEDRAMP20X
-      - HITRUST
-      - MSSSPA11
-      - ESSENTIAL_EIGHT
-      - NYDFS
-      - TISAX
-      - ISO270182025
-      - CCPA2026
-      - ISO277012025
-      - CPS230
-      - CYFUN
-      - AIUC_1
-      - ALL
-    ControlLibraryRequirementTemplateCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 501
-          description: Unique identifier of the Requirement Template.
-        name:
-          type: string
-          example: CC6.1
-          description: Display name of the Requirement Template.
-        description:
-          type: string
-          example: The entity implements logical access security software, infrastructure, and architectures...
-          description: Detailed description of the Requirement Template.
-        longDescription:
-          type:
-          - string
-          - 'null'
-          example: Extended narrative covering scope and exceptions...
-          description: Extended description of the Requirement Template, if available.
-        additionalInfo:
-          type:
-          - string
-          - 'null'
-          example: Additional context for auditors.
-          description: Free-form supplemental info for this Requirement Template.
-        additionalInfo2:
-          type:
-          - string
-          - 'null'
-          description: Second free-form supplemental info field for this Requirement Template.
-        additionalInfo3:
-          type:
-          - string
-          - 'null'
-          description: Third free-form supplemental info field for this Requirement Template.
-        framework:
-          description: The Framework this Requirement Template belongs to.
-          allOf:
-          - $ref: '#/components/schemas/ControlLibraryRequirementFrameworkCompactResponsePublicV2Dto'
-      required:
-      - id
-      - name
-      - description
-      - longDescription
-      - additionalInfo
-      - additionalInfo2
-      - additionalInfo3
-      - framework
-    ControlLibraryImportRequestPublicV2Dto:
-      type: object
-      properties:
-        data:
-          minItems: 1
-          description: 'List of import inputs. Each input provisions one tenant Control from a Control Library template. Defaults from the template are applied; per-input fields override them. Limits: at most 100 inputs per request, spanning no more than 10 distinct workspaceIds.'
-          maxItems: 100
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlLibraryImportInputPublicV2Dto'
-        allowDuplicates:
-          type: boolean
-          default: false
-          description: When true, a template already provisioned in the target workspace produces an additional copy with a suffixed code. When false (default), duplicate inputs reject the entire request.
-      required:
-      - data
-    ControlDomainEnum:
-      type: string
-      enum:
-      - DATA_AND_PRIVACY
-      - INTERNAL_SECURITY_PROCEDURES
-      - ORGANIZATIONAL_SECURITY
-      - PRODUCT_SECURITY
-      - INFRASTRUCTURE_SECURITY
-      - PHYSICAL_SECURITY
-      - AVAILABILITY
-      - CONFIDENTIALITY
-      - PROCESSING_INTEGRITY
-      - PRIVACY
-      - GENERAL
-    ControlAssociationProvisioningResponsePublicV2Dto:
-      type: object
-      properties:
-        created:
-          description: IDs of entities newly created during this import. Every id here is also in `mapped` — a freshly created entity is also freshly linked to this control.
-          type: array
-          items:
-            type: number
-        mapped:
-          description: IDs of entities now linked to this control via the junction row, whether newly created or pre-existing. An existing entity newly mapped to this control appears here but NOT in `created`.
-          type: array
-          items:
-            type: number
-        failures:
-          description: Per-entity failures encountered while creating or mapping this association. Each entry includes the entity identifier and a reason whose prefix names the failure type (creation vs mapping).
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlAssociationFailurePublicV2Dto'
-      required:
-      - created
-      - mapped
-      - failures
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

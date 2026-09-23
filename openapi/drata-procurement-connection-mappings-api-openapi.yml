@@ -1,9 +1,15 @@
 openapi: 3.2.0
 info:
   title: Drata Procurement Connection Mappings API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Procurement Connection Mappings across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
@@ -146,10 +152,6 @@ paths:
       - connections-put-vendor-mapping
       x-product-area:
       - VENDOR_PROCUREMENT_INTEGRATION
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
     ExceptionResponseDto:
@@ -177,32 +179,6 @@ components:
       - statusCode
       - message
       - code
-    ProcurementConnectionMappingUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        vendorMapping:
-          type:
-          - object
-          - 'null'
-          additionalProperties: true
-          example:
-            name: properties.counterpartyName.value
-            externalId: id
-          description: JSONata mapping from provider record fields to vendor properties. Keys are vendor field names, values are JSONata expressions.
-        vendorTypes:
-          example:
-          - vendor
-          - supplier
-          description: Vendor types to filter from the procurement provider
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-        dryRun:
-          type: boolean
-          example: false
-          description: Enable dry run mode (no actual vendor creation/updates). Defaults to true if not set.
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -584,11 +560,34 @@ components:
       - dryRun
       - aiMappingSuggested
       - credentialType
+    ProcurementConnectionMappingUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        vendorMapping:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          example:
+            name: properties.counterpartyName.value
+            externalId: id
+          description: JSONata mapping from provider record fields to vendor properties. Keys are vendor field names, values are JSONata expressions.
+        vendorTypes:
+          example:
+          - vendor
+          - supplier
+          description: Vendor types to filter from the procurement provider
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        dryRun:
+          type: boolean
+          example: false
+          description: Enable dry run mode (no actual vendor creation/updates). Defaults to true if not set.
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

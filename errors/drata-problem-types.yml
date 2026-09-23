@@ -1,0 +1,158 @@
+generated: '2026-08-27'
+method: derived
+source: openapi/drata-api-v2-openapi.yml (responses) + https://help.drata.com/en/articles/6695964-drata-public-api
+provider: Drata
+providerId: drata
+format: vendor-json
+rfc9457: false
+note: Drata does not emit application/problem+json and declares no RFC 9457 problem types. Every error is the same vendor
+  envelope, ExceptionResponsePublicV2Dto. The `code` field is a NUMERIC Drata-internal error code that is distinct from the
+  HTTP statusCode (an unauthenticated GET of https://public-api.drata.com/openapi.json returns {"statusCode":401,"message":"Unauthorized","code":12300});
+  Drata does not publish a registry of those numeric codes, so they cannot be enumerated here without fabricating them.
+envelope:
+  schema: ExceptionResponsePublicV2Dto
+  media_type: application/json
+  fields:
+  - name: name
+    type: string
+    required: true
+    description: Exception class name.
+  - name: statusCode
+    type: number
+    required: true
+    description: HTTP status code, repeated in the body.
+  - name: message
+    type: string
+    required: true
+    description: Human-readable failure description.
+  - name: code
+    type: number
+    required: true
+    description: Drata-internal numeric error code. Not the HTTP status. No public registry.
+  - name: debugInfo
+    type: object
+    required: false
+    description: Optional {name, message, stack} debug block.
+  legacy_variants:
+  - ExceptionResponsePublicDto
+  - ExceptionResponseDto
+  note: The v1/legacy variants are identical minus the top-level `name` field.
+observed_examples:
+- url: https://public-api.drata.com/openapi.json
+  status: 401
+  body: '{"statusCode":401,"message":"Unauthorized","code":12300}'
+- url: https://public-api.drata.com/public/v2/openapi.json
+  status: 401
+  body: '{"statusCode":401,"message":"Unauthorized","code":26430,"debugInfo":null}'
+- url: https://mcp.drata.com/mcp/
+  status: 401
+  body: '{"error": "unauthorized", "message": "Bearer token required. Use OAuth to authenticate."}'
+  note: The MCP gateway uses a DIFFERENT error envelope from the REST API — {error, message}, not {name, statusCode, message,
+    code}. An agent handling both surfaces must parse two shapes.
+status_codes:
+- status: 200
+  occurrences: 142
+  description: Successful
+  variants:
+  - description: At least one record was updated (mix of creates and updates).
+    operations: 1
+- status: 201
+  occurrences: 41
+  description: Created
+  variants:
+  - description: All records were newly created.
+    operations: 1
+  - description: Action performed successfully
+    operations: 1
+- status: 204
+  occurrences: 24
+  description: No Content
+  variants:
+  - description: Control is already in the requested state; no change was made.
+    operations: 1
+- status: 207
+  occurrences: 1
+  description: Some records succeeded and some failed. Per-item `statusCode` indicates each outcome.
+- status: 400
+  occurrences: 171
+  description: Malformed data and/or validation errors
+  remediation: Validate the request body and query parameters against the schema before retrying; the response body message
+    names the failing field. Not retryable unchanged.
+- status: 401
+  occurrences: 196
+  description: Invalid Authorization
+  remediation: The bearer API key is missing, malformed, expired or revoked. Mint a new key under Settings -> API Keys. Do
+    not retry with the same credential.
+- status: 402
+  occurrences: 37
+  description: You must upgrade your plan to use this feature
+  variants:
+  - description: The required account entitlement is not enabled.
+    operations: 5
+  remediation: The tenant is not entitled to this feature on its current Drata plan. A human has to upgrade the subscription
+    or enable the entitlement; retrying will not help.
+- status: 403
+  occurrences: 196
+  description: You are not allowed to perform this action
+  remediation: The API key or the caller role lacks the scope for this operation. Widen the key scopes (Settings -> API Keys)
+    or use a key with the right role. Not retryable unchanged.
+- status: 404
+  occurrences: 153
+  description: Not Found
+  variants:
+  - description: The specified Risk Register does not exist or is not accessible to the caller.
+    operations: 1
+  remediation: The referenced resource does not exist in this tenant or workspace, or the caller cannot see it. Re-resolve
+    the id; check the workspaceId path segment.
+- status: 409
+  occurrences: 8
+  description: There is a conflict in the business rules with this request
+  remediation: A business rule conflicts with the request (for example a duplicate or an illegal state transition). Re-read
+    the resource and reconcile before retrying.
+- status: 412
+  occurrences: 196
+  description: You must accept the Drata terms and conditions to use the API
+  remediation: The tenant has not accepted the Drata API terms and conditions. An administrator must accept them in the Drata
+    app; every operation on the API returns this until they do.
+- status: 413
+  occurrences: 7
+  description: The file was too large to upload
+  remediation: The uploaded file exceeded the size limit. Split or compress the file.
+- status: 422
+  occurrences: 12
+  description: Unprocessable Entity
+  variants:
+  - description: Multiple Custom Field Definitions match the provided name. Use the numeric ID.
+    operations: 1
+  - description: The requested action is not available for the current state of this security review.
+    operations: 1
+  remediation: The request was well formed but semantically unprocessable (for example an ambiguous name that matches multiple
+    records). The message states the disambiguation required.
+- status: 500
+  occurrences: 196
+  description: Internal server error
+  remediation: Server-side failure. Retry with exponential backoff and jitter; escalate to Drata support with the response
+    `code` if it persists.
+- status: 503
+  occurrences: 6
+  description: Third party system was unavailable
+  remediation: A third-party system Drata depends on was unavailable. Retry with backoff; the failure is upstream of Drata.
+notable:
+- status: 412
+  why: Declared on all 196 operations. Drata gates the ENTIRE API on tenant acceptance of the API terms and conditions — an
+    agent that has valid credentials and correct scopes can still be blocked by a legal checkbox nobody in the integration
+    path controls. Handle it as a human-escalation, not a retry.
+- status: 402
+  why: 'Declared on 37 operations. Entitlement, not authorization: the tenant plan does not include the feature. Distinguish
+    it from 403 — widening scopes will never clear a 402.'
+- status: 207
+  why: One operation returns a multi-status body where each item carries its own statusCode; partial success is possible and
+    must be inspected per item.
+special_responses:
+- status: 204
+  description: Control is already in the requested state; no change was made.
+  note: An idempotent no-op signal — useful for safe re-runs.
+- status: 422
+  description: Multiple Custom Field Definitions match the provided name. Use the numeric ID.
+- status: 404
+  description: The specified Risk Register does not exist or is not accessible to the caller.

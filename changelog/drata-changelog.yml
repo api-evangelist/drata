@@ -1,0 +1,61 @@
+generated: '2026-08-27'
+method: searched
+source: https://drata.com/updates
+provider: Drata
+providerId: drata
+url: https://drata.com/updates
+canonical_redirects:
+- from: https://drata.com/products/updates
+  to: https://updates.drata.com/
+  status: 308
+- from: https://updates.drata.com/
+  to: https://drata.com/updates
+  status: 301
+scheme:
+  style: dated product updates
+  date_format: MONTH DD, YYYY
+  versioned: false
+  note: >-
+    Product-level release notes, not API release notes. Entries are dated but carry no API
+    version number, no breaking-change flag and no per-endpoint diff. There is no separate
+    developer changelog on developers.drata.com, so an integrator cannot tell from this feed
+    whether an API contract changed.
+current_version: v2
+entries:
+- date: '2026-08-04'
+  title: Trust Center Account Review via MCP is now in Early Access
+  breaking: false
+  additions: true
+  area: MCP / Trust Center
+- date: '2026-07-31'
+  title: SafeBase MCP Server Is Now in Early Access
+  breaking: false
+  additions: true
+  area: MCP / SafeBase
+  note: >-
+    A second, distinct Drata MCP server for the SafeBase Trust surface, separate from the
+    Drata MCP server at mcp.drata.com. No public endpoint URL has been published for it.
+- date: '2026-07-31'
+  title: Map Audit Requests to DCF Controls with AI
+  breaking: false
+  additions: true
+  area: Audit
+- date: '2026-07-31'
+  title: SafeBase User Management & Permissions
+  breaking: false
+  additions: true
+  area: SafeBase
+- date: '2026-07-24'
+  title: Send Completed Questionnaires to Salesforce
+  breaking: false
+  additions: true
+  area: SafeBase / Integrations
+- date: '2026-07-24'
+  title: Trust Center Point of Contact Validation
+  breaking: false
+  additions: true
+  area: Trust Center
+window: recent entries as listed on 2026-08-27; the page is a rolling feed with no archive index
+evidence:
+- url: https://drata.com/updates
+  status: 200

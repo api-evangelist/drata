@@ -1,16 +1,22 @@
 openapi: 3.2.0
 info:
   title: Drata Personnel API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Personnel across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
 - url: https://public-api.apac.drata.com/public/v2
 tags:
 - name: Personnel
-  description: Personnel are people who work for your organization. The [help docs](https://help.drata.com/en/collections/2653981) have more information.
+  description: Personnel are people who work for your organization. The help docs have more information.
 paths:
   /personnel:
     get:
@@ -125,10 +131,6 @@ paths:
       - personnel-get
       x-product-area:
       - PERSONNEL_PAGE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /personnel-search:
     get:
       description: 'Personnel listing across all accessible workspaces, backed by OpenSearch. Supports full-text search via `q`, prefix matching on `firstName`/`lastName`, and a richer filter / sort surface than `GET /personnel`. Results are eventually consistent: use `GET /personnel` if read-your-writes freshness is required.
@@ -427,10 +429,6 @@ paths:
       - personnel-get
       x-product-area:
       - PERSONNEL_PAGE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/personnel-search:
     get:
       description: 'Workspace-scoped Personnel listing backed by OpenSearch. Supports full-text search via `q`, prefix matching on `firstName`/`lastName`, and a richer filter / sort surface than `GET /personnel`. Results are eventually consistent; use `GET /personnel` if read-your-writes freshness is required.
@@ -735,10 +733,6 @@ paths:
       - personnel-get
       x-product-area:
       - PERSONNEL_PAGE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /personnel/{personnelId}:
     get:
       description: 'Get a single Personnel record.
@@ -892,10 +886,6 @@ paths:
       - personnel-put
       x-product-area:
       - PERSONNEL_PAGE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /personnel/actions:
     post:
       description: 'Perform actions on Personnel records. Supports `reset-sync` for specific Personnel IDs and `reset-sync-all` for all Personnel.
@@ -962,13 +952,19 @@ paths:
       - personnel-put-reset-resync
       x-product-area:
       - PERSONNEL_PAGE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/scoped-personnel-groups:
     get:
-      description: "Returns a cursor-paginated list of personnel groups currently assigned\n            to the workspace's scope. Re-pass all original query parameters (other than the\n            cursor) on subsequent pages — the cursor only tracks position, not query context.\n\n\U0001F9EA **Note:** This endpoint is in beta and may change.\n\n\U0001F512 Requires **Workspaces: View Workspace Personnel Scope** permission."
+      description: 'Returns a cursor-paginated list of personnel groups currently assigned
+
+        to the workspace''s scope. Re-pass all original query parameters (other than the
+
+        cursor) on subsequent pages — the cursor only tracks position, not query context.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Workspaces: View Workspace Personnel Scope** permission.'
       operationId: ScopedPersonnelGroupsPublicV2Controller_listScopedPersonnelGroups
       parameters:
       - name: workspaceId
@@ -1057,7 +1053,17 @@ paths:
       x-product-area:
       - WORKSPACE_PLATFORM
     post:
-      description: "Adds a single personnel group to the workspace's scope. Returns 409\n            when the group is already assigned (active), and 400 when the group does not\n            exist or is not synced.\n\n\U0001F9EA **Note:** This endpoint is in beta and may change.\n\n\U0001F512 Requires **Workspaces: Replace Workspace Personnel Scope** permission."
+      description: 'Adds a single personnel group to the workspace''s scope. Returns 409
+
+        when the group is already assigned (active), and 400 when the group does not
+
+        exist or is not synced.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Workspaces: Replace Workspace Personnel Scope** permission.'
       operationId: ScopedPersonnelGroupsPublicV2Controller_addScopedPersonnelGroup
       parameters:
       - name: workspaceId
@@ -1131,7 +1137,19 @@ paths:
       x-product-area:
       - WORKSPACE_PLATFORM
     put:
-      description: "Full replace of the personnel groups in scope for the workspace.\n             Idempotent: groups in the payload not currently in scope are added,\n             groups currently in scope but absent from the payload are removed.\n             Omit a group to remove it from the scope.\n\n\U0001F9EA **Note:** This endpoint is in beta and may change.\n\n\U0001F512 Requires **Workspaces: Replace Workspace Personnel Scope** permission."
+      description: 'Full replace of the personnel groups in scope for the workspace.
+
+        Idempotent: groups in the payload not currently in scope are added,
+
+        groups currently in scope but absent from the payload are removed.
+
+        Omit a group to remove it from the scope.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Workspaces: Replace Workspace Personnel Scope** permission.'
       operationId: ScopedPersonnelGroupsPublicV2Controller_putScopedPersonnelGroups
       parameters:
       - name: workspaceId
@@ -1194,10 +1212,6 @@ paths:
       - workspace-personnel-scope-update
       x-product-area:
       - WORKSPACE_PLATFORM
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/scoped-personnel-groups/{groupId}:
     delete:
       operationId: ScopedPersonnelGroupsPublicV2Controller_removeScopedPersonnelGroup
@@ -1265,13 +1279,17 @@ paths:
 
 
         🔒 Requires **Workspaces: Remove Group From Workspace Personnel Scope** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/scoped-personnel-counts:
     get:
-      description: "Returns the deduplicated count of personnel reachable through the\n            workspace's scoped groups and the tenant-wide IdP-connected personnel total.\n\n\U0001F9EA **Note:** This endpoint is in beta and may change.\n\n\U0001F512 Requires **Workspaces: View Workspace Personnel Scope** permission."
+      description: 'Returns the deduplicated count of personnel reachable through the
+
+        workspace''s scoped groups and the tenant-wide IdP-connected personnel total.
+
+
+        🧪 **Note:** This endpoint is in beta and may change.
+
+
+        🔒 Requires **Workspaces: View Workspace Personnel Scope** permission.'
       operationId: ScopedPersonnelGroupsPublicV2Controller_getScopedPersonnelCounts
       parameters:
       - name: workspaceId
@@ -1332,12 +1350,38 @@ paths:
       - workspace-personnel-scope-get
       x-product-area:
       - WORKSPACE_PLATFORM
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    PersonnelSyncStatusPublicV2Enum:
+      type: string
+      enum:
+      - SYNCED
+      - NOT_SYNCED
+    PersonnelComplianceChecksSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of compliance checks for this Personnel. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/ComplianceCheckWithExclusionResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 142
+          description: Total count of all compliance checks for this Personnel.
+      required:
+      - data
+      - totalCount
     ScopedPersonnelGroupItemResponsePublicV2Dto:
       type: object
       properties:
@@ -1359,6 +1403,213 @@ components:
       - id
       - name
       - connectionProvider
+    ComplianceCheckStatusEnum:
+      type: string
+      enum:
+      - MISCONFIGURED
+      - PASS
+      - FAIL
+      - EXCLUDED
+    PersonnelCustomFieldsSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of custom field submissions for this Personnel. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 6
+          description: Total count of all custom field submissions for this Personnel.
+      required:
+      - data
+      - totalCount
+    ScopedPersonnelCountsResponsePublicV2Dto:
+      type: object
+      properties:
+        scopedPersonnelCount:
+          type: number
+          example: 42
+          description: Deduplicated count of active personnel reachable through the assigned groups.
+        totalPersonnelCount:
+          type: number
+          example: 120
+          description: Total count of active personnel reachable through any IdP-connected group in the tenant.
+      required:
+      - scopedPersonnelCount
+      - totalPersonnelCount
+    PersonnelModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        startedAt:
+          type: string
+          example: '2020-07-06'
+          description: 'The date when this person started working at the company. Note: Once manually set, automatic updates from identity providers (IDP) and HRIS systems will be ignored. Use the resync endpoint to restore automatic updates.'
+        separatedAt:
+          type: string
+          example: '2020-07-06'
+          description: The date when this person was separated from the company system.
+        employmentStatus:
+          example: CURRENT_CONTRACTOR
+          description: The desired employment status to be updated
+          allOf:
+          - $ref: '#/components/schemas/EmploymentStatusEnum'
+        notHumanReason:
+          type: string
+          maxLength: 30000
+          example: This is not a real personnel, but a placeholder for anyone in charge of X
+          description: Explains why the employment status of this personnel is marked as `OUT_OF_SCOPE`. This field is required if the `employmentStatus` is set to `OUT_OF_SCOPE`.
+        customFields:
+          description: "Custom Fields for the Person. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+    PersonSearchResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Personnel ID
+        userId:
+          type: number
+          example: 1
+          description: User ID associated with this Personnel
+        user:
+          description: The User associated with this Personnel, only returned when `expand[]=user` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        employmentStatus:
+          description: The employment status of the Personnel
+          allOf:
+          - $ref: '#/components/schemas/EmploymentStatusEnum'
+        notHumanReason:
+          type:
+          - string
+          - 'null'
+          example: This is not a real personnel, but a placeholder for anyone in charge of X
+          description: Indicates why the employment status of this Personnel is marked as `OUT_OF_SCOPE`.
+        reasonProvider:
+          description: The User who marked the employment status as `OUT_OF_SCOPE` and provided the `notHumanReason`, only returned when `expand[]=reasonProvider` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        syncStatus:
+          example: SYNCED
+          description: Binary identity-connection status. `SYNCED` means the Personnel has at least one HRIS or IDP connection; `NOT_SYNCED` means none. Mirrors the binary surface of the private `PersonnelSyncStatus` enum.
+          allOf:
+          - $ref: '#/components/schemas/PersonnelSyncStatusPublicV2Enum'
+        idpConnectionId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: ID of the IDP Connection this Personnel was synced from. `null` if the Personnel has no IDP source.
+        hrisConnectionId:
+          type:
+          - number
+          - 'null'
+          example: 2
+          description: ID of the HRIS Connection this Personnel was synced from. `null` if the Personnel has no HRIS source.
+        startedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: The date when this Personnel was onboarded onto the company system
+        separatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2023-12-31T00:00:00.000Z'
+          description: The date when this Personnel was separated from the company system
+        statusUpdatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date when this Personnel was manually updated. If this value is set, changes in the IDP or HRIS will not be reflected in the employment status.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: Personnel created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: Personnel updated date timestamp
+        complianceChecks:
+          description: Compliance checks for this Personnel with pagination metadata. Only returned when `expand[]=complianceChecks` is passed.
+          allOf:
+          - $ref: '#/components/schemas/PersonnelComplianceChecksSubcollectionPublicV2Dto'
+        customFields:
+          description: Custom field submissions for this Personnel with pagination metadata. Only returned when `expand[]=customFields` is passed.
+          allOf:
+          - $ref: '#/components/schemas/PersonnelCustomFieldsSubcollectionPublicV2Dto'
+        groups:
+          description: Groups this Personnel belongs to with pagination metadata. Only returned when `expand[]=groups` is passed.
+          allOf:
+          - $ref: '#/components/schemas/PersonnelGroupsSubcollectionPublicV2Dto'
+        idpConnection:
+          description: The IDP Connection this Personnel was synced from. Only returned when `expand[]=idpConnection` is passed.
+          allOf:
+          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
+        hrisConnection:
+          description: The HRIS Connection this Personnel was synced from. Only returned when `expand[]=hrisConnection` is passed.
+          allOf:
+          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
+      required:
+      - id
+      - userId
+      - employmentStatus
+      - syncStatus
+      - idpConnectionId
+      - hrisConnectionId
+      - startedAt
+      - statusUpdatedAt
+      - createdAt
+      - updatedAt
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    CustomRangeFieldFilterPublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 99
+          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
+        name:
+          type: string
+          example: Headcount
+          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
+        gte:
+          type: string
+          example: '5'
+          description: Greater than or equal to. Numeric or ISO-8601 date string.
+        lte:
+          type: string
+          example: '10'
+          description: Less than or equal to. Numeric or ISO-8601 date string.
     PersonnelSearchFacetsResponsePublicV2Dto:
       type: object
       properties:
@@ -1435,9 +1686,69 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-    ExceptionResponseDto:
+    ComplianceCheckWithExclusionResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Compliance Check ID
+        type:
+          description: The type of Compliance Check
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
+        status:
+          description: The status of the Compliance Check
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
+        checkFrequency:
+          description: The frequency of the Compliance Check
+          allOf:
+          - $ref: '#/components/schemas/CheckFrequencyEnum'
+        expiresAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date when this Compliance Check expires
+        lastCheckedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date when this Compliance Check was last performed
+        completionDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: The date when this Compliance Check was completed
+        createdAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: Compliance Check created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: Compliance Check updated date timestamp
+        exclusion:
+          description: Exclusion details for this compliance check, only present when status is EXCLUDED
+          allOf:
+          - $ref: '#/components/schemas/ComplianceCheckExclusionResponsePublicV2Dto'
+      required:
+      - id
+      - type
+      - status
+      - checkFrequency
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
         statusCode:
           type: number
         message:
@@ -1457,9 +1768,79 @@ components:
           - name
           - message
       required:
+      - name
       - statusCode
       - message
       - code
+    CustomFieldFilterPublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 42
+          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
+        name:
+          type: string
+          example: Department
+          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
+        value:
+          type: string
+          example: Engineering
+          description: The Custom Field value to match. Equality (case-sensitive).
+      required:
+      - value
+    EmploymentStatusEnum:
+      type: string
+      enum:
+      - CURRENT_EMPLOYEE
+      - FORMER_EMPLOYEE
+      - CURRENT_CONTRACTOR
+      - FORMER_CONTRACTOR
+      - OUT_OF_SCOPE
+      - UNKNOWN
+      - SPECIAL_FORMER_EMPLOYEE
+      - SPECIAL_FORMER_CONTRACTOR
+      - FUTURE_HIRE
+      - SERVICE_ACCOUNT
+      x-enumDescriptions:
+        CURRENT_EMPLOYEE: Current Employee
+        FORMER_EMPLOYEE: Former Employee
+        CURRENT_CONTRACTOR: Current Contractor
+        FORMER_CONTRACTOR: Former Contractor
+        FUTURE_HIRE: Future Hire – Based on the HRIS data
+        UNKNOWN: Unknown – The personnel did not match an HRIS record
+        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
+        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
+        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
+        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
+    PersonnelActionsResponsePublicV2Dto:
+      type: object
+      properties:
+        count:
+          type: number
+          description: The number of Personnel records that were affected by the action
+          example: 42
+      required:
+      - count
+    PersonnelSearchExpandEnum:
+      type: string
+      enum:
+      - customFields
+      - complianceChecks
+      - reasonProvider
+      - user
+      - groups
+      - idpConnection
+      - hrisConnection
+    ScopedPersonnelGroupsPostRequestPublicV2Dto:
+      type: object
+      properties:
+        groupId:
+          type: number
+          example: 42
+          description: Personnel group ID to add to the workspace scope.
+      required:
+      - groupId
     ScopedPersonnelGroupsPutRequestPublicV2Dto:
       type: object
       properties:
@@ -1474,6 +1855,11 @@ components:
             type: number
       required:
       - groupIds
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     ConnectionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -1848,117 +2234,84 @@ components:
       - connectedAt
       - failedAt
       - deletedAt
-    PersonnelResponsePublicV2Dto:
+    PersonnelExpandEnum:
+      type: string
+      enum:
+      - customFields
+      - complianceChecks
+      - reasonProvider
+      - user
+    PersonnelActionsRequestPublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
+        action:
+          description: The action to perform on Personnel
+          example: reset-sync
+          allOf:
+          - $ref: '#/components/schemas/PersonnelActionEnum'
+        personnelIds:
+          description: Array of Personnel IDs to perform the action on. Required for `reset-sync` action. Must not be provided for `reset-sync-all` action.
+          example:
+          - 1
+          - 2
+          - 3
           type: array
           items:
-            $ref: '#/components/schemas/PersonResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+            type: number
       required:
-      - data
-      - pagination
-    CustomRangeFieldFilterPublicV2Dto:
+      - action
+    ExceptionResponseDto:
       type: object
       properties:
-        customFieldId:
+        statusCode:
           type: number
-          example: 99
-          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
-        name:
+        message:
           type: string
-          example: Headcount
-          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
-        gte:
-          type: string
-          example: '5'
-          description: Greater than or equal to. Numeric or ISO-8601 date string.
-        lte:
-          type: string
-          example: '10'
-          description: Less than or equal to. Numeric or ISO-8601 date string.
-    UserCompactResponsePublicV2Dto:
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
+        cursor:
           type:
           - string
           - 'null'
-          example: Sally
-          description: User first name
-        lastName:
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
           type:
-          - string
+          - number
           - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    ComplianceCheckStatusEnum:
+      - cursor
+    CheckFrequencyEnum:
       type: string
       enum:
-      - MISCONFIGURED
-      - PASS
-      - FAIL
-      - EXCLUDED
-    FacetBucketResponsePublicV2Dto:
-      type: object
-      properties:
-        value:
-          type: string
-          example: CURRENT_EMPLOYEE
-          description: The facet bucket value.
-        count:
-          type: number
-          example: 312
-          description: Count of personnel records matching this value within the current result set.
-      required:
-      - value
-      - count
-    ComplianceCheckTypeEnum:
-      type: string
-      enum:
-      - FULL_COMPLIANCE
-      - ACCEPTED_POLICIES
-      - IDENTITY_MFA
-      - BG_CHECK
-      - AGENT_INSTALLED
-      - PASSWORD_MANAGER
-      - HDD_ENCRYPTION
-      - ANTIVIRUS
-      - AUTO_UPDATES
-      - LOCK_SCREEN
-      - SECURITY_TRAINING
-      - LOCATION_SERVICES
-      - HIPAA_TRAINING
-      - OFFBOARDING
-      - NIST_AI_TRAINING
+      - ONCE
+      - HOURLY
+      - QID
+      - DAILY
+      - WEEKLY
+      - BIWEEKLY
+      - MONTHLY
+      - QUARTERLY
+      - YEARLY
     ComplianceCheckExclusionResponsePublicV2Dto:
       type: object
       properties:
@@ -2003,250 +2356,74 @@ components:
       - createdAt
       - startDate
       - endDate
-    PersonSearchResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Personnel ID
-        userId:
-          type: number
-          example: 1
-          description: User ID associated with this Personnel
-        user:
-          description: The User associated with this Personnel, only returned when `expand[]=user` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        employmentStatus:
-          description: The employment status of the Personnel
-          allOf:
-          - $ref: '#/components/schemas/EmploymentStatusEnum'
-        notHumanReason:
-          type:
-          - string
-          - 'null'
-          example: This is not a real personnel, but a placeholder for anyone in charge of X
-          description: Indicates why the employment status of this Personnel is marked as `OUT_OF_SCOPE`.
-        reasonProvider:
-          description: The User who marked the employment status as `OUT_OF_SCOPE` and provided the `notHumanReason`, only returned when `expand[]=reasonProvider` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        syncStatus:
-          example: SYNCED
-          description: Binary identity-connection status. `SYNCED` means the Personnel has at least one HRIS or IDP connection; `NOT_SYNCED` means none. Mirrors the binary surface of the private `PersonnelSyncStatus` enum.
-          allOf:
-          - $ref: '#/components/schemas/PersonnelSyncStatusPublicV2Enum'
-        idpConnectionId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: ID of the IDP Connection this Personnel was synced from. `null` if the Personnel has no IDP source.
-        hrisConnectionId:
-          type:
-          - number
-          - 'null'
-          example: 2
-          description: ID of the HRIS Connection this Personnel was synced from. `null` if the Personnel has no HRIS source.
-        startedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: The date when this Personnel was onboarded onto the company system
-        separatedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2023-12-31T00:00:00.000Z'
-          description: The date when this Personnel was separated from the company system
-        statusUpdatedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The date when this Personnel was manually updated. If this value is set, changes in the IDP or HRIS will not be reflected in the employment status.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: Personnel created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: Personnel updated date timestamp
-        complianceChecks:
-          description: Compliance checks for this Personnel with pagination metadata. Only returned when `expand[]=complianceChecks` is passed.
-          allOf:
-          - $ref: '#/components/schemas/PersonnelComplianceChecksSubcollectionPublicV2Dto'
-        customFields:
-          description: Custom field submissions for this Personnel with pagination metadata. Only returned when `expand[]=customFields` is passed.
-          allOf:
-          - $ref: '#/components/schemas/PersonnelCustomFieldsSubcollectionPublicV2Dto'
-        groups:
-          description: Groups this Personnel belongs to with pagination metadata. Only returned when `expand[]=groups` is passed.
-          allOf:
-          - $ref: '#/components/schemas/PersonnelGroupsSubcollectionPublicV2Dto'
-        idpConnection:
-          description: The IDP Connection this Personnel was synced from. Only returned when `expand[]=idpConnection` is passed.
-          allOf:
-          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
-        hrisConnection:
-          description: The HRIS Connection this Personnel was synced from. Only returned when `expand[]=hrisConnection` is passed.
-          allOf:
-          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
-      required:
-      - id
-      - userId
-      - employmentStatus
-      - syncStatus
-      - idpConnectionId
-      - hrisConnectionId
-      - startedAt
-      - statusUpdatedAt
-      - createdAt
-      - updatedAt
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    ScopedPersonnelCountsResponsePublicV2Dto:
-      type: object
-      properties:
-        scopedPersonnelCount:
-          type: number
-          example: 42
-          description: Deduplicated count of active personnel reachable through the assigned groups.
-        totalPersonnelCount:
-          type: number
-          example: 120
-          description: Total count of active personnel reachable through any IdP-connected group in the tenant.
-      required:
-      - scopedPersonnelCount
-      - totalPersonnelCount
-    SortDirectionEnum:
+    PersonnelActionEnum:
       type: string
       enum:
-      - ASC
-      - DESC
-    ScopedPersonnelGroupsPostRequestPublicV2Dto:
+      - reset-sync
+      - reset-sync-all
+    FacetBucketResponsePublicV2Dto:
       type: object
       properties:
-        groupId:
-          type: number
-          example: 42
-          description: Personnel group ID to add to the workspace scope.
-      required:
-      - groupId
-    PersonnelSearchFacetEnum:
-      type: string
-      enum:
-      - employmentStatus
-      - complianceStatus
-      - syncStatus
-      - groupIds
-      - acceptedPoliciesStatus
-      - bgCheckStatus
-      - identityMfaStatus
-      - securityTrainingStatus
-      - hipaaTrainingStatus
-      - aiAwarenessTrainingStatus
-      - offboardingStatus
-      - agentInstalledStatus
-      - passwordManagerStatus
-      - diskEncryptionStatus
-      - antivirusStatus
-      - autoUpdatesStatus
-      - lockScreenStatus
-    CustomFieldFilterPublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 42
-          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
-        name:
-          type: string
-          example: Department
-          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
         value:
           type: string
-          example: Engineering
-          description: The Custom Field value to match. Equality (case-sensitive).
+          example: CURRENT_EMPLOYEE
+          description: The facet bucket value.
+        count:
+          type: number
+          example: 312
+          description: Count of personnel records matching this value within the current result set.
       required:
       - value
-    PersonnelSortEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-      - name
-      - startDate
-    CheckFrequencyEnum:
-      type: string
-      enum:
-      - ONCE
-      - HOURLY
-      - QID
-      - DAILY
-      - WEEKLY
-      - BIWEEKLY
-      - MONTHLY
-      - QUARTERLY
-      - YEARLY
-    GroupCompactResponsePublicV2Dto:
+      - count
+    ScopedPersonnelGroupsListResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 1
-          description: Group ID
-        name:
-          type: string
-          example: Engineering Team
-          description: Group name
-        externalId:
-          type: string
-          example: external-group-123
-          description: External ID from Group identity provider
-        source:
-          type: string
-          example: GOOGLE
-          description: 'Identity source. DEPRECATED: This field will be removed in a future release.'
-          deprecated: true
-        connectionId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: The ID of the identity provider connection that synced this group. Use Get Connection to retrieve connection details including `clientType` and `clientAlias`.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Updated date timestamp
+        data:
+          description: Personnel groups assigned to the workspace scope.
+          type: array
+          items:
+            $ref: '#/components/schemas/ScopedPersonnelGroupItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
       required:
-      - id
-      - name
-      - externalId
-      - source
-      - createdAt
-      - updatedAt
+      - data
+      - pagination
+    PersonnelSearchResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonSearchResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        facets:
+          description: Per-field value counts for the requested facets. Only present when the request supplied `facets[]` AND it was the first page (`cursor` was null). Bounded enum facets (`employmentStatus`, `complianceStatus`, `syncStatus`) are enriched with zero-count entries for every enum value. Unbounded facets (`groupIds`) return only values present in the result set, capped at the per-facet maximum.
+          example:
+            employmentStatus:
+            - value: CURRENT_EMPLOYEE
+              count: 312
+            - value: FORMER_EMPLOYEE
+              count: 24
+          allOf:
+          - $ref: '#/components/schemas/PersonnelSearchFacetsResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    PersonnelResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PersonResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     PersonResponsePublicV2Dto:
       type: object
       properties:
@@ -2324,183 +2501,88 @@ components:
       - statusUpdatedAt
       - createdAt
       - updatedAt
-    PersonnelActionsRequestPublicV2Dto:
-      type: object
-      properties:
-        action:
-          description: The action to perform on Personnel
-          example: reset-sync
-          allOf:
-          - $ref: '#/components/schemas/PersonnelActionEnum'
-        personnelIds:
-          description: Array of Personnel IDs to perform the action on. Required for `reset-sync` action. Must not be provided for `reset-sync-all` action.
-          example:
-          - 1
-          - 2
-          - 3
-          type: array
-          items:
-            type: number
-      required:
-      - action
-    PersonnelActionEnum:
-      type: string
-      enum:
-      - reset-sync
-      - reset-sync-all
-    PersonnelExpandEnum:
-      type: string
-      enum:
-      - customFields
-      - complianceChecks
-      - reasonProvider
-      - user
-    PersonnelSearchResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/PersonSearchResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-        facets:
-          description: Per-field value counts for the requested facets. Only present when the request supplied `facets[]` AND it was the first page (`cursor` was null). Bounded enum facets (`employmentStatus`, `complianceStatus`, `syncStatus`) are enriched with zero-count entries for every enum value. Unbounded facets (`groupIds`) return only values present in the result set, capped at the per-facet maximum.
-          example:
-            employmentStatus:
-            - value: CURRENT_EMPLOYEE
-              count: 312
-            - value: FORMER_EMPLOYEE
-              count: 24
-          allOf:
-          - $ref: '#/components/schemas/PersonnelSearchFacetsResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    ComplianceCheckStatusPublicV2Enum:
-      type: string
-      enum:
-      - PASS
-      - FAIL
-      - MISCONFIGURED
-      - EXCLUDED
-      - OUT_OF_SCOPE
-    PersonnelModifyRequestPublicV2Dto:
-      type: object
-      properties:
-        startedAt:
-          type: string
-          example: '2020-07-06'
-          description: 'The date when this person started working at the company. Note: Once manually set, automatic updates from identity providers (IDP) and HRIS systems will be ignored. Use the resync endpoint to restore automatic updates.'
-        separatedAt:
-          type: string
-          example: '2020-07-06'
-          description: The date when this person was separated from the company system.
-        employmentStatus:
-          example: CURRENT_CONTRACTOR
-          description: The desired employment status to be updated
-          allOf:
-          - $ref: '#/components/schemas/EmploymentStatusEnum'
-        notHumanReason:
-          type: string
-          maxLength: 30000
-          example: This is not a real personnel, but a placeholder for anyone in charge of X
-          description: Explains why the employment status of this personnel is marked as `OUT_OF_SCOPE`. This field is required if the `employmentStatus` is set to `OUT_OF_SCOPE`.
-        customFields:
-          description: "Custom Fields for the Person. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-    PersonnelSyncStatusPublicV2Enum:
-      type: string
-      enum:
-      - SYNCED
-      - NOT_SYNCED
-    CustomFieldSubmitRequestPublicV2Dto:
+    UserCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: The ID of the Custom Field. Either this or the name must be provided.
-        name:
+          description: User ID
+        email:
           type: string
-          example: Compliance Status
-          description: The name of the Custom Field. Either this or the ID must be provided.
-        value:
+          example: email@example.com
+          description: User email
+        firstName:
           type:
           - string
           - 'null'
-          example: Security & IT
-          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
       required:
-      - value
-    ScopedPersonnelGroupsListResponsePublicV2Dto:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    PersonnelSortEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+      - name
+      - startDate
+    PersonnelSearchFacetEnum:
+      type: string
+      enum:
+      - employmentStatus
+      - complianceStatus
+      - syncStatus
+      - groupIds
+      - acceptedPoliciesStatus
+      - bgCheckStatus
+      - identityMfaStatus
+      - securityTrainingStatus
+      - hipaaTrainingStatus
+      - aiAwarenessTrainingStatus
+      - offboardingStatus
+      - agentInstalledStatus
+      - passwordManagerStatus
+      - diskEncryptionStatus
+      - antivirusStatus
+      - autoUpdatesStatus
+      - lockScreenStatus
+    PersonnelGroupsSubcollectionPublicV2Dto:
       type: object
       properties:
         data:
-          description: Personnel groups assigned to the workspace scope.
+          description: Array of groups this Personnel belongs to. Limited to a maximum of 10 items.
           type: array
           items:
-            $ref: '#/components/schemas/ScopedPersonnelGroupItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+            $ref: '#/components/schemas/GroupCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 12
+          description: Total count of all groups this Personnel belongs to.
       required:
       - data
-      - pagination
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    EmploymentStatusEnum:
-      type: string
-      enum:
-      - CURRENT_EMPLOYEE
-      - FORMER_EMPLOYEE
-      - CURRENT_CONTRACTOR
-      - FORMER_CONTRACTOR
-      - OUT_OF_SCOPE
-      - UNKNOWN
-      - SPECIAL_FORMER_EMPLOYEE
-      - SPECIAL_FORMER_CONTRACTOR
-      - FUTURE_HIRE
-      - SERVICE_ACCOUNT
-      x-enumDescriptions:
-        CURRENT_EMPLOYEE: Current Employee
-        FORMER_EMPLOYEE: Former Employee
-        CURRENT_CONTRACTOR: Current Contractor
-        FORMER_CONTRACTOR: Former Contractor
-        FUTURE_HIRE: Future Hire – Based on the HRIS data
-        UNKNOWN: Unknown – The personnel did not match an HRIS record
-        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
-        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
-        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
-        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
+      - totalCount
     CustomFieldResponsePublicV2Dto:
       type: object
       properties:
@@ -2521,153 +2603,82 @@ components:
       required:
       - customFieldId
       - name
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    PersonnelSearchExpandEnum:
-      type: string
-      enum:
-      - customFields
-      - complianceChecks
-      - reasonProvider
-      - user
-      - groups
-      - idpConnection
-      - hrisConnection
-    ComplianceCheckWithExclusionResponsePublicV2Dto:
+    GroupCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Compliance Check ID
-        type:
-          description: The type of Compliance Check
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckTypeEnum'
-        status:
-          description: The status of the Compliance Check
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckStatusEnum'
-        checkFrequency:
-          description: The frequency of the Compliance Check
-          allOf:
-          - $ref: '#/components/schemas/CheckFrequencyEnum'
-        expiresAt:
+          description: Group ID
+        name:
+          type: string
+          example: Engineering Team
+          description: Group name
+        externalId:
+          type: string
+          example: external-group-123
+          description: External ID from Group identity provider
+        source:
+          type: string
+          example: GOOGLE
+          description: 'Identity source. DEPRECATED: This field will be removed in a future release.'
+          deprecated: true
+        connectionId:
           type:
-          - string
+          - number
           - 'null'
-          format: date-time
-          description: The date when this Compliance Check expires
-        lastCheckedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The date when this Compliance Check was last performed
-        completionDate:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: The date when this Compliance Check was completed
+          example: 1
+          description: The ID of the identity provider connection that synced this group. Use Get Connection to retrieve connection details including `clientType` and `clientAlias`.
         createdAt:
           type: string
           format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: Compliance Check created date timestamp
+          example: '2025-07-01T16:45:55.246Z'
+          description: Created date timestamp
         updatedAt:
           type: string
           format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: Compliance Check updated date timestamp
-        exclusion:
-          description: Exclusion details for this compliance check, only present when status is EXCLUDED
-          allOf:
-          - $ref: '#/components/schemas/ComplianceCheckExclusionResponsePublicV2Dto'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Updated date timestamp
       required:
       - id
-      - type
-      - status
-      - checkFrequency
+      - name
+      - externalId
+      - source
       - createdAt
       - updatedAt
-    PersonnelComplianceChecksSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of compliance checks for this Personnel. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/ComplianceCheckWithExclusionResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 142
-          description: Total count of all compliance checks for this Personnel.
-      required:
-      - data
-      - totalCount
-    PersonnelGroupsSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of groups this Personnel belongs to. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 12
-          description: Total count of all groups this Personnel belongs to.
-      required:
-      - data
-      - totalCount
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    PersonnelActionsResponsePublicV2Dto:
-      type: object
-      properties:
-        count:
-          type: number
-          description: The number of Personnel records that were affected by the action
-          example: 42
-      required:
-      - count
-    PersonnelCustomFieldsSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of custom field submissions for this Personnel. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 6
-          description: Total count of all custom field submissions for this Personnel.
-      required:
-      - data
-      - totalCount
+    ComplianceCheckStatusPublicV2Enum:
+      type: string
+      enum:
+      - PASS
+      - FAIL
+      - MISCONFIGURED
+      - EXCLUDED
+      - OUT_OF_SCOPE
+    ComplianceCheckTypeEnum:
+      type: string
+      enum:
+      - FULL_COMPLIANCE
+      - ACCEPTED_POLICIES
+      - IDENTITY_MFA
+      - BG_CHECK
+      - AGENT_INSTALLED
+      - PASSWORD_MANAGER
+      - HDD_ENCRYPTION
+      - ANTIVIRUS
+      - AUTO_UPDATES
+      - LOCK_SCREEN
+      - SECURITY_TRAINING
+      - LOCATION_SERVICES
+      - HIPAA_TRAINING
+      - OFFBOARDING
+      - NIST_AI_TRAINING
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

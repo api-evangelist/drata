@@ -1,9 +1,15 @@
 openapi: 3.2.0
 info:
   title: Drata User Documents API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged User Documents across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
@@ -226,10 +232,6 @@ paths:
       - users-post-document
       x-product-area:
       - PERSONNEL_COMPLIANCE
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /users/{userId}/documents/{documentId}:
     get:
       description: 'Get the full detail of a User Document.
@@ -366,12 +368,66 @@ paths:
       x-product-area:
       - PERSONNEL_COMPLIANCE
       description: '🔒 Requires **Users: Delete User Document** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    UserDocumentsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Full list of user documents
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -400,21 +456,6 @@ components:
       - statusCode
       - message
       - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
     SignedUrlResponsePublicV2Dto:
       type: object
       properties:
@@ -439,53 +480,44 @@ components:
       - signedUrl
       - fileBuffer
       - fileName
-    UserDocumentsResponsePublicV2Dto:
+    UserDocumentExpandEnum:
+      type: string
+      enum:
+      - downloadUrl
+    UserDocumentCreateRequestPublicV2Dto:
       type: object
       properties:
-        data:
-          description: Full list of user documents
-          type: array
-          items:
-            $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        type:
+          enum:
+          - MFA_EVIDENCE
+          - SEC_TRAINING
+          - HIPAA_TRAINING_EVIDENCE
+          - OFFBOARDING_EVIDENCE
+          type: string
+          example: SEC_TRAINING
+          description: The user document type
+        file:
+          type: string
+          format: binary
+          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png'
+        base64File:
+          type: string
+          example:
+            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
+            filename: excellent-filename
+          description: JSON string with external evidence in Base64 format.
+        completionDate:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: The date when the compliance was completed
       required:
-      - data
-      - pagination
+      - type
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    UserDocumentExpandEnum:
-      type: string
-      enum:
-      - downloadUrl
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
     UserDocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -549,45 +581,8 @@ components:
       - renewalDate
       - createdAt
       - updatedAt
-    UserDocumentCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        type:
-          enum:
-          - MFA_EVIDENCE
-          - SEC_TRAINING
-          - HIPAA_TRAINING_EVIDENCE
-          - OFFBOARDING_EVIDENCE
-          type: string
-          example: SEC_TRAINING
-          description: The user document type
-        file:
-          type: string
-          format: binary
-          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png'
-        base64File:
-          type: string
-          example:
-            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
-            filename: excellent-filename
-          description: JSON string with external evidence in Base64 format.
-        completionDate:
-          type: string
-          format: date-time
-          example: '2020-07-06'
-          description: The date when the compliance was completed
-      required:
-      - type
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

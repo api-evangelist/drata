@@ -1,0 +1,205 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  openapi/drata-api-v2-openapi.yml (197 operations) + openapi/drata-safebase-trust-api-openapi.yml +
+  https://help.drata.com/en/articles/6695964-drata-public-api +
+  https://developers.drata.com/openapi/reference/v2/overview/
+provider: Drata
+providerId: drata
+description: >-
+  Cross-cutting runtime semantics for the Drata Public API v2, the SafeBase Trust API and the
+  Drata MCP server. Derived from the published OpenAPI documents and Drata's help-centre API
+  article; nothing here is inferred from behaviour we did not observe.
+
+authentication:
+  public_api_v2:
+    style: bearer API key
+    header: 'Authorization: Bearer <API_KEY>'
+    scheme: bearer
+    bearer_format: API_KEY
+    note: >-
+      Not a JWT despite the bearer scheme — Drata's spec labels the bearerFormat "API_KEY".
+      Keys are created under Settings -> API Keys, shown once, and carry a name (immutable),
+      an expiration (12 months default, or Never, or Custom), an optional source-IP allowlist,
+      and scopes chosen as Custom / All read / All read and write.
+    lifecycle_states: [Active, Expires soon, Expired, Revoked]
+    irreversible: Revocation and expiry are permanent; neither state can be converted back to Active.
+  safebase:
+    style: API key header
+    header: 'x-sb-api-key: <API_KEY>'
+  mcp:
+    style: OAuth 2.x bearer with PKCE and dynamic client registration
+    metadata: https://mcp.drata.com/.well-known/oauth-protected-resource
+  docs: authentication/drata-authentication.yml
+
+idempotency:
+  supported: false
+  key_header: null
+  evidence: >-
+    Zero occurrences of "Idempotency", "Idempotency-Key" or any /idempoten/i token across the
+    entire 197-operation OpenAPI document and its 520 schemas, and no mention in the help-centre
+    API article. Drata publishes no idempotency-key mechanism.
+  partial_signal: >-
+    One operation returns HTTP 204 with the description "Control is already in the requested
+    state; no change was made." That is an idempotent OUTCOME on a single state-setting call,
+    not a general replay-safety contract; it does not protect a retried POST from creating a
+    duplicate.
+  agent_guidance: >-
+    Treat every POST as potentially duplicating. Before retrying a create after a timeout or a
+    5xx, list the collection and match on the natural key rather than re-POSTing.
+
+pagination:
+  style: cursor
+  request_params:
+  - name: cursor
+    in: query
+    used_by: 62 operations
+    note: Omit on the first request; pass back the value returned in pagination.cursor.
+  - name: size
+    in: query
+    used_by: 62 operations
+  - name: sort
+    in: query
+    used_by: 62 operations
+  - name: sortDir
+    in: query
+    used_by: 62 operations
+  - name: includeTotalCount
+    in: query
+    used_by: 53 operations
+    note: Total counts are opt-in — omitting it keeps list responses cheap.
+  response_field: pagination.cursor
+  termination: A response with no pagination.cursor value is the last page.
+  note: >-
+    V2 replaced V1 offset paging with cursor paging specifically so that records are not
+    skipped or duplicated when the underlying data changes mid-walk. Drata publishes a
+    worked fetchAll() example in the spec description.
+
+field_expansion:
+  supported: true
+  param: 'expand[]'
+  in: query
+  used_by: 70 operations
+  note: >-
+    V2 payloads are deliberately minimal; related objects and collections are opted into with
+    expand[]. Each operation declares its own allowed expand enum in the spec — read the
+    per-operation enum rather than assuming a global vocabulary.
+
+multi_tenancy:
+  param: workspaceId
+  in: path
+  used_by: 64 operations
+  note: >-
+    A large share of the surface is workspace-scoped in the PATH, not by header or token
+    claim. An agent that caches an entity id must cache the workspaceId with it, or the same
+    id will 404 in a sibling workspace.
+
+custom_fields:
+  note: >-
+    Custom Field Definitions may be addressed by name, but an ambiguous name returns HTTP 422
+    "Multiple Custom Field Definitions match the provided name. Use the numeric ID." Resolve
+    to the numeric id once and cache it.
+
+versioning:
+  scheme: path
+  current: v2
+  path_segment: /public/v2
+  previous: v1
+  migration_notes: >-
+    The spec's own description documents the V1 -> V2 differences: cursor pagination replaces
+    offset pagination, and payloads are slimmed with opt-in expand[]. Drata publishes no dated
+    deprecation policy and no Sunset/Deprecation response headers.
+  experimental_marker: >-
+    Drata marks in-flux operations by appending a 🧪 test-tube emoji to the operation summary
+    (for example "Delete HRIS User Identity 🧪", "Remove Personnel Group From Workspace Scope 🧪").
+    This is a real, machine-detectable beta signal in the contract, but it is not the OpenAPI
+    `deprecated` flag — zero operations carry `deprecated: true`.
+
+error_envelope:
+  media_type: application/json
+  rfc9457: false
+  shape: '{name, statusCode, message, code, debugInfo?}'
+  schema: ExceptionResponsePublicV2Dto
+  divergence: >-
+    The MCP gateway returns a DIFFERENT shape — {error, message} — so an agent spanning REST
+    and MCP must parse two envelopes.
+  catalog: errors/drata-problem-types.yml
+
+rate_limit_signaling:
+  limit: 500 requests per minute
+  scope: per unique source IP
+  status_on_exhaustion: 429
+  headers: [Retry-After]
+  note: >-
+    The limit is per SOURCE IP, not per key or per tenant — so several keys or several agents
+    behind one NAT share one budget, and adding keys does not add throughput. No X-RateLimit-*
+    or RateLimit-* headers are documented and none are declared in the spec.
+  catalog: rate-limits/drata-rate-limits.yml
+
+request_id_tracing:
+  supported: unknown
+  note: >-
+    No request-id or correlation-id header is declared anywhere in the spec, and none is
+    documented. The error envelope's `debugInfo` {name, message, stack} is the only
+    troubleshooting payload Drata exposes.
+
+audit_trail:
+  note: >-
+    Drata states on its API product page that "Any call that makes a change in your Drata App
+    will be tracked as a separate event and entity, ensuring a complete audit trail." The
+    Events tag (4 operations) is the read side of that trail.
+  source: https://drata.com/products/api
+
+reversibility:
+  grade: none
+  write_surface: true
+  summary: >-
+    Drata's write surface is substantial — 55 mutating operations including 20 DELETEs — and it
+    publishes NO reversal path and NO restore window for any of them. There is no undo, no
+    restore, no unarchive, no soft-delete-with-retention, and no cancel operation anywhere in
+    the 197-operation contract. An agent deleting a Risk Register, an Evidence item, a Vendor
+    or a Custom Connection cannot put it back through the API.
+  reversal_operations: []
+  windows_stated: []
+  evidence: >-
+    Scanned all 197 operationIds and summaries for cancel/refund/void/reverse/undo/rollback/
+    restore/unarchive/reopen. Every match was a forward-destructive DELETE (deleteRisk,
+    deleteRiskRegister, deleteEvidence, deleteEvidenceArtifact, deleteVendor, deleteAsset,
+    deleteCustomConnection, deleteCustomData, deleteControlNote, deleteControlOwner,
+    deleteDeviceDocument, deleteUserDocument, deleteRiskNote, deleteRiskDocument,
+    deleteEvidenceLibrary, deleteVendorType, removePolicyApprovalConfiguration,
+    removeScopedPersonnelGroup, deleteCustomHrisUserIdentity, deleteDeviceFromCustomConnection).
+    None has a paired restore operation and no docs page states a recovery window.
+  explicitly_irreversible:
+  - operation: API key revocation (product UI, not the API)
+    statement: >-
+      "Revoking an API key cannot be undone. Once revoked, that key can no longer make
+      authenticated calls to the Drata API." Expiration is likewise permanent.
+    source: https://help.drata.com/en/articles/6695964-drata-public-api
+  agent_guidance: >-
+    Treat every DELETE on this API as terminal. Read the resource, persist the full body, and
+    confirm with a human before issuing the call. This matters more here than on a typical
+    SaaS API because the deleted objects ARE the audit evidence — a destroyed Evidence
+    artifact or Risk Register is compliance history, and Drata documents no way to recover it.
+  not_stated: >-
+    Drata may well retain deleted records or offer support-assisted recovery; it simply does
+    not say so anywhere public. No window is asserted here because none is published.
+
+dry_run_mode:
+  supported: false
+  note: No preview, validate-only, simulate or dry-run parameter appears in the contract.
+
+sandbox:
+  available: false
+  note: >-
+    Drata publishes no sandbox, test tenant, demo credentials or magic test identifiers. The
+    only way to exercise the API is against a live paid tenant with a real API key, which is
+    also why no sandbox/ artifact is written.
+
+cross_links:
+  errors: errors/drata-problem-types.yml
+  lifecycle: lifecycle/drata-lifecycle.yml
+  authentication: authentication/drata-authentication.yml
+  scopes: scopes/drata-scopes.yml
+  rate_limits: rate-limits/drata-rate-limits.yml
+  data_model: data-model/drata-data-model.yml

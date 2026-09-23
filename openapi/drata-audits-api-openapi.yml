@@ -1,9 +1,15 @@
 openapi: 3.2.0
 info:
   title: Drata Audits API
+  description: '### What''s New in V2
+
+    - Support for Custom Fields
+
+    - Get and acknowledge user''s assigned policies
+
+    - Payloads are streamlined to include only the essential information.'
   version: V2
   contact: {}
-  description: 'Operations tagged Audits across 2 of this provider''s published API definitions: drata-api-v2-openapi.json, drata-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://public-api.drata.com/public/v2
 - url: https://public-api.eu.drata.com/public/v2
@@ -110,10 +116,6 @@ paths:
       x-product-area:
       - AUDIT_HUB
       description: '🔒 Requires **Audits: Get Audits** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
   /workspaces/{workspaceId}/audits/{auditId}:
     get:
       operationId: AuditsPublicV2Controller_getAudit
@@ -190,80 +192,78 @@ paths:
       x-product-area:
       - AUDIT_HUB
       description: '🔒 Requires **Audits: Get Audits** permission.'
-    servers:
-    - url: https://public-api.drata.com/public/v2
-    - url: https://public-api.eu.drata.com/public/v2
-    - url: https://public-api.apac.drata.com/public/v2
 components:
   schemas:
-    ExceptionResponsePublicV2Dto:
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    AuditorFrameworkOverhaulStatusEnum:
+      type: string
+      enum:
+      - PREPARING
+      - ACTIVE
+      - COMPLETED
+    PaginationResponsePublicV2Dto:
       type: object
       properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
+        cursor:
           type:
           - string
           - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
       required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
+      - cursor
+    AuditorFrameworkTypeEnum:
+      type: string
+      enum:
+      - SOC_2_TYPE_1
+      - SOC_2_TYPE_2
+      - ISO_27001
+      - HIPAA
+      - PCI
+      - GDPR
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - CCPA
+      - ISO_27701
+      - COBIT
+      - SOX_ITGC
+      - ISO_27001_2022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO_27017_2015
+      - ISO_27018_2019
+      - NISTAI
+      - PCI4
+      - FEDRAMP
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO_42001_2023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO_27018_2025
+      - CCPA2026
+      - ISO_27701_2025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - CUSTOM
     AuditGetResponsePublicV2Dto:
       type: object
       properties:
@@ -344,6 +344,138 @@ components:
       - completedAt
       - createdAt
       - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    AuditListExpandEnum:
+      type: string
+      enum:
+      - auditors
+      - internalAuditors
+    AuditsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    AuditorCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier of the Auditor
+        name:
+          type: string
+          example: Jane Smith
+          description: Full name of the Auditor
+        email:
+          type: string
+          format: email
+          example: jane.smith@auditfirm.com
+          description: Email address of the Auditor
+      required:
+      - id
+      - name
+      - email
     AuditItemResponsePublicV2Dto:
       type: object
       properties:
@@ -419,79 +551,6 @@ components:
       - completedAt
       - createdAt
       - updatedAt
-    AuditExpandEnum:
-      type: string
-      enum:
-      - auditors
-      - internalAuditors
-      - controls
-    AuditorCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: Unique identifier of the Auditor
-        name:
-          type: string
-          example: Jane Smith
-          description: Full name of the Auditor
-        email:
-          type: string
-          format: email
-          example: jane.smith@auditfirm.com
-          description: Email address of the Auditor
-      required:
-      - id
-      - name
-      - email
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    AuditorFrameworkOverhaulStatusEnum:
-      type: string
-      enum:
-      - PREPARING
-      - ACTIVE
-      - COMPLETED
-    AuditListExpandEnum:
-      type: string
-      enum:
-      - auditors
-      - internalAuditors
-    AuditTypeEnum:
-      type: string
-      enum:
-      - FULL_AUDIT
-      - DOWNLOAD_ONLY_AUDIT
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
     AuditControlCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -518,88 +577,24 @@ components:
       - code
       - name
       - controlNumber
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    AuditorFrameworkTypeEnum:
+    AuditExpandEnum:
       type: string
       enum:
-      - SOC_2_TYPE_1
-      - SOC_2_TYPE_2
-      - ISO_27001
-      - HIPAA
-      - PCI
-      - GDPR
-      - SCF
-      - NIST80053
-      - NISTCSF
-      - CMMC
-      - NIST800171
-      - MSSSPA
-      - FFIEC
-      - CCPA
-      - ISO_27701
-      - COBIT
-      - SOX_ITGC
-      - ISO_27001_2022
-      - CCM
-      - CYBER_ESSENTIALS
-      - ISO_27017_2015
-      - ISO_27018_2019
-      - NISTAI
-      - PCI4
-      - FEDRAMP
-      - NISTCSF2
-      - NIS2
-      - DORA
-      - ISO_42001_2023
-      - DRATA_ESSENTIALS
-      - NIST800171R3
-      - CIS8
-      - CYBER_ESSENTIALS_32
-      - FEDRAMP20X
-      - HITRUST
-      - MSSSPA11
-      - ESSENTIAL_EIGHT
-      - NYDFS
-      - TISAX
-      - ISO_27018_2025
-      - CCPA2026
-      - ISO_27701_2025
-      - CPS230
-      - CYFUN
-      - AIUC_1
-      - CUSTOM
-    AuditsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortDirectionEnum:
+      - auditors
+      - internalAuditors
+      - controls
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - createdAt
+      - updatedAt
+    AuditTypeEnum:
+      type: string
+      enum:
+      - FULL_AUDIT
+      - DOWNLOAD_ONLY_AUDIT
   securitySchemes:
     bearer:
       scheme: bearer
       bearerFormat: API_KEY
       type: http
-x-refined-from:
-- drata-api-v2-openapi.json
-- drata-api-v2-openapi.yml

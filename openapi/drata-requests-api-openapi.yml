@@ -83,7 +83,19 @@ paths:
       tags:
       - Requests
       summary: Approve access request
-      description: "Approve access request\n\n Takes as input an object that must have one of two keys (not both):\n\n \n\n1. accountId - The account ID under which to approve the request \n\n2. account - Account information. The account will be created and the request will be approved under it \n\n**Idempotent Operation**: If the request has already been approved or declined, this endpoint will return a 409 Conflict response instead of an error. This allows for safe retries without side effects."
+      description: 'Approve access request
+
+
+        Takes as input an object that must have one of two keys (not both):
+
+
+        1. accountId - The account ID under which to approve the request
+
+
+        2. account - Account information. The account will be created and the request will be approved under it
+
+
+        **Idempotent Operation**: If the request has already been approved or declined, this endpoint will return a 409 Conflict response instead of an error. This allows for safe retries without side effects.'
       operationId: approveRequest
       parameters:
       - name: requestId
@@ -189,13 +201,6 @@ paths:
         - accounts:edit
 components:
   schemas:
-    CreateAccountPayload:
-      type: object
-      description: Account object that needs to be added to SafeBase
-      required:
-      - name
-      properties:
-        $ref: '#/paths/~1accounts/post/requestBody/content/application~1json/schema/properties/input/properties'
     AccountOutput:
       type: object
       properties:
@@ -218,18 +223,6 @@ components:
           type: string | null
           format: date-time
           example: '2022-01-01T12:00:00Z'
-    ApiResponseInvalidApiKeyOrMissingScope:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 403
-        error:
-          type: string
-          example: forbidden
-        message:
-          type: string
-          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
     ApiResponseInvalidRequest:
       type: object
       properties:
@@ -242,26 +235,6 @@ components:
         message:
           type: string
           example: Invalid request.
-    ApiResponseNotFound:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 404
-        error:
-          type: string
-          example: not_found
-        message:
-          type: string
-          example: Not found
-    NdaProvider:
-      type: string
-      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
-      enum:
-      - none
-      - clickwrap
-      - docusign
-      - override
     ApiResponseConflict:
       type: object
       properties:
@@ -277,6 +250,45 @@ components:
             type: string
           example:
           - Request has already been handled.
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    NdaProvider:
+      type: string
+      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
+      enum:
+      - none
+      - clickwrap
+      - docusign
+      - override
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
+    CreateAccountPayload:
+      type: object
+      description: Account object that needs to be added to SafeBase
+      required:
+      - name
+      properties:
+        $ref: '#/paths/~1accounts/post/requestBody/content/application~1json/schema/properties/input/properties'
   responses:
     '400':
       description: Invalid request
@@ -284,8 +296,20 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
     '405':
       description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '404':
+      description: Not found or no access
       content:
         application/json:
           schema:
@@ -296,18 +320,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseConflict'
-    '404':
-      description: Not found or no access
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseNotFound'
-    '403':
-      description: Invalid api key / missing scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
   securitySchemes:
     apiKey:
       type: apiKey

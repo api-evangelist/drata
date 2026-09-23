@@ -1,22 +1,131 @@
-generated: '2026-07-15'
+generated: '2026-08-27'
 method: generated
-source: openapi/drata-openapi.yml
+source: openapi/drata-api-v2-openapi.yml, openapi/drata-safebase-trust-api-openapi.yml
 description: Recommended x-agentic-access execution contracts, classified heuristically from
   the OpenAPI. A governance starting point for exposing this API to AI agents — review and bind
   audience per deployment. See research/curity/agentic-governance/.
 summary:
-  operations: 21
+  operations: 238
   by_action_class:
-    connected: 14
-    acting: 7
+    connected: 124
+    acting: 114
   by_consequence:
-    read: 14
-    write: 7
-  human_in_the_loop_required: 0
+    read: 124
+    safety-critical: 93
+    write: 21
+  human_in_the_loop_required: 93
 operations:
+- path: /custom-connections
+  method: get
+  operationId: CustomConnectionsPublicV2Controller_listCustomConnections
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections
+  method: post
+  operationId: CustomConnectionsPublicV2Controller_createCustomConnection
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}
+  method: get
+  operationId: CustomConnectionsPublicV2Controller_getCustomConnection
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}
+  method: put
+  operationId: CustomConnectionsPublicV2Controller_updateCustomConnection
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}
+  method: delete
+  operationId: CustomConnectionsPublicV2Controller_deleteCustomConnection
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/audits/{auditId}/requests
+  method: get
+  operationId: AuditRequestsPublicV2Controller_listAuditRequests
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/audits/{auditId}/requests/{requestId}
+  method: get
+  operationId: AuditRequestsPublicV2Controller_getAuditRequest
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/audits
+  method: get
+  operationId: AuditsPublicV2Controller_listAudits
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/audits/{auditId}
+  method: get
+  operationId: AuditsPublicV2Controller_getAudit
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
 - path: /assets
   method: get
-  operationId: listAssets
+  operationId: AssetsPublicV2Controller_listAssets
   x-agentic-access:
     action-class: connected
     consequence: read
@@ -26,23 +135,23 @@ operations:
     audit: none
 - path: /assets
   method: post
-  operationId: createAsset
+  operationId: AssetsPublicV2Controller_createAsset
   x-agentic-access:
     action-class: acting
-    consequence: write
+    consequence: safety-critical
     subject: required
     audience: null
     token:
-      max-ttl: 900
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
     escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
+      human-in-the-loop: required
     audit: required
 - path: /assets/{assetId}
   method: get
-  operationId: getAsset
+  operationId: AssetsPublicV2Controller_getAsset
   x-agentic-access:
     action-class: connected
     consequence: read
@@ -52,65 +161,1063 @@ operations:
     audit: none
 - path: /assets/{assetId}
   method: put
-  operationId: updateAsset
+  operationId: AssetsPublicV2Controller_updateAsset
   x-agentic-access:
     action-class: acting
-    consequence: write
+    consequence: safety-critical
     subject: required
     audience: null
     token:
-      max-ttl: 900
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
     escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
+      human-in-the-loop: required
     audit: required
 - path: /assets/{assetId}
   method: delete
-  operationId: deleteAsset
+  operationId: AssetsPublicV2Controller_deleteAsset
   x-agentic-access:
     action-class: acting
-    consequence: write
+    consequence: safety-critical
     subject: required
     audience: null
     token:
-      max-ttl: 900
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
     escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
+      human-in-the-loop: required
     audit: required
-- path: /personnel
-  method: get
-  operationId: listPersonnel
-  x-agentic-access:
-    action-class: connected
-    consequence: read
-    subject: optional
-    token:
-      max-ttl: 3600
-    audit: none
-- path: /personnel
+- path: /background-checks
   method: post
-  operationId: createPersonnel
+  operationId: BackgroundChecksPublicV2Controller_createBackgroundCheck
   x-agentic-access:
     action-class: acting
-    consequence: write
+    consequence: safety-critical
     subject: required
     audience: null
     token:
-      max-ttl: 900
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
     escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
+      human-in-the-loop: required
     audit: required
+- path: /company
+  method: get
+  operationId: CompaniesPublicV2Controller_getCompany
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /control-library
+  method: get
+  operationId: ControlLibraryPublicV2Controller_listControlLibrary
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /control-library/{templateId}
+  method: get
+  operationId: ControlLibraryPublicV2Controller_getControlLibraryItem
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /control-library/action-import
+  method: post
+  operationId: ControlLibraryPublicV2Controller_importControlLibrary
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/notes
+  method: get
+  operationId: ControlNotesPublicV2Controller_getControlNotes
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/controls/{controlId}/notes
+  method: post
+  operationId: ControlNotesPublicV2Controller_createControlNote
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/notes/{noteId}
+  method: get
+  operationId: ControlNotesPublicV2Controller_getControlNote
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/controls/{controlId}/notes/{noteId}
+  method: put
+  operationId: ControlNotesPublicV2Controller_updateNote
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/notes/{noteId}
+  method: delete
+  operationId: ControlNotesPublicV2Controller_deleteNote
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/owners
+  method: get
+  operationId: ControlOwnersPublicV2Controller_getControlOwnersForAControl
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/controls/{controlId}/owners
+  method: post
+  operationId: ControlOwnersPublicV2Controller_createControlOwner
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/owners
+  method: put
+  operationId: ControlOwnersPublicV2Controller_modifyControlOwners
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/owners/{ownerId}
+  method: delete
+  operationId: ControlOwnersPublicV2Controller_deleteControlOwner
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls
+  method: get
+  operationId: ControlsPublicV2Controller_getControls
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/controls
+  method: post
+  operationId: ControlsPublicV2Controller_createControl
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}
+  method: get
+  operationId: ControlsPublicV2Controller_getControlById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/controls/{controlId}
+  method: put
+  operationId: ControlsPublicV2Controller_modifyControl
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/requirements
+  method: get
+  operationId: ControlsPublicV2Controller_getMappedRequirements
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/controls/action-reset-mappings
+  method: post
+  operationId: ControlsPublicV2Controller_resetControlRequirementMappings
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls/{controlId}/actions
+  method: post
+  operationId: ControlsPublicV2Controller_performControlAction
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/controls-requirement-comparison
+  method: get
+  operationId: ControlsPublicV2Controller_compareControlRequirements
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}/resources/{resourceId}/records
+  method: get
+  operationId: CustomDataRecordsPublicV2Controller_listCustomDataRecords
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}/resources/{resourceId}/records
+  method: post
+  operationId: CustomDataRecordsPublicV2Controller_createCustomData
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}/resources/{resourceId}/sessions
+  method: get
+  operationId: CustomDataRecordsPublicV2Controller_listSessions
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}/resources/{resourceId}/sessions/{sessionId}
+  method: post
+  operationId: CustomDataRecordsPublicV2Controller_uploadSessionRecords
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}/resources/{resourceId}/sessions/{sessionId}/actions
+  method: post
+  operationId: CustomDataRecordsPublicV2Controller_performSessionAction
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}/resources/{resourceId}/records/{recordId}
+  method: put
+  operationId: CustomDataRecordsPublicV2Controller_updateCustomData
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}/resources/{resourceId}/records/{recordId}
+  method: delete
+  operationId: CustomDataRecordsPublicV2Controller_deleteCustomData
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-field-definitions
+  method: get
+  operationId: CustomFieldDefinitionsPublicV2Controller_listCustomFieldDefinitions
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-field-definitions/{customFieldId}
+  method: get
+  operationId: CustomFieldDefinitionsPublicV2Controller_getCustomFieldDefinition
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}/hris-user-identities
+  method: get
+  operationId: CustomHrisUserIdentitiesPublicV2Controller_listCustomHrisUserIdentities
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}/hris-user-identities
+  method: post
+  operationId: CustomHrisUserIdentitiesPublicV2Controller_createCustomHrisUserIdentities
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}/hris-user-identities/{userIdentityId}
+  method: get
+  operationId: CustomHrisUserIdentitiesPublicV2Controller_getCustomHrisUserIdentity
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}/hris-user-identities/{userIdentityId}
+  method: delete
+  operationId: CustomHrisUserIdentitiesPublicV2Controller_deleteCustomHrisUserIdentity
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /devices/{deviceId}/documents
+  method: get
+  operationId: DeviceDocumentsPublicV2Controller_getDeviceDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /devices/{deviceId}/documents
+  method: post
+  operationId: DeviceDocumentsPublicV2Controller_uploadDocumentForDevice
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /devices/{deviceId}/documents/{documentId}
+  method: get
+  operationId: DeviceDocumentsPublicV2Controller_getDeviceDocument
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /devices/{deviceId}/documents/{documentId}
+  method: delete
+  operationId: DeviceDocumentsPublicV2Controller_deleteDeviceDocument
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /devices
+  method: get
+  operationId: DevicesPublicV2Controller_getDevices
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /personnel/{personnelId}/devices
+  method: get
+  operationId: DevicesPublicV2Controller_getDevicesForPersonnel
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /devices/{deviceId}
+  method: get
+  operationId: DevicesPublicV2Controller_getDevice
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /connections/{connectionId}/devices
+  method: get
+  operationId: DevicesPublicV2Controller_getDevicesForCustomConnection
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /devices/{deviceId}/apps
+  method: get
+  operationId: DevicesPublicV2Controller_getDeviceApps
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /custom-connections/{connectionId}/devices
+  method: post
+  operationId: DevicesPublicV2Controller_createDeviceForCustomConnection
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /custom-connections/{connectionId}/devices/{deviceId}
+  method: delete
+  operationId: DevicesPublicV2Controller_deleteDeviceFromCustomConnection
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /events
+  method: get
+  operationId: EventsPublicV2Controller_listEvents
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /events/{eventId}
+  method: get
+  operationId: EventsPublicV2Controller_getEvent
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /events/{eventId}/download-jobs
+  method: post
+  operationId: EventsPublicV2Controller_createEventDownloadJob
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /events/{eventId}/download-jobs/{jobId}
+  method: get
+  operationId: EventsPublicV2Controller_getEventDownloadJobStatus
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/evidence-library
+  method: get
+  operationId: EvidenceLibraryPublicV2Controller_listEvidenceLibrary
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/evidence-library
+  method: post
+  operationId: EvidenceLibraryPublicV2Controller_createEvidenceLibrary
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence-library/{evidenceLibraryId}
+  method: get
+  operationId: EvidenceLibraryPublicV2Controller_getEvidenceLibrary
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/evidence-library/{evidenceLibraryId}
+  method: put
+  operationId: EvidenceLibraryPublicV2Controller_updateEvidenceLibrary
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence-library/{evidenceLibraryId}
+  method: delete
+  operationId: EvidenceLibraryPublicV2Controller_deleteEvidenceLibrary
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence-library/{evidenceLibraryId}/versions/{versionId}
+  method: get
+  operationId: EvidenceLibraryPublicV2Controller_getEvidenceLibraryVersion
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/evidence
+  method: get
+  operationId: EvidencePublicV2Controller_listEvidence
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/evidence
+  method: post
+  operationId: EvidencePublicV2Controller_createEvidence
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence-files
+  method: post
+  operationId: EvidencePublicV2Controller_uploadArtifactFile
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence/{evidenceId}
+  method: get
+  operationId: EvidencePublicV2Controller_getEvidence
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/evidence/{evidenceId}
+  method: put
+  operationId: EvidencePublicV2Controller_updateEvidence
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence/{evidenceId}
+  method: delete
+  operationId: EvidencePublicV2Controller_deleteEvidence
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence/{evidenceId}/artifacts
+  method: get
+  operationId: EvidencePublicV2Controller_listEvidenceArtifacts
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/evidence/{evidenceId}/artifacts/{artifactId}
+  method: put
+  operationId: EvidencePublicV2Controller_updateEvidenceArtifact
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence/{evidenceId}/artifacts/{artifactId}
+  method: delete
+  operationId: EvidencePublicV2Controller_deleteEvidenceArtifact
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/evidence/{evidenceId}/artifacts/{artifactId}/actions
+  method: post
+  operationId: EvidencePublicV2Controller_createEvidenceArtifactAction
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/frameworks
+  method: get
+  operationId: FrameworksPublicV2Controller_getFrameworks
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/frameworks
+  method: post
+  operationId: FrameworksPublicV2Controller_createFramework
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/framework-requirements
+  method: get
+  operationId: FrameworksPublicV2Controller_getFrameworkRequirementsLegacy
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/framework-requirements/{frameworkRequirementId}
+  method: put
+  operationId: FrameworksPublicV2Controller_updateFrameworkRequirementLegacy
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements
+  method: get
+  operationId: FrameworksPublicV2Controller_listFrameworkRequirements
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements
+  method: post
+  operationId: FrameworksPublicV2Controller_createFrameworkRequirements
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}/controls
+  method: get
+  operationId: FrameworksPublicV2Controller_listFrameworkRequirementControls
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/frameworks/{frameworkId}/requirements/{requirementId}
+  method: put
+  operationId: FrameworksPublicV2Controller_updateFrameworkRequirement
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/frameworks/{frameworkId}
+  method: put
+  operationId: FrameworksPublicV2Controller_updateFramework
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /groups
+  method: get
+  operationId: GroupsPublicV2Controller_listGroups
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /personnel
+  method: get
+  operationId: PersonnelPublicV2Controller_listPersonnel
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /personnel-search
+  method: get
+  operationId: PersonnelPublicV2Controller_searchPersonnelAcrossWorkspaces
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/personnel-search
+  method: get
+  operationId: PersonnelPublicV2Controller_searchPersonnel
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
 - path: /personnel/{personnelId}
   method: get
-  operationId: getPersonnel
+  operationId: PersonnelPublicV2Controller_getPerson
   x-agentic-access:
     action-class: connected
     consequence: read
@@ -120,59 +1227,39 @@ operations:
     audit: none
 - path: /personnel/{personnelId}
   method: put
-  operationId: updatePersonnel
+  operationId: PersonnelPublicV2Controller_modifyPerson
   x-agentic-access:
     action-class: acting
-    consequence: write
+    consequence: safety-critical
     subject: required
     audience: null
     token:
-      max-ttl: 900
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
     escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
+      human-in-the-loop: required
     audit: required
-- path: /personnel/{personnelId}
-  method: delete
-  operationId: deletePersonnel
+- path: /personnel/actions
+  method: post
+  operationId: PersonnelPublicV2Controller_performPersonnelAction
   x-agentic-access:
     action-class: acting
-    consequence: write
+    consequence: safety-critical
     subject: required
     audience: null
     token:
-      max-ttl: 900
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
     escalation:
-      human-in-the-loop: conditional
-      triggers:
-      - abnormal
-      - high-value
+      human-in-the-loop: required
     audit: required
-- path: /controls
+- path: /policies
   method: get
-  operationId: listControls
-  x-agentic-access:
-    action-class: connected
-    consequence: read
-    subject: optional
-    token:
-      max-ttl: 3600
-    audit: none
-- path: /controls/{controlId}
-  method: get
-  operationId: getControl
-  x-agentic-access:
-    action-class: connected
-    consequence: read
-    subject: optional
-    token:
-      max-ttl: 3600
-    audit: none
-- path: /frameworks
-  method: get
-  operationId: listFrameworks
+  operationId: PoliciesPublicV2Controller_listPolicies
   x-agentic-access:
     action-class: connected
     consequence: read
@@ -181,8 +1268,24 @@ operations:
       max-ttl: 3600
     audit: none
 - path: /policies
+  method: post
+  operationId: PoliciesPublicV2Controller_createPolicy
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}/policy-versions
   method: get
-  operationId: listPolicies
+  operationId: PoliciesPublicV2Controller_listPolicyVersions
   x-agentic-access:
     action-class: connected
     consequence: read
@@ -190,9 +1293,1067 @@ operations:
     token:
       max-ttl: 3600
     audit: none
+- path: /policies/{policyId}/policy-versions
+  method: post
+  operationId: PoliciesPublicV2Controller_createPolicyVersion
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}
+  method: get
+  operationId: PoliciesPublicV2Controller_getPolicy
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /policies/{policyId}
+  method: put
+  operationId: PoliciesPublicV2Controller_modifyPolicy
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}/owner
+  method: put
+  operationId: PoliciesPublicV2Controller_assignPolicyOwner
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}/approval-configuration
+  method: get
+  operationId: PoliciesPublicV2Controller_getApprovalConfiguration
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /policies/{policyId}/approval-configuration
+  method: post
+  operationId: PoliciesPublicV2Controller_addPolicyApprovalConfiguration
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}/approval-configuration/{approvalConfigurationTier}
+  method: put
+  operationId: PoliciesPublicV2Controller_updatePolicyApprovalConfiguration
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}/approval-configuration/{approvalConfigurationTier}
+  method: delete
+  operationId: PoliciesPublicV2Controller_removePolicyApprovalConfiguration
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}/actions
+  method: get
+  operationId: PoliciesPublicV2Controller_listPolicyActions
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /policies/{policyId}/actions
+  method: post
+  operationId: PoliciesPublicV2Controller_performPolicyAction
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /policies/{policyId}/policy-versions/{policyVersionId}
+  method: get
+  operationId: PoliciesPublicV2Controller_getPolicyVersion
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /policy-language-settings
+  method: get
+  operationId: PolicyLanguagesPublicV2Controller_listPolicyLanguageSettings
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /policy-language-versions
+  method: get
+  operationId: PolicyLanguagesPublicV2Controller_listPolicyLanguageVersions
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /policy-language-versions/{policyLanguageVersionId}
+  method: get
+  operationId: PolicyLanguagesPublicV2Controller_getPolicyLanguageVersion
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/documents
+  method: get
+  operationId: RiskDocumentsPublicV2Controller_listRiskDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/documents
+  method: post
+  operationId: RiskDocumentsPublicV2Controller_uploadRiskDocuments
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/documents/{documentId}
+  method: get
+  operationId: RiskDocumentsPublicV2Controller_getRiskDocument
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/documents/{documentId}
+  method: delete
+  operationId: RiskDocumentsPublicV2Controller_deleteRiskDocument
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risk-library
+  method: get
+  operationId: RiskLibraryPublicV2Controller_listRiskLibrary
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risk-library/{riskLibraryId}
+  method: get
+  operationId: RiskLibraryPublicV2Controller_getRiskLibraryItem
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-library/action-copy
+  method: post
+  operationId: RiskLibraryPublicV2Controller_copyRiskLibrary
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/notes
+  method: get
+  operationId: RiskNotesPublicV2Controller_getRiskNotes
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/notes
+  method: post
+  operationId: RiskNotesPublicV2Controller_createRiskNote
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/notes/{noteId}
+  method: get
+  operationId: RiskNotesPublicV2Controller_getRiskNote
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/notes/{noteId}
+  method: put
+  operationId: RiskNotesPublicV2Controller_updateRiskNote
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}/notes/{noteId}
+  method: delete
+  operationId: RiskNotesPublicV2Controller_deleteRiskNote
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers
+  method: get
+  operationId: RiskRegisterPublicV2Controller_listRiskRegisters
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers
+  method: post
+  operationId: RiskRegisterPublicV2Controller_createRiskRegister
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}
+  method: get
+  operationId: RiskRegisterPublicV2Controller_getRiskRegister
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}
+  method: put
+  operationId: RiskRegisterPublicV2Controller_updateRiskRegister
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}
+  method: delete
+  operationId: RiskRegisterPublicV2Controller_deleteRiskRegister
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risks
+  method: get
+  operationId: RiskManagementPublicV2Controller_listRisks
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks
+  method: post
+  operationId: RiskManagementPublicV2Controller_createRisk
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risks-search
+  method: get
+  operationId: RiskManagementPublicV2Controller_searchRisks
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risks-search
+  method: get
+  operationId: RiskManagementPublicV2Controller_searchRisksAcrossRegisters
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}
+  method: get
+  operationId: RiskManagementPublicV2Controller_getRisk
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}
+  method: put
+  operationId: RiskManagementPublicV2Controller_updateRisk
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/risks/{riskId}
+  method: delete
+  operationId: RiskManagementPublicV2Controller_deleteRisk
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /risk-registers/{riskRegisterId}/insights
+  method: get
+  operationId: RiskManagementPublicV2Controller_getRiskInsights
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /roles
+  method: get
+  operationId: RolesPublicV2Controller_listRoles
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /roles/{roleId}
+  method: get
+  operationId: RolesPublicV2Controller_getRole
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /roles/{roleId}/users
+  method: get
+  operationId: RolesPublicV2Controller_listUsers
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/tasks
+  method: get
+  operationId: TasksPublicV2Controller_listTasks
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/tasks
+  method: post
+  operationId: TasksPublicV2Controller_createTask
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/tasks/{taskId}
+  method: get
+  operationId: TasksPublicV2Controller_getTask
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/tasks/{taskId}
+  method: put
+  operationId: TasksPublicV2Controller_updateTask
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/tasks/{taskId}/actions
+  method: post
+  operationId: TasksPublicV2Controller_performTaskAction
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/upcoming-tasks
+  method: get
+  operationId: UpcomingTasksPublicV2Controller_listUpcomingTasks
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /upload-urls
+  method: post
+  operationId: UploadsPublicV2Controller_requestUploadUrl
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /users/{userId}/documents
+  method: get
+  operationId: UserDocumentsPublicV2Controller_listUserDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /users/{userId}/documents
+  method: post
+  operationId: UserDocumentsPublicV2Controller_uploadUserDocument
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /users/{userId}/documents/{documentId}
+  method: get
+  operationId: UserDocumentsPublicV2Controller_getUserDocument
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /users/{userId}/documents/{documentId}
+  method: delete
+  operationId: UserDocumentsPublicV2Controller_deleteUserDocument
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /users/{userId}/assigned-policies
+  method: get
+  operationId: UsersPoliciesPublicV2Controller_getPolicyVersionsForUser
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /users/{userId}/assigned-policies/{policyId}/action-acknowledge
+  method: post
+  operationId: UsersPoliciesPublicV2Controller_acceptUserPolicyVersion
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /users
+  method: get
+  operationId: UsersPublicV2Controller_listUsers
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /users/{userId}
+  method: get
+  operationId: UsersPublicV2Controller_getUser
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/monitoring-tests
+  method: get
+  operationId: MonitorsPublicV2Controller_listMonitors
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/monitoring-tests/{testId}
+  method: get
+  operationId: MonitorsPublicV2Controller_getMonitor
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/monitoring-tests/{testId}
+  method: put
+  operationId: MonitorsPublicV2Controller_updateMonitor
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/monitoring-tests/{testId}/exclusions
+  method: get
+  operationId: MonitorsPublicV2Controller_listMonitorExclusions
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/monitoring-tests/{testId}/failures
+  method: get
+  operationId: MonitorsPublicV2Controller_listMonitorTestFailures
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/monitoring-tests/{testId}/passes
+  method: get
+  operationId: MonitorsPublicV2Controller_listMonitorTestPasses
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /connections/{connectionId}/vendor-mapping
+  method: get
+  operationId: ProcurementConnectionMappingsPublicV2Controller_getVendorMapping
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /connections/{connectionId}/vendor-mapping
+  method: put
+  operationId: ProcurementConnectionMappingsPublicV2Controller_updateVendorMapping
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/documents
+  method: get
+  operationId: VendorDocumentsPublicV2Controller_getVendorDocuments
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/documents
+  method: post
+  operationId: VendorDocumentsPublicV2Controller_uploadVendorDocument
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/documents/{documentId}
+  method: get
+  operationId: VendorDocumentsPublicV2Controller_getVendorDocument
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/security-reviews
+  method: get
+  operationId: VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviews
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/security-reviews
+  method: post
+  operationId: VendorSecurityReviewsPublicV2Controller_createVendorSecurityReview
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/security-reviews/with-file
+  method: post
+  operationId: VendorSecurityReviewsPublicV2Controller_createVendorSecurityReviewWithFile
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendor-security-reviews
+  method: get
+  operationId: VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviewsAcrossVendors
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/security-reviews/{securityReviewId}
+  method: get
+  operationId: VendorSecurityReviewsPublicV2Controller_getVendorSecurityReview
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/security-reviews/{securityReviewId}
+  method: put
+  operationId: VendorSecurityReviewsPublicV2Controller_updateVendorSecurityReview
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/security-questionnaires
+  method: post
+  operationId: VendorSecurityReviewsPublicV2Controller_sendSecurityQuestionnaire
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/security-reviews/{securityReviewId}/security-questionnaires
+  method: get
+  operationId: VendorSecurityReviewsPublicV2Controller_listVendorSecurityReviewSecurityQuestionnaires
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/security-reviews/{securityReviewId}/security-questionnaires
+  method: post
+  operationId: VendorSecurityReviewsPublicV2Controller_sendSecurityQuestionnaireForSecurityReview
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/security-reviews/{securityReviewId}/actions
+  method: get
+  operationId: VendorSecurityReviewsPublicV2Controller_listSecurityReviewActions
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/security-reviews/{securityReviewId}/actions
+  method: post
+  operationId: VendorSecurityReviewsPublicV2Controller_performSecurityReviewAction
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendor-types
+  method: get
+  operationId: VendorTypesPublicV2Controller_listVendorTypes
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendor-types
+  method: post
+  operationId: VendorTypesPublicV2Controller_createVendorType
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendor-types/{vendorTypeId}
+  method: put
+  operationId: VendorTypesPublicV2Controller_updateVendorType
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendor-types/{vendorTypeId}
+  method: delete
+  operationId: VendorTypesPublicV2Controller_deleteVendorType
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
 - path: /vendors
   method: get
-  operationId: listVendors
+  operationId: VendorsPublicV2Controller_listVendors
   x-agentic-access:
     action-class: connected
     consequence: read
@@ -202,11 +2363,207 @@ operations:
     audit: none
 - path: /vendors
   method: post
-  operationId: createVendor
+  operationId: VendorsPublicV2Controller_createVendor
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors-stats
+  method: get
+  operationId: VendorsPublicV2Controller_getVendorStats
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}
+  method: get
+  operationId: VendorsPublicV2Controller_getVendor
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}
+  method: put
+  operationId: VendorsPublicV2Controller_updateVendor
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}
+  method: delete
+  operationId: VendorsPublicV2Controller_deleteVendor
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/questionnaires
+  method: get
+  operationId: VendorsPublicV2Controller_listVendorQuestionnaires
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /vendors/{vendorId}/questionnaires
+  method: post
+  operationId: VendorsPublicV2Controller_sendQuestionnaireToVendor
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /vendors/{vendorId}/questionnaires/{questionnaireId}
+  method: get
+  operationId: VendorsPublicV2Controller_getVendorQuestionnaire
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/scoped-personnel-groups
+  method: get
+  operationId: ScopedPersonnelGroupsPublicV2Controller_listScopedPersonnelGroups
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces/{workspaceId}/scoped-personnel-groups
+  method: post
+  operationId: ScopedPersonnelGroupsPublicV2Controller_addScopedPersonnelGroup
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/scoped-personnel-groups
+  method: put
+  operationId: ScopedPersonnelGroupsPublicV2Controller_putScopedPersonnelGroups
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/scoped-personnel-groups/{groupId}
+  method: delete
+  operationId: ScopedPersonnelGroupsPublicV2Controller_removeScopedPersonnelGroup
+  x-agentic-access:
+    action-class: acting
+    consequence: safety-critical
+    subject: required
+    audience: null
+    token:
+      max-ttl: 120
+      exchange: true
+      purpose-required: true
+      proof-of-possession: true
+    escalation:
+      human-in-the-loop: required
+    audit: required
+- path: /workspaces/{workspaceId}/scoped-personnel-counts
+  method: get
+  operationId: ScopedPersonnelGroupsPublicV2Controller_getScopedPersonnelCounts
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /workspaces
+  method: get
+  operationId: WorkspacesPublicV2Controller_listWorkspaces
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /accounts
+  method: get
+  operationId: getAccounts
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - accounts:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /accounts
+  method: post
+  operationId: addAccount
   x-agentic-access:
     action-class: acting
     consequence: write
     subject: required
+    scope:
+    - accounts:edit
     audience: null
     token:
       max-ttl: 900
@@ -216,53 +2573,590 @@ operations:
       - abnormal
       - high-value
     audit: required
-- path: /tasks
+- path: /accounts/members
   method: get
-  operationId: listTasks
+  operationId: searchForAccountMembers
   x-agentic-access:
     action-class: connected
     consequence: read
     subject: optional
+    scope:
+    - accounts:view
     token:
       max-ttl: 3600
     audit: none
-- path: /audits
+- path: /accounts/{id}
   method: get
-  operationId: listAudits
+  operationId: getAccount
   x-agentic-access:
     action-class: connected
     consequence: read
     subject: optional
+    scope:
+    - accounts:view
     token:
       max-ttl: 3600
     audit: none
-- path: /risks
+- path: /accounts/{id}
+  method: delete
+  operationId: deleteAccount
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /accounts/{id}
+  method: patch
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /accounts/{id}/url
   method: get
-  operationId: listRisks
+  operationId: getAccountPageUrl
   x-agentic-access:
     action-class: connected
     consequence: read
     subject: optional
+    scope:
+    - accounts:view
     token:
       max-ttl: 3600
     audit: none
-- path: /evidence-library
+- path: /accounts/{id}/members
+  method: post
+  operationId: addMemberToAccount
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /accounts/{id}/members
+  method: delete
+  operationId: deleteMemberFromAccount
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /accounts/{id}/members/notify
+  method: post
+  operationId: accountMemberNotify
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /document/{id}
   method: get
-  operationId: listEvidence
+  operationId: getDocument
   x-agentic-access:
     action-class: connected
     consequence: read
     subject: optional
+    scope:
+    - documents:view
     token:
       max-ttl: 3600
     audit: none
-- path: /monitoring-tests
+- path: /document/{id}
+  method: delete
+  operationId: deleteDocument
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - documents:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /document/{id}
+  method: patch
+  operationId: patchDocument
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - documents:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /documents
   method: get
-  operationId: listMonitoringTests
+  operationId: getDocuments
   x-agentic-access:
     action-class: connected
     consequence: read
     subject: optional
+    scope:
+    - documents:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /documents/upload
+  method: post
+  operationId: postDocumentUpload
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - documents:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /documents/upload
+  method: put
+  operationId: putDocumentUpload
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - documents:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /document-types
+  method: get
+  operationId: getDocumentTypes
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - documents:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /kb/search
+  method: get
+  operationId: searchKnowledgeBase
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - knowledgebase:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /kb/entries
+  method: post
+  operationId: addKbEntry
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - knowledgebase:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /kb/entries/{id}/
+  method: patch
+  operationId: updateKbEntry
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - knowledgebase:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /requests
+  method: get
+  operationId: getRequests
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - accounts:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /requests/{requestId}/approve
+  method: post
+  operationId: approveRequest
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edt
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /requests/{requestId}/decline
+  method: post
+  operationId: declineRequest
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /organizations
+  method: get
+  operationId: getOrganization
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - organization:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /organizations/nda
+  method: get
+  operationId: getOrganizationNDASettings
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - organization:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /organizations/settings
+  method: get
+  operationId: getOrganizationSettings
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - organization:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /organizations/members/me
+  method: get
+  operationId: getOrganizationMemberMe
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - organization:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /portals/default/products
+  method: get
+  operationId: getPortal
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - organization:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /questionnaires/
+  method: post
+  operationId: submitQnrFile
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - accounts:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /questionnaires/{id}/
+  method: get
+  operationId: getCompletedQuestionnaireUrl
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - automated-questionnaires:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /tcu/topics/
+  method: post
+  operationId: createTopic
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - tcupdates:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /tcu/topics/
+  method: get
+  operationId: listTopics
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - tcupdates:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /tcu/topics/{topicId}
+  method: patch
+  operationId: updateTrustCenterTopic
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - tcupdates:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /tcu/topics/{topicId}
+  method: delete
+  operationId: deleteTrustCenterTopic
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - tcupdates:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /tcu/topics/{topicId}
+  method: get
+  operationId: getTrustCenterTopic
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - tcupdates:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /tcu/topics/{topicId}/updates
+  method: post
+  operationId: createTrustCenterUpdate
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - tcupdates:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /tcu/topics/{topicId}/updates/{updateId}
+  method: get
+  operationId: getTrustCenterUpdateById
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - tcupdates:read
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /tcu/topics/{topicId}/updates/{updateId}
+  method: patch
+  operationId: updateTrustCenterUpdate
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - tcupdates:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /tcu/topics/{topicId}/updates/{updateId}
+  method: delete
+  operationId: deleteTrustCenterUpdate
+  x-agentic-access:
+    action-class: acting
+    consequence: write
+    subject: required
+    scope:
+    - tcupdates:edit
+    audience: null
+    token:
+      max-ttl: 900
+    escalation:
+      human-in-the-loop: conditional
+      triggers:
+      - abnormal
+      - high-value
+    audit: required
+- path: /products
+  method: get
+  operationId: getProducts
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - products:view
+    token:
+      max-ttl: 3600
+    audit: none
+- path: /tags
+  method: get
+  operationId: getTags
+  x-agentic-access:
+    action-class: connected
+    consequence: read
+    subject: optional
+    scope:
+    - organization:view
     token:
       max-ttl: 3600
     audit: none

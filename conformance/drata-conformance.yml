@@ -1,0 +1,178 @@
+generated: '2026-08-27'
+method: derived
+source: >-
+  openapi/drata-api-v2-openapi.yml + openapi/drata-safebase-trust-api-openapi.yml +
+  well-known/drata-mcp-oauth-authorization-server.json +
+  well-known/drata-mcp-oauth-protected-resource.json +
+  https://trust.drata.com/ + https://drata.com/products/api
+provider: Drata
+providerId: drata
+description: >-
+  Cross-cutting and domain standards the Drata contracts actually declare, each with evidence
+  pointing at the exact spec or metadata location. Reward-only: an absent standard is recorded
+  as conforms:false with the reason, never inflated.
+
+standards:
+- id: openapi
+  name: OpenAPI Specification
+  version: 3.0.0 (Public API v2), 3.1.0 (SafeBase Trust API)
+  conforms: true
+  evidence: >-
+    openapi/drata-api-v2-openapi.yml declares openapi 3.0.0 with 132 paths / 197 operations /
+    520 schemas; openapi/drata-safebase-trust-api-openapi.yml declares openapi 3.1.0 with 29
+    paths / 41 operations. Both parse.
+
+- id: oauth2
+  name: OAuth 2.0 / 2.1
+  conforms: true
+  scope: MCP server only
+  evidence: >-
+    https://mcp.drata.com/.well-known/oauth-authorization-server returns RFC 8414
+    authorization-server metadata (issuer https://drata-prod.us.auth0.com/, PKCE S256,
+    authorization_code + refresh_token + client_credentials + device_code grants).
+    The Public API v2 itself does NOT use OAuth — it uses bearer API keys.
+
+- id: rfc9728
+  name: OAuth 2.0 Protected Resource Metadata
+  conforms: true
+  evidence: >-
+    https://mcp.drata.com/.well-known/oauth-protected-resource returns a conformant document
+    with resource, authorization_servers[], scopes_supported[] (33 scopes) and
+    bearer_methods_supported ["header"]. This is what makes the MCP server discoverable to an
+    agent with no prior configuration.
+
+- id: rfc8414
+  name: OAuth 2.0 Authorization Server Metadata
+  conforms: true
+  evidence: https://mcp.drata.com/.well-known/oauth-authorization-server, HTTP 200.
+
+- id: oidc
+  name: OpenID Connect Discovery
+  conforms: true
+  scope: MCP authorization only
+  evidence: >-
+    https://mcp.drata.com/.well-known/openid-configuration, HTTP 200, issuer
+    https://drata-prod.us.auth0.com/, jwks_uri present, openid/profile/email scopes supported.
+
+- id: rfc7591
+  name: OAuth 2.0 Dynamic Client Registration
+  conforms: true
+  evidence: registration_endpoint https://drata-prod.us.auth0.com/oidc/register in the authorization-server metadata.
+
+- id: mcp
+  name: Model Context Protocol
+  conforms: true
+  transport: streamable HTTP
+  evidence: >-
+    https://mcp.drata.com/mcp/ answers a JSON-RPC tools/list POST with HTTP 401 and
+    www-authenticate Bearer realm="drata-mcp" — an authenticated MCP endpoint, discoverable
+    via RFC 9728. Tool schemas are auth-gated and were not introspected.
+
+- id: rfc9457
+  name: Problem Details for HTTP APIs
+  conforms: false
+  evidence: >-
+    No application/problem+json media type and no type/title/detail/instance members anywhere
+    in either spec. Errors use a vendor envelope {name, statusCode, message, code, debugInfo}.
+
+- id: idempotency
+  name: Idempotency keys (draft-ietf-httpapi-idempotency-key-header)
+  conforms: false
+  evidence: Zero /idempoten/i tokens in either OpenAPI document or in the help-centre API article.
+
+- id: rfc8594
+  name: Sunset HTTP Header
+  conforms: false
+  evidence: No Sunset or Deprecation header declared; zero operations flagged `deprecated`.
+
+- id: pagination
+  name: Cursor pagination
+  conforms: true
+  evidence: >-
+    `cursor`, `size`, `sort`, `sortDir` query parameters on 62 list operations;
+    `includeTotalCount` on 53; the response carries pagination.cursor and the spec description
+    publishes a worked fetchAll() loop.
+
+- id: rate-limit-headers
+  name: RateLimit header fields for HTTP (RFC 9239 draft)
+  conforms: false
+  evidence: >-
+    Drata documents a 500 req/min per-source-IP limit and a Retry-After on 429, but declares no
+    RateLimit-* or X-RateLimit-* response headers in the spec.
+
+- id: scim
+  name: SCIM 2.0
+  conforms: false
+  evidence: >-
+    No urn:ietf:params:scim:schemas:* URN and no /Users or /Groups SCIM endpoints in the public
+    contract. Drata operates HRIS User Identity and Users-and-Roles surfaces with its own shapes.
+
+- id: odata
+  name: OData
+  conforms: false
+  evidence: No $metadata surface and no OData query options in either contract.
+
+- id: json-schema
+  name: JSON Schema
+  conforms: true
+  scope: Custom Connections
+  evidence: >-
+    The Custom Connections recipe requires callers to supply a JSON Schema for CUSTOM provider
+    records via the `schema` field (or to have Drata infer one from `sampleData`). Consumer-
+    authored schemas travel through the API as first-class data.
+  source: https://developers.drata.com/developer-portal/v2/recipes/custom-connections/
+
+domain_standards:
+  market: GRC / security compliance automation
+  note: >-
+    Drata's market has audit and control FRAMEWORKS rather than a wire-format interchange
+    standard, and Drata models those frameworks as first-class API resources — but as its own
+    shapes, not as a published exchange format. There is no OSCAL, no SCAP/OpenControl, and no
+    common-controls interchange in the contract. Recorded as absent, not penalised.
+  entries:
+  - id: oscal
+    name: NIST OSCAL (Open Security Controls Assessment Language)
+    conforms: false
+    evidence: >-
+      No OSCAL catalog/profile/component-definition/assessment-plan media types, schemas or
+      endpoints in the 520-schema contract. Drata exposes Frameworks (9 ops), Controls (8),
+      Control Library (3) and Evidence (10) through proprietary DTOs. OSCAL is the closest
+      thing this market has to an interchange standard, and consuming a Drata control set into
+      an OSCAL-speaking tool requires a bespoke connector.
+  - id: fedramp
+    name: FedRAMP / FedRAMP 20x
+    conforms: partial
+    kind: programme participation, not a wire format
+    evidence: >-
+      Drata maintains a public github.com/drata/fedramp-20x repository and publishes FedRAMP
+      20x material on its blog. This is programme participation and framework support inside
+      the product; it is not a machine-readable conformance of the API contract.
+
+compliance_certifications:
+  source: https://trust.drata.com/
+  artifact: security/drata-trust-center.yml
+  certifications: [SOC 2, ISO 27001, ISO 27017, ISO 27018, HIPAA, GDPR, CSA STAR]
+  note: >-
+    Drata is itself certified against the frameworks its product automates; the trust centre is
+    a SafeBase trust centre, i.e. Drata's own acquired product.
+
+regional_data_residency:
+  regions: [US, EU, APAC]
+  evidence: >-
+    Three declared servers in the spec (public-api.drata.com, public-api.eu.drata.com,
+    public-api.apac.drata.com), three regional MCP endpoints, and region-split components on
+    the status page. Data residency is a contract-level fact here, not just a marketing claim.
+
+evidence:
+- url: https://mcp.drata.com/.well-known/oauth-protected-resource
+  status: 200
+- url: https://mcp.drata.com/.well-known/oauth-authorization-server
+  status: 200
+- url: https://mcp.drata.com/.well-known/openid-configuration
+  status: 200
+- url: https://mcp.drata.com/mcp/
+  status: 401
+- url: https://developers.drata.com/page-data/openapi/reference/v2/overview/page-data.json
+  status: 200
+- url: https://dash.readme.com/api/v1/api-registry/1c7h6egmjk0rsav
+  status: 200
