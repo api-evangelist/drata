@@ -635,16 +635,19 @@ paths:
       - TASKS
 components:
   schemas:
-    TaskActionRequestPublicV2Dto:
+    ExpandDataWithCountDto:
       type: object
       properties:
-        action:
-          description: 'Action to execute: `complete` marks the task as completed, `uncomplete` marks it as incomplete'
-          example: complete
-          allOf:
-          - $ref: '#/components/schemas/TaskActionEnum'
+        data:
+          type: array
+          items:
+            type: array
+        totalCount:
+          type: number
+          description: Total count of linked items
       required:
-      - action
+      - data
+      - totalCount
     UpcomingTaskResponsePublicV2Dto:
       type: object
       properties:
@@ -704,19 +707,6 @@ components:
       - status
       - completedAt
       - assigneeIds
-    TasksResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/TaskResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
     TaskUpdateRequestPublicV2Dto:
       type: object
       properties:
@@ -758,10 +748,97 @@ components:
           type: array
           items:
             type: number
+    UpcomingTasksResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/UpcomingTaskResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    TaskActionEnum:
+      type: string
+      enum:
+      - complete
+      - uncomplete
+    TaskSortEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+      - dueDate
     UpcomingTaskSortEnum:
       type: string
       enum:
       - dueDate
+    TaskActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: 'Action to execute: `complete` marks the task as completed, `uncomplete` marks it as incomplete'
+          example: complete
+          allOf:
+          - $ref: '#/components/schemas/TaskActionEnum'
+      required:
+      - action
+    TaskExpandEnum:
+      type: string
+      enum:
+      - assignee
+      - createdBy
+      - controls
+      - risks
+      - policies
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -790,37 +867,29 @@ components:
       - statusCode
       - message
       - code
-    UpcomingTasksResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/UpcomingTaskResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    TaskActionEnum:
+    TaskTypeEnum:
       type: string
       enum:
-      - complete
-      - uncomplete
-    ExpandDataWithCountDto:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            type: array
-        totalCount:
-          type: number
-          description: Total count of linked items
-      required:
-      - data
-      - totalCount
+      - POLICY_RENEWALS
+      - EVIDENCE
+      - VENDOR
+      - EXTERNAL_EVIDENCE
+      - REPORT
+      - GENERAL
+      - CONTROL
+      - RISK
+      - CONTROL_APPROVALS
+      - POLICY_APPROVALS
+    TaskStatus:
+      type: string
+      enum:
+      - PAST_DUE
+      - COMPLETED
+      - INCOMPLETE
+      x-enumDescriptions:
+        PAST_DUE: Past Due – Due date has passed and task is not completed
+        COMPLETED: Completed – Task has been marked as complete
+        INCOMPLETE: Incomplete – Task is not yet due and not completed
     TaskCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -878,6 +947,46 @@ components:
       required:
       - title
       - dueDate
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
     TaskResponsePublicV2Dto:
       type: object
       properties:
@@ -971,128 +1080,19 @@ components:
       - updatedAt
       - assigneeId
       - createdById
-    TaskTypeEnum:
-      type: string
-      enum:
-      - POLICY_RENEWALS
-      - EVIDENCE
-      - VENDOR
-      - EXTERNAL_EVIDENCE
-      - REPORT
-      - GENERAL
-      - CONTROL
-      - RISK
-      - CONTROL_APPROVALS
-      - POLICY_APPROVALS
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
+    TasksResponsePublicV2Dto:
       type: object
       properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    TaskExpandEnum:
-      type: string
-      enum:
-      - assignee
-      - createdBy
-      - controls
-      - risks
-      - policies
-    TaskStatus:
-      type: string
-      enum:
-      - PAST_DUE
-      - COMPLETED
-      - INCOMPLETE
-      x-enumDescriptions:
-        PAST_DUE: Past Due – Due date has passed and task is not completed
-        COMPLETED: Completed – Task has been marked as complete
-        INCOMPLETE: Incomplete – Task is not yet due and not completed
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    TaskSortEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-      - dueDate
+      - data
+      - pagination
   securitySchemes:
     bearer:
       scheme: bearer

@@ -323,40 +323,6 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    RiskCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 100
-          description: Unique identifier of the newly created Risk in the register
-        riskId:
-          type: string
-          example: AC-04
-          description: Human-readable Risk Identifier
-        title:
-          type: string
-          example: Password Management - Password Cracking
-          description: Title of the Risk
-        description:
-          type: string
-          example: An attacker attempts to gain access to organizational information by guessing passwords.
-          description: Description of the Risk
-        registerId:
-          type: number
-          example: 5
-          description: ID of the Risk Register where the Risk was created
-      required:
-      - id
-      - riskId
-      - title
-      - description
-      - registerId
     PaginationResponsePublicV2Dto:
       type: object
       properties:
@@ -377,98 +343,6 @@ components:
             $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
       required:
       - data
-    RiskLibraryExpandEnum:
-      type: string
-      enum:
-      - controls
-      - categories
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    RiskLibraryItemResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique identifier for the Risk Library Item
-        riskId:
-          type: string
-          example: AC-04
-          description: Human-readable Risk Identifier
-        title:
-          type: string
-          example: Password Management - Password Cracking
-          description: Title of the Risk Library Item
-        description:
-          type: string
-          example: An attacker attempts to gain access to organizational information by guessing passwords.
-          description: Detailed description of the Risk Library Item
-        controls:
-          description: Associated Controls in compact format, only returned when `expand[]=controls` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskControlCompactResponsePublicV2Dto'
-        categories:
-          description: Associated Categories in compact format, only returned when `expand[]=categories` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
-      required:
-      - id
-      - riskId
-      - title
-      - description
     RiskLibraryCopyRequestPublicV2Dto:
       type: object
       properties:
@@ -547,6 +421,99 @@ components:
       - name
       - createdAt
       - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    RiskLibraryItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier for the Risk Library Item
+        riskId:
+          type: string
+          example: AC-04
+          description: Human-readable Risk Identifier
+        title:
+          type: string
+          example: Password Management - Password Cracking
+          description: Title of the Risk Library Item
+        description:
+          type: string
+          example: An attacker attempts to gain access to organizational information by guessing passwords.
+          description: Detailed description of the Risk Library Item
+        controls:
+          description: Associated Controls in compact format, only returned when `expand[]=controls` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskControlCompactResponsePublicV2Dto'
+        categories:
+          description: Associated Categories in compact format, only returned when `expand[]=categories` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
+      required:
+      - id
+      - riskId
+      - title
+      - description
+    RiskCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 100
+          description: Unique identifier of the newly created Risk in the register
+        riskId:
+          type: string
+          example: AC-04
+          description: Human-readable Risk Identifier
+        title:
+          type: string
+          example: Password Management - Password Cracking
+          description: Title of the Risk
+        description:
+          type: string
+          example: An attacker attempts to gain access to organizational information by guessing passwords.
+          description: Description of the Risk
+        registerId:
+          type: number
+          example: 5
+          description: ID of the Risk Register where the Risk was created
+      required:
+      - id
+      - riskId
+      - title
+      - description
+      - registerId
+    RiskLibraryExpandEnum:
+      type: string
+      enum:
+      - controls
+      - categories
     RiskCategoryCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -573,6 +540,11 @@ components:
       - name
       - createdAt
       - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     RiskLibraryResponsePublicV2Dto:
       type: object
       properties:
@@ -591,6 +563,34 @@ components:
       enum:
       - createdAt
       - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

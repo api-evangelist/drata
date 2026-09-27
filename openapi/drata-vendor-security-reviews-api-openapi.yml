@@ -1054,43 +1054,25 @@ paths:
       - VENDOR_PUBLIC_API
 components:
   schemas:
-    SocReviewUserControlItemResponsePublicV2Dto:
+    SecurityReviewActionEnum:
+      type: string
+      enum:
+      - finalize
+      - reopen
+    VendorReportOpinionEnum:
+      type: string
+      enum:
+      - UNQUALIFIED
+      - QUALIFIED
+      - ADVERSE
+      - DISCLAIMER
+    SocReviewServiceItemRequestPublicV2Dto:
       type: object
       properties:
-        description:
+        name:
           type: string
-          description: Description of the user control.
-          example: Users must enforce strong password policies.
-        inPlace:
-          type: boolean
-          description: Whether the control is in place.
-          example: true
-      required:
-      - description
-      - inPlace
-    SocReviewEndUserControlsSectionResponsePublicV2Dto:
-      type: object
-      properties:
-        isComplete:
-          type: boolean
-          description: True when all required fields in this section are populated.
-          example: false
-        missingRequiredFields:
-          description: Dot-notation paths of required fields that are currently missing.
-          example:
-          - reviewerInformation.reviewer
-          type: array
-          items:
-            type: string
-        userControls:
-          description: User controls identified in the report.
-          type: array
-          items:
-            $ref: '#/components/schemas/SocReviewUserControlItemResponsePublicV2Dto'
-      required:
-      - isComplete
-      - missingRequiredFields
-      - userControls
+          maxLength: 30000
+          description: Name of the service.
     SocReviewReviewerInformationSectionRequestPublicV2Dto:
       type: object
       properties:
@@ -1108,31 +1090,211 @@ components:
           format: date
           description: The date the report was issued. Cannot be a future date.
           example: '2020-07-06'
-    SocReviewFindingItemRequestPublicV2Dto:
+    VendorSecurityReviewsResponsePublicV2Dto:
       type: object
       properties:
-        description:
+        data:
+          description: Full list of Vendor Security Reviews
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorSecurityReviewResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SocReviewCpaFirmSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        cpaFirm:
+          type:
+          - string
+          - 'null'
+          description: CPA firm name.
+          example: Deloitte
+        cpaProcedurePerformed:
+          type:
+          - string
+          - 'null'
+          description: Procedures performed to assess reputation of CPA firm.
+          example: Assessed reputation via public records.
+      required:
+      - isComplete
+      - missingRequiredFields
+      - cpaFirm
+      - cpaProcedurePerformed
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
           type: string
-          maxLength: 30000
-          description: Description of the finding.
-    SocReviewServicesAndLocationsSectionRequestPublicV2Dto:
-      type: object
-      properties:
-        services:
-          description: List of services to add. New items are appended to any existing ones. Pass an empty array to clear all existing services. Omit to leave existing services unchanged.
-          type: array
-          items:
-            $ref: '#/components/schemas/SocReviewServiceItemRequestPublicV2Dto'
-        locations:
-          description: List of locations to add. New items are appended to any existing ones. Pass an empty array to clear all existing locations. Omit to leave existing locations unchanged.
-          type: array
-          items:
-            $ref: '#/components/schemas/SocReviewLocationItemRequestPublicV2Dto'
-    VendorSecurityReviewExpandEnum:
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    SecurityReviewFinalizeDecisionEnum:
       type: string
       enum:
-      - user
-      - requesterUser
+      - APPROVED
+      - APPROVED_WITH_CONDITIONS
+      - REJECTED
+    VendorSecurityReviewDecisionEnum:
+      type: string
+      enum:
+      - PENDING
+      - APPROVED
+      - APPROVED_WITH_CONDITIONS
+      - REJECTED
+    SocReviewFormSaveRequestPublicV2Dto:
+      type: object
+      properties:
+        reviewerInformation:
+          description: Reviewer identity and report issue date.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReviewerInformationSectionRequestPublicV2Dto'
+        complianceScope:
+          description: SOC certification type, scope type, audit period, and trust service criteria.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewComplianceScopeSectionRequestPublicV2Dto'
+        reportOpinion:
+          description: Auditor's opinion on the report and any follow-up activity.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReportOpinionSectionRequestPublicV2Dto'
+        findings:
+          description: Exceptions or findings noted in the report and their material impact.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewFindingsSectionRequestPublicV2Dto'
+        endUserControls:
+          description: Complementary user entity controls identified in the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewEndUserControlsSectionRequestPublicV2Dto'
+        servicesAndLocations:
+          description: Services and physical locations covered by the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewServicesAndLocationsSectionRequestPublicV2Dto'
+        cpaFirm:
+          description: CPA firm that performed the audit and procedures used to assess its reputation.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewCpaFirmSectionRequestPublicV2Dto'
+        subserviceOrganizations:
+          description: Subservice organizations included in the report and the method used to present them.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewSubserviceOrganizationsSectionRequestPublicV2Dto'
+    SocReviewCpaFirmSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        cpaFirm:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          description: CPA firm that performed the audit.
+          example: Deloitte
+        cpaProcedurePerformed:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          description: Procedures performed to assess reputation of CPA firm.
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    VendorReviewScopeTypeEnum:
+      type: string
+      enum:
+      - TYPE_1
+      - TYPE_2
+    SocReviewLocationItemRequestPublicV2Dto:
+      type: object
+      properties:
+        city:
+          type: string
+          maxLength: 191
+          description: City of the geographic location where the vendor provides its services.
+          example: Austin
+        stateOrCountry:
+          type: string
+          maxLength: 191
+          description: State (for US-based locations) or country (for international locations) paired with the city to identify where the vendor provides its services.
+          example: TX
+    SocReviewServicesAndLocationsSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        services:
+          description: Services included in the report.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewServiceItemResponsePublicV2Dto'
+        locations:
+          description: Locations covered by the report.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewLocationItemResponsePublicV2Dto'
+      required:
+      - isComplete
+      - missingRequiredFields
+      - services
+      - locations
     SecurityReviewActionItemResponsePublicV2Dto:
       type: object
       properties:
@@ -1143,72 +1305,6 @@ components:
           - $ref: '#/components/schemas/SecurityReviewActionEnum'
       required:
       - action
-    SocReviewSubserviceOrganizationsSectionRequestPublicV2Dto:
-      type: object
-      properties:
-        subserviceOrganization:
-          type:
-          - string
-          - 'null'
-          maxLength: 30000
-          description: Subservice organizations listed in the report.
-        subserviceOrganizationUsingInclusiveMethod:
-          type:
-          - boolean
-          - 'null'
-          description: Are subservice organizations presented using the inclusive method?
-          example: true
-        subserviceOrganizationProcedurePerformed:
-          type:
-          - string
-          - 'null'
-          maxLength: 30000
-          description: Procedures performed to assess subservice organizations.
-    SocReviewAuditPeriodRangeSectionRequestPublicV2Dto:
-      type: object
-      properties:
-        start:
-          type: string
-          format: date
-          description: The start date of the audit period range.
-          example: '2020-07-06'
-        end:
-          type: string
-          format: date
-          description: The end date of the audit period range. Must be after start.
-          example: '2020-07-06'
-      required:
-      - start
-      - end
-    VendorReviewServiceCategoryEnum:
-      type: string
-      enum:
-      - AVAILABILITY
-      - CONFIDENTIALITY
-      - SECURITY
-      - PRIVACY
-      - PROCESSING_INTEGRITY
-    SecurityReviewActionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Available actions for the current security review state.
-          type: array
-          items:
-            $ref: '#/components/schemas/SecurityReviewActionItemResponsePublicV2Dto'
-      required:
-      - data
-    VendorSecurityReviewQuestionnaireCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        files:
-          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .csv'
-          type: array
-          items:
-            type: string
-            format: binary
-      required:
-      - files
     SocReviewFindingsSectionResponsePublicV2Dto:
       type: object
       properties:
@@ -1239,69 +1335,20 @@ components:
       - missingRequiredFields
       - findings
       - hasMaterialImpact
-    SecurityReviewFinalizeDecisionEnum:
+    SocReviewFindingItemResponsePublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          description: Description of the finding.
+          example: Control objective was not met during the audit period.
+      required:
+      - description
+    VendorSecurityReviewExpandEnum:
       type: string
       enum:
-      - APPROVED
-      - APPROVED_WITH_CONDITIONS
-      - REJECTED
-    SocReviewFormResponsePublicV2Dto:
-      type: object
-      properties:
-        readyToFinalize:
-          type: boolean
-          description: True when all required fields for finalization are complete.
-          example: false
-        reviewerInformation:
-          description: Reviewer identity and report issue date.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewReviewerInformationSectionResponsePublicV2Dto'
-        complianceScope:
-          description: SOC certification type, scope type, audit period, and trust service criteria.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewComplianceScopeSectionResponsePublicV2Dto'
-        reportOpinion:
-          description: Auditor's opinion on the report and any follow-up activity.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewReportOpinionSectionResponsePublicV2Dto'
-        findings:
-          description: Exceptions or findings noted in the report and their material impact.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewFindingsSectionResponsePublicV2Dto'
-        endUserControls:
-          description: Complementary user entity controls identified in the report.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewEndUserControlsSectionResponsePublicV2Dto'
-        servicesAndLocations:
-          description: Services and physical locations covered by the report.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewServicesAndLocationsSectionResponsePublicV2Dto'
-        cpaFirm:
-          description: CPA firm that performed the audit and procedures used to assess its reputation.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewCpaFirmSectionResponsePublicV2Dto'
-        subserviceOrganizations:
-          description: Subservice organizations included in the report and the method used to present them.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewSubserviceOrganizationsSectionResponsePublicV2Dto'
-      required:
-      - readyToFinalize
-      - reviewerInformation
-      - complianceScope
-      - reportOpinion
-      - findings
-      - endUserControls
-      - servicesAndLocations
-      - cpaFirm
-      - subserviceOrganizations
-    SocReviewEndUserControlsSectionRequestPublicV2Dto:
-      type: object
-      properties:
-        userControls:
-          description: List of user controls to add. New items are appended to any existing ones. Pass an empty array to clear all existing user controls. Omit to leave existing user controls unchanged.
-          type: array
-          items:
-            $ref: '#/components/schemas/SocReviewUserControlItemRequestPublicV2Dto'
+      - user
+      - requesterUser
     VendorSecurityQuestionnairesResponsePublicV2Dto:
       type: object
       properties:
@@ -1315,40 +1362,195 @@ components:
       required:
       - data
       - pagination
-    VendorSecurityReviewsAcrossVendorsExpandEnum:
-      type: string
-      enum:
-      - user
-      - requesterUser
-      - vendor
-    ExceptionResponsePublicV2Dto:
+    VendorCompactResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor ID
         name:
           type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+          example: Acme
+          description: Vendor name
       required:
+      - id
       - name
-      - statusCode
-      - message
-      - code
+    SocReviewComplianceScopeSectionResponsePublicV2Dto:
+      type: object
+      properties:
+        isComplete:
+          type: boolean
+          description: True when all required fields in this section are populated.
+          example: false
+        missingRequiredFields:
+          description: Dot-notation paths of required fields that are currently missing.
+          example:
+          - reviewerInformation.reviewer
+          type: array
+          items:
+            type: string
+        certification:
+          type:
+          - string
+          - 'null'
+          description: SOC report certification type.
+          enum:
+          - SOC_1
+          - SOC_2
+          - SOC_3
+          example: SOC_2
+        scopeType:
+          description: Scope type of the audit.
+          example: TYPE_2
+          allOf:
+          - $ref: '#/components/schemas/VendorReviewScopeTypeEnum'
+        auditPeriod:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Audit period date for TYPE_1 audits.
+          example: '2020-07-06'
+        auditPeriodRange:
+          type:
+          - object
+          - 'null'
+          description: Audit period range for TYPE_2.
+          properties:
+            start:
+              type:
+              - string
+              - 'null'
+              format: date
+            end:
+              type:
+              - string
+              - 'null'
+              format: date
+          example:
+            start: '2020-07-06'
+            end: '2020-07-06'
+        trustServiceCriteria:
+          type:
+          - array
+          - 'null'
+          description: Trust service criteria categories.
+          items:
+            type: string
+            enum:
+            - AVAILABILITY
+            - CONFIDENTIALITY
+            - SECURITY
+            - PRIVACY
+            - PROCESSING_INTEGRITY
+      required:
+      - isComplete
+      - missingRequiredFields
+      - certification
+      - scopeType
+      - auditPeriod
+      - auditPeriodRange
+      - trustServiceCriteria
+    VendorSecurityQuestionnaireResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Questionnaire ID
+        completedBy:
+          type:
+          - string
+          - 'null'
+          example: Acme
+          description: Who completed the Questionnaire, null if not completed
+        recipientEmail:
+          type: string
+          maxLength: 191
+          format: email
+          example: jdoe@company.com
+          description: The email address to receive the Questionnaire
+        isCompleted:
+          type: boolean
+          example: 'true'
+          description: The status of the Questionnaire
+        dateSent:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Questionnaire was sent
+        isManualUpload:
+          type: boolean
+          example: 'true'
+          description: Flag indicating whether the questionnaire was manually uploaded
+        responseId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: The Questionnaire response ID to the Questionnaire data file, null if not completed
+        title:
+          type: string
+          example: Vendor Security Questionnaire
+          description: Vendor Questionnaire title
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - SENT
+          example: SENT
+          description: Lifecycle status of the Questionnaire. DRAFT is an agent-generated follow-up questionnaire that has been saved but not yet sent to the vendor.
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Questionnaire was completed, null if not completed
+        totalQuestions:
+          type:
+          - number
+          - 'null'
+          example: 10
+          description: Total number of questions in the Questionnaire, null for DRAFT Questionnaires
+        totalQuestionsAnswered:
+          type:
+          - number
+          - 'null'
+          example: 10
+          description: Total number of questions answered, null for DRAFT Questionnaires
+        reminderDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the most recent reminder for this Questionnaire was sent, if any
+      required:
+      - id
+      - completedBy
+      - recipientEmail
+      - isCompleted
+      - dateSent
+      - isManualUpload
+      - responseId
+      - status
+      - completedAt
+      - totalQuestions
+      - totalQuestionsAnswered
+      - reminderDate
+    VendorSecurityReviewUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 191
+          description: The Security Review name.
+        socForm:
+          description: SOC review form data. Only processed when `securityReviewType` is SOC_REPORT.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewFormSaveRequestPublicV2Dto'
     VendorSecurityReviewResponsePublicV2Dto:
       type: object
       properties:
@@ -1449,253 +1651,17 @@ components:
       - vendorId
       - userId
       - requesterUserId
-    VendorSecurityReviewDecisionEnum:
-      type: string
-      enum:
-      - PENDING
-      - APPROVED
-      - APPROVED_WITH_CONDITIONS
-      - REJECTED
-    VendorSecurityReviewTypeEnum:
-      type: string
-      enum:
-      - SECURITY
-      - SOC_REPORT
-      - UPLOAD_REPORT
-    SocReportTypeEnum:
-      type: string
-      enum:
-      - SOC_1
-      - SOC_2
-      - SOC_3
-    SocReviewCpaFirmSectionRequestPublicV2Dto:
+    VendorSecurityReviewQuestionnaireCreateRequestPublicV2Dto:
       type: object
       properties:
-        cpaFirm:
-          type:
-          - string
-          - 'null'
-          maxLength: 191
-          description: CPA firm that performed the audit.
-          example: Deloitte
-        cpaProcedurePerformed:
-          type:
-          - string
-          - 'null'
-          maxLength: 30000
-          description: Procedures performed to assess reputation of CPA firm.
-    VendorSecurityReviewUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        title:
-          type: string
-          maxLength: 191
-          description: The Security Review name.
-        socForm:
-          description: SOC review form data. Only processed when `securityReviewType` is SOC_REPORT.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewFormSaveRequestPublicV2Dto'
-    VendorSecurityQuestionnaireResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Questionnaire ID
-        completedBy:
-          type:
-          - string
-          - 'null'
-          example: Acme
-          description: Who completed the Questionnaire, null if not completed
-        recipientEmail:
-          type: string
-          maxLength: 191
-          format: email
-          example: jdoe@company.com
-          description: The email address to receive the Questionnaire
-        isCompleted:
-          type: boolean
-          example: 'true'
-          description: The status of the Questionnaire
-        dateSent:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Questionnaire was sent
-        isManualUpload:
-          type: boolean
-          example: 'true'
-          description: Flag indicating whether the questionnaire was manually uploaded
-        responseId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: The Questionnaire response ID to the Questionnaire data file, null if not completed
-        title:
-          type: string
-          example: Vendor Security Questionnaire
-          description: Vendor Questionnaire title
-        status:
-          type: string
-          enum:
-          - DRAFT
-          - SENT
-          example: SENT
-          description: Lifecycle status of the Questionnaire. DRAFT is an agent-generated follow-up questionnaire that has been saved but not yet sent to the vendor.
-        completedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Questionnaire was completed, null if not completed
-        totalQuestions:
-          type:
-          - number
-          - 'null'
-          example: 10
-          description: Total number of questions in the Questionnaire, null for DRAFT Questionnaires
-        totalQuestionsAnswered:
-          type:
-          - number
-          - 'null'
-          example: 10
-          description: Total number of questions answered, null for DRAFT Questionnaires
-        reminderDate:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the most recent reminder for this Questionnaire was sent, if any
-      required:
-      - id
-      - completedBy
-      - recipientEmail
-      - isCompleted
-      - dateSent
-      - isManualUpload
-      - responseId
-      - status
-      - completedAt
-      - totalQuestions
-      - totalQuestionsAnswered
-      - reminderDate
-    SecurityReviewActionEnum:
-      type: string
-      enum:
-      - finalize
-      - reopen
-    SocReviewReviewerInformationSectionResponsePublicV2Dto:
-      type: object
-      properties:
-        isComplete:
-          type: boolean
-          description: True when all required fields in this section are populated.
-          example: false
-        missingRequiredFields:
-          description: Dot-notation paths of required fields that are currently missing.
-          example:
-          - reviewerInformation.reviewer
+        files:
+          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .csv'
           type: array
           items:
             type: string
-        reviewer:
-          type:
-          - string
-          - 'null'
-          description: Reviewer display name.
-          example: Jane Doe
-        reportIssueDate:
-          type:
-          - string
-          - 'null'
-          format: date
-          description: Report issue date.
-          example: '2020-07-06'
+            format: binary
       required:
-      - isComplete
-      - missingRequiredFields
-      - reviewer
-      - reportIssueDate
-    SocReviewComplianceScopeSectionResponsePublicV2Dto:
-      type: object
-      properties:
-        isComplete:
-          type: boolean
-          description: True when all required fields in this section are populated.
-          example: false
-        missingRequiredFields:
-          description: Dot-notation paths of required fields that are currently missing.
-          example:
-          - reviewerInformation.reviewer
-          type: array
-          items:
-            type: string
-        certification:
-          type:
-          - string
-          - 'null'
-          description: SOC report certification type.
-          enum:
-          - SOC_1
-          - SOC_2
-          - SOC_3
-          example: SOC_2
-        scopeType:
-          description: Scope type of the audit.
-          example: TYPE_2
-          allOf:
-          - $ref: '#/components/schemas/VendorReviewScopeTypeEnum'
-        auditPeriod:
-          type:
-          - string
-          - 'null'
-          format: date
-          description: Audit period date for TYPE_1 audits.
-          example: '2020-07-06'
-        auditPeriodRange:
-          type:
-          - object
-          - 'null'
-          description: Audit period range for TYPE_2.
-          properties:
-            start:
-              type:
-              - string
-              - 'null'
-              format: date
-            end:
-              type:
-              - string
-              - 'null'
-              format: date
-          example:
-            start: '2020-07-06'
-            end: '2020-07-06'
-        trustServiceCriteria:
-          type:
-          - array
-          - 'null'
-          description: Trust service criteria categories.
-          items:
-            type: string
-            enum:
-            - AVAILABILITY
-            - CONFIDENTIALITY
-            - SECURITY
-            - PRIVACY
-            - PROCESSING_INTEGRITY
-      required:
-      - isComplete
-      - missingRequiredFields
-      - certification
-      - scopeType
-      - auditPeriod
-      - auditPeriodRange
-      - trustServiceCriteria
+      - files
     VendorSecurityReviewWithFileCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -1762,6 +1728,208 @@ components:
       - securityReviewStatus
       - securityReviewType
       - file
+    HateoasLinksPublicV2Dto:
+      type: object
+      properties:
+        self:
+          description: Link to the resource in the Drata application
+          allOf:
+          - $ref: '#/components/schemas/HateoasLinkPublicV2Dto'
+      required:
+      - self
+    SocReviewSubserviceOrganizationsSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        subserviceOrganization:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          description: Subservice organizations listed in the report.
+        subserviceOrganizationUsingInclusiveMethod:
+          type:
+          - boolean
+          - 'null'
+          description: Are subservice organizations presented using the inclusive method?
+          example: true
+        subserviceOrganizationProcedurePerformed:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          description: Procedures performed to assess subservice organizations.
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    SocReviewFindingsSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        findings:
+          description: List of findings to add. New findings are appended to any existing ones. Pass an empty array to clear all existing findings. Omit to leave existing findings unchanged.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewFindingItemRequestPublicV2Dto'
+        hasMaterialImpact:
+          type:
+          - boolean
+          - 'null'
+          description: Whether the findings have a material impact. Required at finalize when at least one finding is present.
+          example: false
+    VendorReviewServiceCategoryEnum:
+      type: string
+      enum:
+      - AVAILABILITY
+      - CONFIDENTIALITY
+      - SECURITY
+      - PRIVACY
+      - PROCESSING_INTEGRITY
+    SecurityReviewActionResultResponsePublicV2Dto:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+          description: Whether the action was successful
+        newStatus:
+          type: string
+          example: COMPLETED
+          description: The new status of the security review after the action
+        message:
+          type: string
+          example: Security review finalized successfully
+          description: A human-readable message about the result
+      required:
+      - success
+      - message
+    SecurityReviewActionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Available actions for the current security review state.
+          type: array
+          items:
+            $ref: '#/components/schemas/SecurityReviewActionItemResponsePublicV2Dto'
+      required:
+      - data
+    SocReviewUserControlItemRequestPublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 30000
+          description: Description of the user control.
+        inPlace:
+          type: boolean
+          description: Whether the user control is in place.
+          example: true
+    SocReviewEndUserControlsSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        userControls:
+          description: List of user controls to add. New items are appended to any existing ones. Pass an empty array to clear all existing user controls. Omit to leave existing user controls unchanged.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewUserControlItemRequestPublicV2Dto'
+    SocReportTypeEnum:
+      type: string
+      enum:
+      - SOC_1
+      - SOC_2
+      - SOC_3
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    SocReviewAuditPeriodRangeSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        start:
+          type: string
+          format: date
+          description: The start date of the audit period range.
+          example: '2020-07-06'
+        end:
+          type: string
+          format: date
+          description: The end date of the audit period range. Must be after start.
+          example: '2020-07-06'
+      required:
+      - start
+      - end
+    SocReviewFindingItemRequestPublicV2Dto:
+      type: object
+      properties:
+        description:
+          type: string
+          maxLength: 30000
+          description: Description of the finding.
+    VendorSecurityReviewTypeEnum:
+      type: string
+      enum:
+      - SECURITY
+      - SOC_REPORT
+      - UPLOAD_REPORT
     SocReviewReportOpinionSectionRequestPublicV2Dto:
       type: object
       properties:
@@ -1782,167 +1950,88 @@ components:
           - 'null'
           maxLength: 30000
           description: Planned follow-up activity if the report opinion is qualified.
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    SocReviewUserControlItemRequestPublicV2Dto:
+    SocReviewFormResponsePublicV2Dto:
+      type: object
+      properties:
+        readyToFinalize:
+          type: boolean
+          description: True when all required fields for finalization are complete.
+          example: false
+        reviewerInformation:
+          description: Reviewer identity and report issue date.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReviewerInformationSectionResponsePublicV2Dto'
+        complianceScope:
+          description: SOC certification type, scope type, audit period, and trust service criteria.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewComplianceScopeSectionResponsePublicV2Dto'
+        reportOpinion:
+          description: Auditor's opinion on the report and any follow-up activity.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewReportOpinionSectionResponsePublicV2Dto'
+        findings:
+          description: Exceptions or findings noted in the report and their material impact.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewFindingsSectionResponsePublicV2Dto'
+        endUserControls:
+          description: Complementary user entity controls identified in the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewEndUserControlsSectionResponsePublicV2Dto'
+        servicesAndLocations:
+          description: Services and physical locations covered by the report.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewServicesAndLocationsSectionResponsePublicV2Dto'
+        cpaFirm:
+          description: CPA firm that performed the audit and procedures used to assess its reputation.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewCpaFirmSectionResponsePublicV2Dto'
+        subserviceOrganizations:
+          description: Subservice organizations included in the report and the method used to present them.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewSubserviceOrganizationsSectionResponsePublicV2Dto'
+      required:
+      - readyToFinalize
+      - reviewerInformation
+      - complianceScope
+      - reportOpinion
+      - findings
+      - endUserControls
+      - servicesAndLocations
+      - cpaFirm
+      - subserviceOrganizations
+    SocReviewUserControlItemResponsePublicV2Dto:
       type: object
       properties:
         description:
           type: string
-          maxLength: 30000
           description: Description of the user control.
+          example: Users must enforce strong password policies.
         inPlace:
           type: boolean
-          description: Whether the user control is in place.
+          description: Whether the control is in place.
           example: true
-    VendorReviewScopeTypeEnum:
-      type: string
-      enum:
-      - TYPE_1
-      - TYPE_2
-    SocReviewLocationItemRequestPublicV2Dto:
-      type: object
-      properties:
-        city:
-          type: string
-          maxLength: 191
-          description: City of the geographic location where the vendor provides its services.
-          example: Austin
-        stateOrCountry:
-          type: string
-          maxLength: 191
-          description: State (for US-based locations) or country (for international locations) paired with the city to identify where the vendor provides its services.
-          example: TX
-    VendorCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor ID
-        name:
-          type: string
-          example: Acme
-          description: Vendor name
       required:
-      - id
-      - name
-    SecurityReviewActionResultResponsePublicV2Dto:
+      - description
+      - inPlace
+    SocReviewServicesAndLocationsSectionRequestPublicV2Dto:
       type: object
       properties:
-        success:
-          type: boolean
-          example: true
-          description: Whether the action was successful
-        newStatus:
-          type: string
-          example: COMPLETED
-          description: The new status of the security review after the action
-        message:
-          type: string
-          example: Security review finalized successfully
-          description: A human-readable message about the result
-      required:
-      - success
-      - message
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    VendorReportOpinionEnum:
-      type: string
-      enum:
-      - UNQUALIFIED
-      - QUALIFIED
-      - ADVERSE
-      - DISCLAIMER
-    SocReviewLocationItemResponsePublicV2Dto:
-      type: object
-      properties:
-        city:
-          type: string
-          description: City of the geographic location where the vendor provides its services.
-          example: Austin
-        stateOrCountry:
-          type: string
-          description: State (for US-based locations) or country (for international locations) paired with the city to identify where the vendor provides its services.
-          example: TX
-      required:
-      - city
-      - stateOrCountry
-    SocReviewFindingsSectionRequestPublicV2Dto:
-      type: object
-      properties:
-        findings:
-          description: List of findings to add. New findings are appended to any existing ones. Pass an empty array to clear all existing findings. Omit to leave existing findings unchanged.
+        services:
+          description: List of services to add. New items are appended to any existing ones. Pass an empty array to clear all existing services. Omit to leave existing services unchanged.
           type: array
           items:
-            $ref: '#/components/schemas/SocReviewFindingItemRequestPublicV2Dto'
-        hasMaterialImpact:
-          type:
-          - boolean
-          - 'null'
-          description: Whether the findings have a material impact. Required at finalize when at least one finding is present.
-          example: false
-    VendorSecurityReviewsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Full list of Vendor Security Reviews
+            $ref: '#/components/schemas/SocReviewServiceItemRequestPublicV2Dto'
+        locations:
+          description: List of locations to add. New items are appended to any existing ones. Pass an empty array to clear all existing locations. Omit to leave existing locations unchanged.
           type: array
           items:
-            $ref: '#/components/schemas/VendorSecurityReviewResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    VendorSecurityReviewStatusEnum:
+            $ref: '#/components/schemas/SocReviewLocationItemRequestPublicV2Dto'
+    VendorSecurityReviewsAcrossVendorsExpandEnum:
       type: string
       enum:
-      - NOT_YET_STARTED
-      - IN_PROGRESS
-      - COMPLETED
-      - NOT_REQUIRED
+      - user
+      - requesterUser
+      - vendor
     VendorSecurityReviewCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -1991,6 +2080,15 @@ components:
       - reviewDeadlineAt
       - securityReviewStatus
       - securityReviewType
+    SocReviewServiceItemResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the service.
+          example: Cloud Hosting
+      required:
+      - name
     SocReviewSubserviceOrganizationsSectionResponsePublicV2Dto:
       type: object
       properties:
@@ -2029,46 +2127,29 @@ components:
       - subserviceOrganization
       - subserviceOrganizationUsingInclusiveMethod
       - subserviceOrganizationProcedurePerformed
-    SocReviewComplianceScopeSectionRequestPublicV2Dto:
+    SecurityReviewActionRequestPublicV2Dto:
       type: object
       properties:
-        certification:
-          description: SOC report certification type.
-          example: SOC_2
+        action:
+          description: Action to perform on the security review.
+          example: finalize
           allOf:
-          - $ref: '#/components/schemas/SocReportTypeEnum'
-        scopeType:
-          description: Scope type of the audit.
-          example: TYPE_2
+          - $ref: '#/components/schemas/SecurityReviewActionEnum'
+        decision:
+          example: APPROVED
+          description: Finalization decision. Only valid when `action` is `finalize`. Must be one of APPROVED, APPROVED_WITH_CONDITIONS, or REJECTED. PENDING is intentionally not accepted; use the `reopen` action if the reviewer needs to return the review to in-progress. When omitted on `finalize`, defaults to APPROVED for backward compatibility.
           allOf:
-          - $ref: '#/components/schemas/VendorReviewScopeTypeEnum'
-        auditPeriod:
-          type:
-          - string
-          - 'null'
-          format: date
-          description: The audit period date. Required at finalize when TYPE_1.
-          example: '2020-07-06'
-        auditPeriodRange:
-          description: The audit period date range. Required at finalize when TYPE_2.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewAuditPeriodRangeSectionRequestPublicV2Dto'
-        trustServiceCriteria:
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/VendorReviewServiceCategoryEnum'
-          description: Trust service criteria categories. Required at finalize (min 1) unless SOC_1 or SOC_3.
-          example:
-          - AVAILABILITY
-    SocReviewServiceItemRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
+          - $ref: '#/components/schemas/SecurityReviewFinalizeDecisionEnum'
+        note:
           type: string
-          maxLength: 30000
-          description: Name of the service.
+          maxLength: 1000
+          description: Optional reviewer note captured with the finalization. Only valid when `action` is `finalize`.
+        resetDecision:
+          type: boolean
+          example: true
+          description: When true, reset the decision back to PENDING as part of the reopen. Only valid when `action` is `reopen`. Defaults to `false`, which preserves the prior decision on the reopened review.
+      required:
+      - action
     SocReviewReportOpinionSectionResponsePublicV2Dto:
       type: object
       properties:
@@ -2112,51 +2193,7 @@ components:
       - reportOpinion
       - encompassBusinessNeeds
       - followUpActivity
-    SocReviewFormSaveRequestPublicV2Dto:
-      type: object
-      properties:
-        reviewerInformation:
-          description: Reviewer identity and report issue date.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewReviewerInformationSectionRequestPublicV2Dto'
-        complianceScope:
-          description: SOC certification type, scope type, audit period, and trust service criteria.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewComplianceScopeSectionRequestPublicV2Dto'
-        reportOpinion:
-          description: Auditor's opinion on the report and any follow-up activity.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewReportOpinionSectionRequestPublicV2Dto'
-        findings:
-          description: Exceptions or findings noted in the report and their material impact.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewFindingsSectionRequestPublicV2Dto'
-        endUserControls:
-          description: Complementary user entity controls identified in the report.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewEndUserControlsSectionRequestPublicV2Dto'
-        servicesAndLocations:
-          description: Services and physical locations covered by the report.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewServicesAndLocationsSectionRequestPublicV2Dto'
-        cpaFirm:
-          description: CPA firm that performed the audit and procedures used to assess its reputation.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewCpaFirmSectionRequestPublicV2Dto'
-        subserviceOrganizations:
-          description: Subservice organizations included in the report and the method used to present them.
-          allOf:
-          - $ref: '#/components/schemas/SocReviewSubserviceOrganizationsSectionRequestPublicV2Dto'
-    HateoasLinksPublicV2Dto:
-      type: object
-      properties:
-        self:
-          description: Link to the resource in the Drata application
-          allOf:
-          - $ref: '#/components/schemas/HateoasLinkPublicV2Dto'
-      required:
-      - self
-    SocReviewCpaFirmSectionResponsePublicV2Dto:
+    SocReviewEndUserControlsSectionResponsePublicV2Dto:
       type: object
       properties:
         isComplete:
@@ -2170,81 +2207,15 @@ components:
           type: array
           items:
             type: string
-        cpaFirm:
-          type:
-          - string
-          - 'null'
-          description: CPA firm name.
-          example: Deloitte
-        cpaProcedurePerformed:
-          type:
-          - string
-          - 'null'
-          description: Procedures performed to assess reputation of CPA firm.
-          example: Assessed reputation via public records.
+        userControls:
+          description: User controls identified in the report.
+          type: array
+          items:
+            $ref: '#/components/schemas/SocReviewUserControlItemResponsePublicV2Dto'
       required:
       - isComplete
       - missingRequiredFields
-      - cpaFirm
-      - cpaProcedurePerformed
-    SocReviewServiceItemResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Name of the service.
-          example: Cloud Hosting
-      required:
-      - name
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    SocReviewFindingItemResponsePublicV2Dto:
-      type: object
-      properties:
-        description:
-          type: string
-          description: Description of the finding.
-          example: Control objective was not met during the audit period.
-      required:
-      - description
+      - userControls
     HateoasLinkPublicV2Dto:
       type: object
       properties:
@@ -2254,35 +2225,21 @@ components:
           example: https://app.drata.com/risk/vendors/profile/1/overview
       required:
       - href
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    SecurityReviewActionRequestPublicV2Dto:
+    SocReviewLocationItemResponsePublicV2Dto:
       type: object
       properties:
-        action:
-          description: Action to perform on the security review.
-          example: finalize
-          allOf:
-          - $ref: '#/components/schemas/SecurityReviewActionEnum'
-        decision:
-          example: APPROVED
-          description: Finalization decision. Only valid when `action` is `finalize`. Must be one of APPROVED, APPROVED_WITH_CONDITIONS, or REJECTED. PENDING is intentionally not accepted; use the `reopen` action if the reviewer needs to return the review to in-progress. When omitted on `finalize`, defaults to APPROVED for backward compatibility.
-          allOf:
-          - $ref: '#/components/schemas/SecurityReviewFinalizeDecisionEnum'
-        note:
+        city:
           type: string
-          maxLength: 1000
-          description: Optional reviewer note captured with the finalization. Only valid when `action` is `finalize`.
-        resetDecision:
-          type: boolean
-          example: true
-          description: When true, reset the decision back to PENDING as part of the reopen. Only valid when `action` is `reopen`. Defaults to `false`, which preserves the prior decision on the reopened review.
+          description: City of the geographic location where the vendor provides its services.
+          example: Austin
+        stateOrCountry:
+          type: string
+          description: State (for US-based locations) or country (for international locations) paired with the city to identify where the vendor provides its services.
+          example: TX
       required:
-      - action
-    SocReviewServicesAndLocationsSectionResponsePublicV2Dto:
+      - city
+      - stateOrCountry
+    SocReviewReviewerInformationSectionResponsePublicV2Dto:
       type: object
       properties:
         isComplete:
@@ -2296,21 +2253,64 @@ components:
           type: array
           items:
             type: string
-        services:
-          description: Services included in the report.
-          type: array
-          items:
-            $ref: '#/components/schemas/SocReviewServiceItemResponsePublicV2Dto'
-        locations:
-          description: Locations covered by the report.
-          type: array
-          items:
-            $ref: '#/components/schemas/SocReviewLocationItemResponsePublicV2Dto'
+        reviewer:
+          type:
+          - string
+          - 'null'
+          description: Reviewer display name.
+          example: Jane Doe
+        reportIssueDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: Report issue date.
+          example: '2020-07-06'
       required:
       - isComplete
       - missingRequiredFields
-      - services
-      - locations
+      - reviewer
+      - reportIssueDate
+    VendorSecurityReviewStatusEnum:
+      type: string
+      enum:
+      - NOT_YET_STARTED
+      - IN_PROGRESS
+      - COMPLETED
+      - NOT_REQUIRED
+    SocReviewComplianceScopeSectionRequestPublicV2Dto:
+      type: object
+      properties:
+        certification:
+          description: SOC report certification type.
+          example: SOC_2
+          allOf:
+          - $ref: '#/components/schemas/SocReportTypeEnum'
+        scopeType:
+          description: Scope type of the audit.
+          example: TYPE_2
+          allOf:
+          - $ref: '#/components/schemas/VendorReviewScopeTypeEnum'
+        auditPeriod:
+          type:
+          - string
+          - 'null'
+          format: date
+          description: The audit period date. Required at finalize when TYPE_1.
+          example: '2020-07-06'
+        auditPeriodRange:
+          description: The audit period date range. Required at finalize when TYPE_2.
+          allOf:
+          - $ref: '#/components/schemas/SocReviewAuditPeriodRangeSectionRequestPublicV2Dto'
+        trustServiceCriteria:
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/VendorReviewServiceCategoryEnum'
+          description: Trust service criteria categories. Required at finalize (min 1) unless SOC_1 or SOC_3.
+          example:
+          - AVAILABILITY
   securitySchemes:
     bearer:
       scheme: bearer

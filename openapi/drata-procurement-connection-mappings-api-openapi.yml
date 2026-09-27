@@ -154,31 +154,32 @@ paths:
       - VENDOR_PROCUREMENT_INTEGRATION
 components:
   schemas:
-    ExceptionResponseDto:
+    ProcurementConnectionMappingUpdateRequestPublicV2Dto:
       type: object
       properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
+        vendorMapping:
+          type:
+          - object
+          - 'null'
+          additionalProperties: true
+          example:
+            name: properties.counterpartyName.value
+            externalId: id
+          description: JSONata mapping from provider record fields to vendor properties. Keys are vendor field names, values are JSONata expressions.
+        vendorTypes:
+          example:
+          - vendor
+          - supplier
+          description: Vendor types to filter from the procurement provider
+          type:
+          - array
+          - 'null'
+          items:
+            type: string
+        dryRun:
+          type: boolean
+          example: false
+          description: Enable dry run mode (no actual vendor creation/updates). Defaults to true if not set.
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -204,6 +205,31 @@ components:
           - message
       required:
       - name
+      - statusCode
+      - message
+      - code
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
       - statusCode
       - message
       - code
@@ -560,32 +586,6 @@ components:
       - dryRun
       - aiMappingSuggested
       - credentialType
-    ProcurementConnectionMappingUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        vendorMapping:
-          type:
-          - object
-          - 'null'
-          additionalProperties: true
-          example:
-            name: properties.counterpartyName.value
-            externalId: id
-          description: JSONata mapping from provider record fields to vendor properties. Keys are vendor field names, values are JSONata expressions.
-        vendorTypes:
-          example:
-          - vendor
-          - supplier
-          description: Vendor types to filter from the procurement provider
-          type:
-          - array
-          - 'null'
-          items:
-            type: string
-        dryRun:
-          type: boolean
-          example: false
-          description: Enable dry run mode (no actual vendor creation/updates). Defaults to true if not set.
   securitySchemes:
     bearer:
       scheme: bearer

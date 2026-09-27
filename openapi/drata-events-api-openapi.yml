@@ -406,11 +406,6 @@ paths:
       - EVENT_TRACKING
 components:
   schemas:
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
     CheckResultStatusEnum:
       type: string
       enum:
@@ -424,6 +419,306 @@ components:
       enum:
       - createdAt
       - updatedAt
+    EventSourceEnum:
+      type: string
+      enum:
+      - APP
+      - AUTOPILOT
+      - PUBLIC_API
+      - VENDOR_QUESTIONNAIRE
+      - SCHEDULED
+      - WORKFLOW
+      - DRATA_POLICY
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    EventSortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+    EvidenceJobStatusEnum:
+      type: string
+      enum:
+      - Pending
+      - Running
+      - Completed
+      - Failed
+    EventResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Event UUID
+        type:
+          description: The type of event
+          allOf:
+          - $ref: '#/components/schemas/EventTypeEnum'
+        category:
+          description: The category of event
+          allOf:
+          - $ref: '#/components/schemas/EventCategoryEnum'
+        source:
+          description: The source of the event (APP or AUTOPILOT)
+          allOf:
+          - $ref: '#/components/schemas/EventSourceEnum'
+        description:
+          type: string
+          example: Wile E. Coyote updated the company info.
+          description: The description of the event
+        metadata:
+          type: object
+          properties:
+            dto:
+              type:
+              - object
+              - 'null'
+              additionalProperties: true
+            targetEntity:
+              type:
+              - object
+              - 'null'
+              additionalProperties: true
+            targetEntities:
+              type: array
+              items:
+                type:
+                - object
+                - 'null'
+                additionalProperties: true
+            fileKey:
+              type:
+              - string
+              - 'null'
+            sourceData:
+              type:
+              - object
+              - 'null'
+              additionalProperties: true
+            taskType:
+              type:
+              - number
+              - 'null'
+            request:
+              type:
+              - object
+              - 'null'
+              additionalProperties: true
+            response:
+              type:
+              - object
+              - 'null'
+              additionalProperties: true
+          description: The event metadata in JSON, only returned when `expand[]=metadata` is passed.
+        status:
+          description: The result of the test if the event type is an Autopilot test, otherwise null
+          allOf:
+          - $ref: '#/components/schemas/CheckResultStatusEnum'
+        createdAt:
+          type: string
+          format: date-time
+          description: Report created date timestamp
+        userId:
+          type:
+          - number
+          - 'null'
+          description: The id of the user related to the event
+        user:
+          description: The user related to the event, only returned when `expand[]=user` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        connectionId:
+          type:
+          - number
+          - 'null'
+          description: The id of the connection associated to the event
+        connection:
+          description: The associated connection if this event has one, only returned when `expand[]=connection` is passed.
+          allOf:
+          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
+        requestDescription:
+          type:
+          - string
+          - 'null'
+          example: Data was fetched from https://xyz.com/api/v1/data
+          description: The human readable explanation of the workings of the associated AP test
+        testName:
+          type:
+          - string
+          - 'null'
+          description: The name of the monitoring test associated with this event, only returned when `expand[]=testName` is passed.
+        testId:
+          type:
+          - string
+          - 'null'
+          description: The identifier of the monitoring test associated with this event. This value may be duplicated across workspaces. Only returned when `expand[]=testId` is passed.
+        issues:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: The issues associated to this event, if any, only returned when `expand[]=issues` or `expand[]=metadata` is passed.
+      required:
+      - id
+      - type
+      - category
+      - source
+      - description
+      - status
+      - createdAt
+      - userId
+      - connectionId
+      - requestDescription
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    EventDownloadJobResponsePublicV2Dto:
+      type: object
+      properties:
+        jobId:
+          type: string
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: The unique job ID for tracking the Event PDF download generation
+        status:
+          description: The current status of the event PDF download job
+          example: Pending
+          allOf:
+          - $ref: '#/components/schemas/EvidenceJobStatusEnum'
+        result:
+          type:
+          - string
+          - 'null'
+          description: The signed URL to download the event PDF (only available when status is `COMPLETED`). URL expires after 10 minutes from generation.
+          example: https://s3.amazonaws.com/event-pdf.pdf?Signature=ABC123
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the job was created
+          example: '2025-07-01T16:45:55.246Z'
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Timestamp when the job was completed (only available when status is `COMPLETED` or `FAILED`)
+          example: '2025-07-01T16:45:55.246Z'
+        errorMessage:
+          type: string
+          description: Error message (only available when status is `FAILED`)
+          example: 'Failed to generate event PDF: insufficient permissions'
+      required:
+      - jobId
+      - status
+      - result
+      - createdAt
+      - completedAt
     ConnectionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -798,240 +1093,6 @@ components:
       - connectedAt
       - failedAt
       - deletedAt
-    EventResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: string
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: Event UUID
-        type:
-          description: The type of event
-          allOf:
-          - $ref: '#/components/schemas/EventTypeEnum'
-        category:
-          description: The category of event
-          allOf:
-          - $ref: '#/components/schemas/EventCategoryEnum'
-        source:
-          description: The source of the event (APP or AUTOPILOT)
-          allOf:
-          - $ref: '#/components/schemas/EventSourceEnum'
-        description:
-          type: string
-          example: Wile E. Coyote updated the company info.
-          description: The description of the event
-        metadata:
-          type: object
-          properties:
-            dto:
-              type:
-              - object
-              - 'null'
-              additionalProperties: true
-            targetEntity:
-              type:
-              - object
-              - 'null'
-              additionalProperties: true
-            targetEntities:
-              type: array
-              items:
-                type:
-                - object
-                - 'null'
-                additionalProperties: true
-            fileKey:
-              type:
-              - string
-              - 'null'
-            sourceData:
-              type:
-              - object
-              - 'null'
-              additionalProperties: true
-            taskType:
-              type:
-              - number
-              - 'null'
-            request:
-              type:
-              - object
-              - 'null'
-              additionalProperties: true
-            response:
-              type:
-              - object
-              - 'null'
-              additionalProperties: true
-          description: The event metadata in JSON, only returned when `expand[]=metadata` is passed.
-        status:
-          description: The result of the test if the event type is an Autopilot test, otherwise null
-          allOf:
-          - $ref: '#/components/schemas/CheckResultStatusEnum'
-        createdAt:
-          type: string
-          format: date-time
-          description: Report created date timestamp
-        userId:
-          type:
-          - number
-          - 'null'
-          description: The id of the user related to the event
-        user:
-          description: The user related to the event, only returned when `expand[]=user` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        connectionId:
-          type:
-          - number
-          - 'null'
-          description: The id of the connection associated to the event
-        connection:
-          description: The associated connection if this event has one, only returned when `expand[]=connection` is passed.
-          allOf:
-          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
-        requestDescription:
-          type:
-          - string
-          - 'null'
-          example: Data was fetched from https://xyz.com/api/v1/data
-          description: The human readable explanation of the workings of the associated AP test
-        testName:
-          type:
-          - string
-          - 'null'
-          description: The name of the monitoring test associated with this event, only returned when `expand[]=testName` is passed.
-        testId:
-          type:
-          - string
-          - 'null'
-          description: The identifier of the monitoring test associated with this event. This value may be duplicated across workspaces. Only returned when `expand[]=testId` is passed.
-        issues:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-          description: The issues associated to this event, if any, only returned when `expand[]=issues` or `expand[]=metadata` is passed.
-      required:
-      - id
-      - type
-      - category
-      - source
-      - description
-      - status
-      - createdAt
-      - userId
-      - connectionId
-      - requestDescription
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
     EventTypeEnum:
       type: string
       enum:
@@ -1906,19 +1967,6 @@ components:
       - AP_INFRASTRUCTURE_HIGH_AVAILABILITY
       - AP_INFRASTRUCTURE_POLICY_BASED_ACCESS_CONTROL
       - AP_AWS_IAM_USERS_COMPANY_INFRASTRUCTURE_MFA_ENABLED
-    EventExpandEnum:
-      type: string
-      enum:
-      - connection
-      - issues
-      - metadata
-      - testId
-      - testName
-      - user
-    EventSortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
     EventsResponsePublicV2Dto:
       type: object
       properties:
@@ -1932,63 +1980,6 @@ components:
       required:
       - data
       - pagination
-    EventDownloadJobResponsePublicV2Dto:
-      type: object
-      properties:
-        jobId:
-          type: string
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: The unique job ID for tracking the Event PDF download generation
-        status:
-          description: The current status of the event PDF download job
-          example: Pending
-          allOf:
-          - $ref: '#/components/schemas/EvidenceJobStatusEnum'
-        result:
-          type:
-          - string
-          - 'null'
-          description: The signed URL to download the event PDF (only available when status is `COMPLETED`). URL expires after 10 minutes from generation.
-          example: https://s3.amazonaws.com/event-pdf.pdf?Signature=ABC123
-        createdAt:
-          type: string
-          format: date-time
-          description: Timestamp when the job was created
-          example: '2025-07-01T16:45:55.246Z'
-        completedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          description: Timestamp when the job was completed (only available when status is `COMPLETED` or `FAILED`)
-          example: '2025-07-01T16:45:55.246Z'
-        errorMessage:
-          type: string
-          description: Error message (only available when status is `FAILED`)
-          example: 'Failed to generate event PDF: insufficient permissions'
-      required:
-      - jobId
-      - status
-      - result
-      - createdAt
-      - completedAt
-    EventSourceEnum:
-      type: string
-      enum:
-      - APP
-      - AUTOPILOT
-      - PUBLIC_API
-      - VENDOR_QUESTIONNAIRE
-      - SCHEDULED
-      - WORKFLOW
-      - DRATA_POLICY
-    EvidenceJobStatusEnum:
-      type: string
-      enum:
-      - Pending
-      - Running
-      - Completed
-      - Failed
     EventCategoryEnum:
       type: string
       enum:
@@ -2035,6 +2026,15 @@ components:
       - SAFEBASE_MIGRATION
       - TRUST_ACCESS_REQUEST
       - SAFEBASE_ONBOARDING
+    EventExpandEnum:
+      type: string
+      enum:
+      - connection
+      - issues
+      - metadata
+      - testId
+      - testName
+      - user
   securitySchemes:
     bearer:
       scheme: bearer

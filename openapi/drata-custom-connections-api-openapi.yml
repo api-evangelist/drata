@@ -410,66 +410,11 @@ paths:
         💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
 components:
   schemas:
-    CustomConnectionResourceResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 123
-          description: The unique identifier for the Custom Resource
-        name:
-          type: string
-          example: Employees
-          description: The name of the Custom Resource
-        description:
-          type:
-          - string
-          - 'null'
-          example: Employee records for compliance tracking
-          description: A description of the Custom Resource and its purpose
-        schema:
-          type: object
-          description: The JSON schema that defines the structure and validation rules for Custom Data records in this Custom Resource
-          additionalProperties: true
-          example:
-            id: string
-            type: object
-            properties:
-              name:
-                type: string
-            required:
-            - name
-            additionalProperties: false
-            selfRequired: true
-            $schema: http://json-schema.org/draft-07/schema#
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The date when the Custom Resource was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The date when the Custom Resource was last updated
-        deletedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The date when the Custom Resource was soft-deleted
-      required:
-      - id
-      - name
-      - schema
-      - createdAt
-      - updatedAt
-    SortDirectionEnum:
+    CustomConnectionExpandEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - createdByUser
+      - customResources
     CustomConnectionCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -609,6 +554,74 @@ components:
       - lastName
       - createdAt
       - updatedAt
+    CustomConnectionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Connections based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CustomConnectionResourceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: The unique identifier for the Custom Resource
+        name:
+          type: string
+          example: Employees
+          description: The name of the Custom Resource
+        description:
+          type:
+          - string
+          - 'null'
+          example: Employee records for compliance tracking
+          description: A description of the Custom Resource and its purpose
+        schema:
+          type: object
+          description: The JSON schema that defines the structure and validation rules for Custom Data records in this Custom Resource
+          additionalProperties: true
+          example:
+            id: string
+            type: object
+            properties:
+              name:
+                type: string
+            required:
+            - name
+            additionalProperties: false
+            selfRequired: true
+            $schema: http://json-schema.org/draft-07/schema#
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was last updated
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was soft-deleted
+      required:
+      - id
+      - name
+      - schema
+      - createdAt
+      - updatedAt
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -624,19 +637,16 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    CustomConnectionUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        clientAlias:
-          type:
-          - string
-          - 'null'
-          example: My Updated Custom Connection
-          description: Alias for the Custom Connection
-        description:
-          type: string
-          example: Updated description for Custom Connection
-          description: Description for Custom Connection
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -665,24 +675,6 @@ components:
       - statusCode
       - message
       - code
-    CustomConnectionExpandEnum:
-      type: string
-      enum:
-      - createdByUser
-      - customResources
-    CustomConnectionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: List of Custom Connections based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
     CustomConnectionResponsePublicV2Dto:
       type: object
       properties:
@@ -769,11 +761,19 @@ components:
       - description
       - createdAt
       - updatedAt
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
+    CustomConnectionUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        clientAlias:
+          type:
+          - string
+          - 'null'
+          example: My Updated Custom Connection
+          description: Alias for the Custom Connection
+        description:
+          type: string
+          example: Updated description for Custom Connection
+          description: Description for Custom Connection
   securitySchemes:
     bearer:
       scheme: bearer

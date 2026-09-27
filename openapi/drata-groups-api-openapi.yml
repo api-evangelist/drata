@@ -116,24 +116,6 @@ paths:
       - PERSONNEL_PAGE
 components:
   schemas:
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    GroupsListResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/GroupCompactResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
     ExceptionResponseDto:
       type: object
       properties:
@@ -159,6 +141,19 @@ components:
       - statusCode
       - message
       - code
+    GroupsListResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/GroupCompactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -174,6 +169,16 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -243,11 +248,6 @@ components:
       - name
       - externalId
       - source
-      - createdAt
-      - updatedAt
-    SortTypeLimitedEnum:
-      type: string
-      enum:
       - createdAt
       - updatedAt
   securitySchemes:

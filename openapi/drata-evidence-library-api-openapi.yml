@@ -493,38 +493,126 @@ paths:
       - EVIDENCE_LIBRARY
 components:
   schemas:
-    RenewalSchemaCompactResponsePublicV2Dto:
+    EvidenceLibraryVersionResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
-          example: 1
-          description: Renewal Schema ID
-        renewalDate:
+          example: 789
+          description: The unique identifier of the version (artifact). Use this value for API operations.
+        name:
           type:
           - string
           - 'null'
+          example: security-policy.pdf
+          description: The name of the Artifact
+        version:
+          type: number
+          example: 1
+          description: Artifact version number (sequential counter)
+        current:
+          type: boolean
+          example: true
+          description: Indicates if this Artifact is the current version
+        filedAt:
+          type:
+          - string
+          - 'null'
+          format: date
           example: '2020-07-06'
-          description: Renewal date
-        renewalScheduleType:
-          example: ONE_YEAR
-          description: The interval the evidence should be renewed on.
-          allOf:
-          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+          description: Date when the artifact was filed/effective. May differ from `createdAt` for backdated evidence
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The timestamp when the Artifact was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The timestamp when the Artifact was last updated
+        downloadUrl:
+          type:
+          - string
+          - 'null'
+          format: uri
+          example: https://s3.amazonaws.com/bucket/file.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256...
+          description: A time-limited signed URL for downloading the file, only returned when `expand[]=downloadUrl` is passed. Valid for 10 minutes.
       required:
       - id
-      - renewalDate
-      - renewalScheduleType
-    EvidenceStatusEnum:
+      - name
+      - version
+      - current
+      - filedAt
+      - createdAt
+      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    LibraryDocumentVersionTypeEnum:
       type: string
       enum:
-      - NEEDS_ARTIFACT
-      - ERROR
-      - READY
-      - EXPIRING_SOON
-      - EXPIRED
-      - NEEDS_SOURCE
-      - NEEDS_ATTENTION
+      - URL
+      - S3_FILE
+      - TICKET_PROVIDER
+      - NONE
+      - GOOGLE_DRIVE
+      - ONE_DRIVE
+      - BOX
+      - DROPBOX
+      - SHARE_POINT
+      - TEST_RESULT
+    EvidenceLibraryVersionExpandEnum:
+      type: string
+      enum:
+      - downloadUrl
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     EvidenceLibraryCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -608,34 +696,48 @@ components:
           description: Artifact source as URL. When provided, `renewalScheduleType`, `filedAt`, and `ownerId` are required. Only one artifact source (`file`, `base64File`, `url`, `ticketUrl`, or `fileKey`) can be provided.
       required:
       - name
-    ExceptionResponsePublicV2Dto:
+    ControlCompactResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: AC-1
+          description: Control code
         name:
           type: string
-        statusCode:
-          type: number
-        message:
+          example: Access Control
+          description: Control name
+        description:
+          type:
+          - string
+          - 'null'
+          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
+          description: Control description
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
+        createdAt:
           type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was last updated
       required:
-      - name
-      - statusCode
-      - message
+      - id
       - code
+      - name
+      - description
+      - createdAt
+      - updatedAt
     EvidenceLibraryVersionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -669,16 +771,16 @@ components:
       - type
       - current
       - createdAt
-    RenewalScheduleTypeEnum:
+    EvidenceStatusEnum:
       type: string
       enum:
-      - ONE_MONTH
-      - TWO_MONTHS
-      - THREE_MONTHS
-      - SIX_MONTHS
-      - ONE_YEAR
-      - CUSTOM
-      - NONE
+      - NEEDS_ARTIFACT
+      - ERROR
+      - READY
+      - EXPIRING_SOON
+      - EXPIRED
+      - NEEDS_SOURCE
+      - NEEDS_ATTENTION
     EvidenceLibraryModifyRequestPublicV2Dto:
       type: object
       properties:
@@ -756,14 +858,24 @@ components:
           format: uri
           example: https://example.com/updated-security-policy
           description: Artifact source as URL. When provided, this adds new artifact to the Evidence Library Item, making `filedAt`, `renewalScheduleType`, `renewalDate` (if `renewalScheduleType` is CUSTOM), and `ownerId` (if not already assigned) required. Only one artifact source (`file`, `base64File`, `url`, or `ticketUrl`) can be provided.
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
+    EvidenceLibraryListResponsePublicV2Dto:
       type: object
       properties:
+        data:
+          description: Array of Evidence Library items
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceLibraryCompactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
         statusCode:
           type: number
         message:
@@ -783,81 +895,16 @@ components:
           - name
           - message
       required:
+      - name
       - statusCode
       - message
       - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    EvidenceLibraryVersionExpandEnum:
+    EvidenceLibraryExpandEnum:
       type: string
       enum:
-      - downloadUrl
-    EvidenceLibraryVersionResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 789
-          description: The unique identifier of the version (artifact). Use this value for API operations.
-        name:
-          type:
-          - string
-          - 'null'
-          example: security-policy.pdf
-          description: The name of the Artifact
-        version:
-          type: number
-          example: 1
-          description: Artifact version number (sequential counter)
-        current:
-          type: boolean
-          example: true
-          description: Indicates if this Artifact is the current version
-        filedAt:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2020-07-06'
-          description: Date when the artifact was filed/effective. May differ from `createdAt` for backdated evidence
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The timestamp when the Artifact was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The timestamp when the Artifact was last updated
-        downloadUrl:
-          type:
-          - string
-          - 'null'
-          format: uri
-          example: https://s3.amazonaws.com/bucket/file.pdf?X-Amz-Algorithm=AWS4-HMAC-SHA256...
-          description: A time-limited signed URL for downloading the file, only returned when `expand[]=downloadUrl` is passed. Valid for 10 minutes.
-      required:
-      - id
-      - name
-      - version
-      - current
-      - filedAt
-      - createdAt
-      - updatedAt
+      - user
+      - controls
+      - renewalSchemaAndVersions
     UserCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -898,85 +945,38 @@ components:
       - lastName
       - createdAt
       - updatedAt
-    ControlCompactResponsePublicV2Dto:
+    RenewalScheduleTypeEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+      - CUSTOM
+      - NONE
+    RenewalSchemaCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Control ID
-        code:
-          type: string
-          example: AC-1
-          description: Control code
-        name:
-          type: string
-          example: Access Control
-          description: Control name
-        description:
+          description: Renewal Schema ID
+        renewalDate:
           type:
           - string
           - 'null'
-          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
-          description: Control description
-        isReady:
-          type: boolean
-          example: true
-          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was last updated
+          example: '2020-07-06'
+          description: Renewal date
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: The interval the evidence should be renewed on.
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
       required:
       - id
-      - code
-      - name
-      - description
-      - createdAt
-      - updatedAt
-    EvidenceLibraryListResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of Evidence Library items
-          type: array
-          items:
-            $ref: '#/components/schemas/EvidenceLibraryCompactResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    EvidenceLibraryExpandEnum:
-      type: string
-      enum:
-      - user
-      - controls
-      - renewalSchemaAndVersions
-    LibraryDocumentVersionTypeEnum:
-      type: string
-      enum:
-      - URL
-      - S3_FILE
-      - TICKET_PROVIDER
-      - NONE
-      - GOOGLE_DRIVE
-      - ONE_DRIVE
-      - BOX
-      - DROPBOX
-      - SHARE_POINT
-      - TEST_RESULT
+      - renewalDate
+      - renewalScheduleType
     EvidenceLibraryCompactResponsePublicV2Dto:
       type: object
       properties:

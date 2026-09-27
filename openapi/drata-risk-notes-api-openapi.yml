@@ -490,21 +490,19 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    RiskNoteWriteRequestPublicV2Dto:
+    RiskNotesResponsePublicV2Dto:
       type: object
       properties:
-        comment:
-          type: string
-          maxLength: 768
-          example: This is a note about the risk assessment findings.
-          description: The comment content for the note
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - comment
+      - data
+      - pagination
     ExceptionResponseDto:
       type: object
       properties:
@@ -530,19 +528,6 @@ components:
       - statusCode
       - message
       - code
-    RiskNotesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
     UserCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -583,53 +568,16 @@ components:
       - lastName
       - createdAt
       - updatedAt
-    ExceptionResponsePublicV2Dto:
+    RiskNoteWriteRequestPublicV2Dto:
       type: object
       properties:
-        name:
+        comment:
           type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+          maxLength: 768
+          example: This is a note about the risk assessment findings.
+          description: The comment content for the note
       required:
-      - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    RiskNotesExpandEnum:
-      type: string
-      enum:
-      - owner
+      - comment
     RiskNoteResponsePublicV2Dto:
       type: object
       properties:
@@ -659,11 +607,63 @@ components:
       - comment
       - createdAt
       - updatedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RiskNotesExpandEnum:
+      type: string
+      enum:
+      - owner
   securitySchemes:
     bearer:
       scheme: bearer

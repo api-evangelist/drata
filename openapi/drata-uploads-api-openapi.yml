@@ -80,130 +80,6 @@ paths:
       - EVIDENCE_LIBRARY
 components:
   schemas:
-    UploadUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        presignedUrl:
-          type: string
-          example: https://s3.amazonaws.com/drata-bucket/account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf?X-Amz-Algorithm=...
-          description: Full pre-signed AWS S3 URL to perform the HTTP PUT operation against to upload the file.
-        objectKey:
-          type: string
-          example: account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf
-          description: The S3 object key the uploaded file will be stored under. Reference this value per the semantics of the request `purpose` (e.g. as the `fileKey` when creating the Evidence item).
-        expiresAt:
-          type: string
-          example: '2026-07-08T15:04:05.000Z'
-          description: ISO-8601 timestamp indicating when the pre-signed URL expires.
-        webUploadUrl:
-          type: string
-          example: https://api.drata.com/upload/abc123XYZ_-
-          description: 'Browser-facing upload URL. Present only when the request included `includeWebUploadUrl: true`. Point a user at this URL to upload the file via a drag-and-drop page; the URL expires alongside `presignedUrl`.'
-      required:
-      - presignedUrl
-      - objectKey
-      - expiresAt
-    UploadPurposeEnum:
-      type: string
-      enum:
-      - evidence
-      - background_check
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    UploadUrlRequestPublicV2Dto:
-      type: object
-      properties:
-        purpose:
-          example: evidence
-          description: What the uploaded file will be attached to. Determines authorization, storage prefix, and workspace requirements.
-          allOf:
-          - $ref: '#/components/schemas/UploadPurposeEnum'
-        workspaceId:
-          type: number
-          example: 11
-          description: 'Required when `purpose` is workspace-scoped (currently: `evidence`). Omit for account-global purposes.'
-        fileName:
-          type: string
-          maxLength: 191
-          example: My Security Training.pdf
-          description: 'The original filename of the file that will be uploaded. When provided, it is used to build the human-readable segment of the S3 object key. Optional for browser-driven uploads (`includeWebUploadUrl: true`) where the user picks the file after the URL is minted — in that case the actual filename lands on the evidence artifact once the browser PUT completes.'
-        contentType:
-          type: string
-          example: application/pdf
-          description: The MIME type of the file being uploaded. When provided, sent back as the `Content-Type` on the pre-signed URL, so the client's PUT must send a matching `Content-Type` header. When omitted, the URL is signed WITHOUT binding a Content-Type — the client can PUT any mime (useful for browser flows where the mime is not known at mint time).
-        includeWebUploadUrl:
-          type: boolean
-          example: true
-          description: When `true`, the response additionally includes a `webUploadUrl` — a short-lived, browser-facing URL that hosts a drag-and-drop upload page backed by this pre-signed URL. Intended for surfaces (e.g., MCP tools in Claude Desktop) that want to hand the user a clickable link rather than a curl command. Defaults to `false`.
-        existingArtifactId:
-          type: number
-          example: 42
-          description: 'When set, the browser upload session is bound as a REPLACE of the referenced artifact. When the user completes the upload, the API bumps the existing artifact chain (same artifact ID, new version, previous version archived) instead of creating a new artifact. If the user abandons the upload, no changes to the evidence occur -- the previous version stays current. Validated at mint time to ensure the artifact exists, belongs to the caller, and is a current S3_FILE. Only meaningful with `includeWebUploadUrl: true` (browser flow).'
-        addToEvidenceId:
-          type: number
-          example: 258
-          description: 'When set, the browser upload session is bound as an ADD of a new artifact to the referenced evidence. When the user completes the upload, the API attaches a new S3_FILE artifact to the evidence -- no artifact row is created at mint time. If the user abandons the upload, no artifact appears on the evidence (no phantom placeholder). Validated at mint time to ensure the evidence exists and belongs to the workspace. Mutually exclusive with `existingArtifactId`. Only meaningful with `includeWebUploadUrl: true` (browser flow).'
-        multiArtifact:
-          type: boolean
-          example: true
-          description: 'When `true`, the browser upload session renders the multi-artifact cart page (drag N files + add N URLs, then Confirm) instead of the single-file page. Requires `includeWebUploadUrl: true`. Incompatible with `existingArtifactId` (REPLACE is single-file only). Must be paired with either `addToEvidenceId` (add-many to existing evidence) or `createEvidence` (create new evidence with N artifacts).'
-        createEvidence:
-          description: 'Evidence-level metadata for CREATE-with-N. Required when `multiArtifact: true` and `addToEvidenceId` is omitted; forbidden otherwise. Stashed on the session at mint time and consumed at commit time to drive `POST /evidence-library`.'
-          allOf:
-          - $ref: '#/components/schemas/MultiArtifactCreateEvidencePublicV2Dto'
-      required:
-      - purpose
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
     MultiArtifactCreateEvidencePublicV2Dto:
       type: object
       properties:
@@ -249,6 +125,107 @@ components:
       - name
       - ownerId
       - renewalScheduleType
+    UploadUrlRequestPublicV2Dto:
+      type: object
+      properties:
+        purpose:
+          example: evidence
+          description: What the uploaded file will be attached to. Determines authorization, storage prefix, and workspace requirements.
+          allOf:
+          - $ref: '#/components/schemas/UploadPurposeEnum'
+        workspaceId:
+          type: number
+          example: 11
+          description: 'Required when `purpose` is workspace-scoped (currently: `evidence`). Omit for account-global purposes.'
+        fileName:
+          type: string
+          maxLength: 191
+          example: My Security Training.pdf
+          description: 'The original filename of the file that will be uploaded. When provided, it is used to build the human-readable segment of the S3 object key. Optional for browser-driven uploads (`includeWebUploadUrl: true`) where the user picks the file after the URL is minted — in that case the actual filename lands on the evidence artifact once the browser PUT completes.'
+        contentType:
+          type: string
+          example: application/pdf
+          description: The MIME type of the file being uploaded. When provided, sent back as the `Content-Type` on the pre-signed URL, so the client's PUT must send a matching `Content-Type` header. When omitted, the URL is signed WITHOUT binding a Content-Type — the client can PUT any mime (useful for browser flows where the mime is not known at mint time).
+        includeWebUploadUrl:
+          type: boolean
+          example: true
+          description: When `true`, the response additionally includes a `webUploadUrl` — a short-lived, browser-facing URL that hosts a drag-and-drop upload page backed by this pre-signed URL. Intended for surfaces (e.g., MCP tools in Claude Desktop) that want to hand the user a clickable link rather than a curl command. Defaults to `false`.
+        existingArtifactId:
+          type: number
+          example: 42
+          description: 'When set, the browser upload session is bound as a REPLACE of the referenced artifact. When the user completes the upload, the API bumps the existing artifact chain (same artifact ID, new version, previous version archived) instead of creating a new artifact. If the user abandons the upload, no changes to the evidence occur -- the previous version stays current. Validated at mint time to ensure the artifact exists, belongs to the caller, and is a current S3_FILE. Only meaningful with `includeWebUploadUrl: true` (browser flow).'
+        addToEvidenceId:
+          type: number
+          example: 258
+          description: 'When set, the browser upload session is bound as an ADD of a new artifact to the referenced evidence. When the user completes the upload, the API attaches a new S3_FILE artifact to the evidence -- no artifact row is created at mint time. If the user abandons the upload, no artifact appears on the evidence (no phantom placeholder). Validated at mint time to ensure the evidence exists and belongs to the workspace. Mutually exclusive with `existingArtifactId`. Only meaningful with `includeWebUploadUrl: true` (browser flow).'
+        multiArtifact:
+          type: boolean
+          example: true
+          description: 'When `true`, the browser upload session renders the multi-artifact cart page (drag N files + add N URLs, then Confirm) instead of the single-file page. Requires `includeWebUploadUrl: true`. Incompatible with `existingArtifactId` (REPLACE is single-file only). Must be paired with either `addToEvidenceId` (add-many to existing evidence) or `createEvidence` (create new evidence with N artifacts).'
+        createEvidence:
+          description: 'Evidence-level metadata for CREATE-with-N. Required when `multiArtifact: true` and `addToEvidenceId` is omitted; forbidden otherwise. Stashed on the session at mint time and consumed at commit time to drive `POST /evidence-library`.'
+          allOf:
+          - $ref: '#/components/schemas/MultiArtifactCreateEvidencePublicV2Dto'
+      required:
+      - purpose
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    UploadPurposeEnum:
+      type: string
+      enum:
+      - evidence
+      - background_check
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
     RenewalScheduleTypeEnum:
       type: string
       enum:
@@ -259,6 +236,29 @@ components:
       - ONE_YEAR
       - CUSTOM
       - NONE
+    UploadUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        presignedUrl:
+          type: string
+          example: https://s3.amazonaws.com/drata-bucket/account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf?X-Amz-Algorithm=...
+          description: Full pre-signed AWS S3 URL to perform the HTTP PUT operation against to upload the file.
+        objectKey:
+          type: string
+          example: account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf
+          description: The S3 object key the uploaded file will be stored under. Reference this value per the semantics of the request `purpose` (e.g. as the `fileKey` when creating the Evidence item).
+        expiresAt:
+          type: string
+          example: '2026-07-08T15:04:05.000Z'
+          description: ISO-8601 timestamp indicating when the pre-signed URL expires.
+        webUploadUrl:
+          type: string
+          example: https://api.drata.com/upload/abc123XYZ_-
+          description: 'Browser-facing upload URL. Present only when the request included `includeWebUploadUrl: true`. Point a user at this URL to upload the file via a drag-and-drop page; the URL expires alongside `presignedUrl`.'
+      required:
+      - presignedUrl
+      - objectKey
+      - expiresAt
   securitySchemes:
     bearer:
       scheme: bearer

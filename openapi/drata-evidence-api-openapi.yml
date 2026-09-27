@@ -861,21 +861,98 @@ paths:
       - EVIDENCE_LIBRARY
 components:
   schemas:
-    EvidenceArtifactMetadataPublicV2Dto:
+    ExceptionResponseDto:
       type: object
       properties:
-        originalFileName:
+        statusCode:
+          type: number
+        message:
           type: string
-          example: security-policy.pdf
-          description: Original file name
-        mimeType:
-          type: string
-          example: application/pdf
-          description: MIME type of the artifact
-        extension:
-          type: string
-          example: pdf
-          description: File extension
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    ArtifactType:
+      type: string
+      enum:
+      - URL
+      - S3_FILE
+      - TICKET_PROVIDER
+      - NONE
+      - GOOGLE_DRIVE
+      - ONE_DRIVE
+      - BOX
+      - DROPBOX
+      - SHARE_POINT
+      - TEST_RESULT
+    LibraryDocumentVersionTypeEnum:
+      type: string
+      enum:
+      - URL
+      - S3_FILE
+      - TICKET_PROVIDER
+      - NONE
+      - GOOGLE_DRIVE
+      - ONE_DRIVE
+      - BOX
+      - DROPBOX
+      - SHARE_POINT
+      - TEST_RESULT
+    EvidenceArtifactUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        artifactName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Q4 Security Review
+          description: Custom name for the artifact. Omit to leave unchanged; send null to clear it.
+        filedAt:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: The date when the artifact was filed/effective. Omit to leave unchanged; send null to clear it.
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    EvidenceControlsSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of controls. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all controls for this evidence item.
+      required:
+      - data
+      - totalCount
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     PaginationResponsePublicV2Dto:
       type: object
       properties:
@@ -886,114 +963,48 @@ components:
           description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
       required:
       - cursor
-    EvidenceStatusEnum:
-      type: string
-      enum:
-      - NEEDS_ARTIFACT
-      - ERROR
-      - READY
-      - EXPIRING_SOON
-      - EXPIRED
-      - NEEDS_SOURCE
-      - NEEDS_ATTENTION
-    EvidenceCreateRequestPublicV2Dto:
+    ControlCompactResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: AC-1
+          description: Control code
         name:
           type: string
-          maxLength: 191
-          example: Security Training
-          description: Evidence name
+          example: Access Control
+          description: Control name
         description:
           type:
           - string
           - 'null'
-          maxLength: 30000
-          example: Security Training completed evidence
-          description: Evidence description
-        implementationGuidance:
-          type:
-          - string
-          - 'null'
-          maxLength: 30000
-          example: Example of architectural diagram www.drata/arch-diagram-example.com
-          description: Guidance for implementing evidence
-        stepsToReproduce:
-          type:
-          - string
-          - 'null'
-          maxLength: 30000
-          example: Steps to reproduce the issue or evidence collection process
-          description: Steps to reproduce or collect this evidence
-        artifacts:
-          description: Array of artifacts to create for this evidence. Each artifact should reference a pre-uploaded file (via fileKey) or a URL.
-          example:
-          - type: S3_FILE
-            artifactName: Security Policy v2.pdf
-            fileKey: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/policy.pdf
-            filedAt: '2020-07-06'
-          - type: URL
-            artifactName: External Documentation
-            url: https://example.com/docs
-            filedAt: '2020-07-06'
-          type: array
-          items:
-            $ref: '#/components/schemas/EvidenceArtifactRequestPublicV2Dto'
-        ownerId:
-          type: number
-          example: 1
-          description: Owner user ID
-        controlIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: List of control IDs to link to this evidence
-          type:
-          - array
-          - 'null'
-          items:
-            type: number
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2020-07-06'
-          description: Evidence renewal date. Optional - if not provided and renewalScheduleType is set, it may be auto-calculated by the backend based on the schedule type.
-        renewalScheduleType:
-          example: ONE_YEAR
-          description: Evidence renewal schedule type
-          allOf:
-          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
+          description: Control description
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was last updated
       required:
+      - id
+      - code
       - name
-      - artifacts
-    ComputedEvidenceStatusEnum:
-      type: string
-      enum:
-      - NEEDS_ARTIFACT
-      - EXPIRED
-      - EXPIRING_SOON
-      - TEST_ERROR
-      - TEST_FAILED
-      - READY
-      - TEST_PASSED
-      - TEST_UNUSED
-      - TEST_DISABLED
-      - TEST_DELETED
-    EvidenceArtifactsListResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of artifacts belonging to the evidence item
-          type: array
-          items:
-            $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
+      - description
+      - createdAt
+      - updatedAt
     EvidenceArtifactRequestPublicV2Dto:
       type: object
       properties:
@@ -1039,122 +1050,126 @@ components:
       required:
       - type
       - filedAt
-    ExceptionResponsePublicV2Dto:
+    EvidenceResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Evidence ID
         name:
           type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    EvidenceArtifactsSubcollectionResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of artifacts. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 15
-          description: Total count of all artifacts for this evidence item.
-      required:
-      - data
-      - totalCount
-    EvidenceArtifactAddRequestPublicV2Dto:
-      type: object
-      properties:
-        artifactName:
+          example: Security Policy Document
+          description: Evidence name
+        description:
           type:
           - string
           - 'null'
-          maxLength: 191
-          example: Q4 Security Review
-          description: Custom name for the artifact
-        artifactType:
-          example: URL
-          description: The type of artifact. Use S3_FILE for uploaded files, URL for web links, TICKET_PROVIDER for ticket references.
+          example: This document outlines our security policies and procedures.
+          description: Evidence description. May contain %s placeholders replaced with company name.
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          example: Follow the company security training guidelines and ensure all employees complete the training within 30 days of onboarding.
+          description: Implementation guidance for this evidence. May contain %s placeholders replaced with company name.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence last updated date timestamp
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: Date when the evidence is due for renewal
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: The interval the evidence should be renewed on
           allOf:
-          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
-        fileKey:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        status:
+          example: READY
+          description: 'Computed status of the evidence. Values: NEEDS_ARTIFACT, ERROR, EXPIRED, EXPIRING_SOON, READY'
+          allOf:
+          - $ref: '#/components/schemas/EvidenceStatusEnum'
+        safeBaseSyncStatus:
           type:
           - string
           - 'null'
-          maxLength: 191
-          example: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/TestReport.pdf
-          description: Drata S3 file key from the evidence-files endpoint. Required when artifactType is S3_FILE. Must belong to the authenticated account.
-        url:
-          type:
-          - string
-          - 'null'
-          maxLength: 768
-          format: uri
-          example: https://example.com/policy.pdf
-          description: The URL for URL type artifacts
-        ticketUrl:
-          type:
-          - string
-          - 'null'
-          maxLength: 768
-          format: uri
-          example: https://jira.example.com/browse/SEC-123
-          description: The ticket URL for TICKET_PROVIDER type artifacts
-        filedAt:
-          type:
-          - string
-          - 'null'
-          example: '2020-07-05'
-          description: The date when the artifact was originally filed/created (ISO 8601 format)
+          example: COMPLETE
+          description: SafeBase sync status
+          enum:
+          - NOT_SYNCED
+          - PENDING
+          - COMPLETE
+          - ERROR
+        owners:
+          description: Evidence owners with total count. Returned when `expand[]=owners` is passed.
+          allOf:
+          - $ref: '#/components/schemas/OwnersSubcollectionResponsePublicV2Dto'
+        artifacts:
+          description: Evidence artifacts with total count. Returned when `expand[]=artifacts` is passed.
+          allOf:
+          - $ref: '#/components/schemas/EvidenceArtifactsSubcollectionResponsePublicV2Dto'
+        controls:
+          description: Controls linked to this evidence with total count. Returned when `expand[]=controls` is passed.
+          allOf:
+          - $ref: '#/components/schemas/EvidenceControlsSubcollectionResponsePublicV2Dto'
       required:
-      - artifactType
-      - filedAt
-    EvidenceArtifactUploadRequestPublicV2Dto:
+      - id
+      - name
+      - description
+      - implementationGuidance
+      - createdAt
+      - updatedAt
+      - renewalDate
+      - renewalScheduleType
+      - status
+    EvidenceStatusEnum:
+      type: string
+      enum:
+      - NEEDS_ARTIFACT
+      - ERROR
+      - READY
+      - EXPIRING_SOON
+      - EXPIRED
+      - NEEDS_SOURCE
+      - NEEDS_ATTENTION
+    EvidenceArtifactMetadataPublicV2Dto:
       type: object
       properties:
-        file:
+        originalFileName:
           type: string
-          format: binary
-          description: 'Artifact source as a file. Provide exactly one of `file` or `base64File`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
-        base64File:
+          example: security-policy.pdf
+          description: Original file name
+        mimeType:
           type: string
-          example:
-            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
-            filename: security-certificate.pdf
-          description: Artifact source as a Base64-encoded file in data URL format (alternative to `file`). Provide exactly one of `file` or `base64File`.
-    EvidenceListResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of evidence items
-          type: array
-          items:
-            $ref: '#/components/schemas/EvidenceResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
+          example: application/pdf
+          description: MIME type of the artifact
+        extension:
+          type: string
+          example: pdf
+          description: File extension
+    ComputedEvidenceStatusEnum:
+      type: string
+      enum:
+      - NEEDS_ARTIFACT
+      - EXPIRED
+      - EXPIRING_SOON
+      - TEST_ERROR
+      - TEST_FAILED
+      - READY
+      - TEST_PASSED
+      - TEST_UNUSED
+      - TEST_DISABLED
+      - TEST_DELETED
     EvidenceArtifactReplaceRequestPublicV2Dto:
       type: object
       properties:
@@ -1206,80 +1221,53 @@ components:
       - artifactType
       - filedAt
       - existingArtifactId
-    EvidenceArtifactActionRequestPublicV2Dto:
+    EvidenceArtifactAddRequestPublicV2Dto:
       type: object
       properties:
-        action:
-          description: 'Action to execute: `archive` moves the artifact to past artifacts, `restore` moves it back to current artifacts. Both are reversible; to remove an artifact and its version history permanently, use the delete artifact endpoint instead.'
-          example: archive
+        artifactName:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: Q4 Security Review
+          description: Custom name for the artifact
+        artifactType:
+          example: URL
+          description: The type of artifact. Use S3_FILE for uploaded files, URL for web links, TICKET_PROVIDER for ticket references.
           allOf:
-          - $ref: '#/components/schemas/EvidenceArtifactActionEnum'
-      required:
-      - action
-    RenewalScheduleTypeEnum:
-      type: string
-      enum:
-      - ONE_MONTH
-      - TWO_MONTHS
-      - THREE_MONTHS
-      - SIX_MONTHS
-      - ONE_YEAR
-      - CUSTOM
-      - NONE
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    EvidenceArtifactUploadResponsePublicV2Dto:
-      type: object
-      properties:
+          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
         fileKey:
-          type: string
-          example: account-id/evidence-library/uuid/file.pdf
-          description: The S3 key for the uploaded file
-        originalFilename:
-          type: string
-          example: My Security Training (v2).pdf
-          description: The original filename before sanitization
-        mimeType:
-          type: string
-          example: application/pdf
-          description: The MIME type of the uploaded file
-        fileSize:
-          type: number
-          example: 1024
-          description: The size of the uploaded file in bytes
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/TestReport.pdf
+          description: Drata S3 file key from the evidence-files endpoint. Required when artifactType is S3_FILE. Must belong to the authenticated account.
+        url:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://example.com/policy.pdf
+          description: The URL for URL type artifacts
+        ticketUrl:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://jira.example.com/browse/SEC-123
+          description: The ticket URL for TICKET_PROVIDER type artifacts
+        filedAt:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-05'
+          description: The date when the artifact was originally filed/created (ISO 8601 format)
       required:
-      - fileKey
-      - originalFilename
-      - mimeType
-      - fileSize
+      - artifactType
+      - filedAt
     EvidenceArtifactResponsePublicV2Dto:
       type: object
       properties:
@@ -1352,6 +1340,395 @@ components:
       - filedAt
       - archivedAt
       - createdAt
+    EvidenceMutationResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Evidence ID
+        name:
+          type: string
+          example: Security Policy Document
+          description: Evidence name
+        description:
+          type:
+          - string
+          - 'null'
+          example: This document outlines our security policies and procedures.
+          description: Evidence description
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          example: Follow the company security training guidelines and ensure all employees complete the training within 30 days of onboarding.
+          description: Implementation guidance for this evidence
+        evidenceTemplateCode:
+          type:
+          - string
+          - 'null'
+          example: REQ-12
+          description: Unique code identifying the system-generated evidence template this item is based on; null for user-created custom evidence.
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: Date when the evidence is due for renewal
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: The interval the evidence should be renewed on
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Evidence last updated date timestamp
+        artifactsRequested:
+          type: number
+          example: 3
+          description: Total number of artifacts in the request
+        artifactsCreated:
+          type: number
+          example: 2
+          description: Number of artifacts that were created successfully. When less than artifactsRequested, some artifact uploads failed but the evidence row was still created.
+        controls:
+          description: Controls linked to this evidence
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
+        linkedWorkspaces:
+          description: Workspaces mapped to the controls of this evidence
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceLinkedWorkspaceCompactResponsePublicV2Dto'
+        artifacts:
+          description: Artifacts for this evidence
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceMutationArtifactResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - description
+      - implementationGuidance
+      - evidenceTemplateCode
+      - renewalDate
+      - renewalScheduleType
+      - createdAt
+      - updatedAt
+      - artifactsRequested
+      - artifactsCreated
+      - controls
+      - linkedWorkspaces
+      - artifacts
+    EvidenceMutationArtifactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Artifact ID
+        source:
+          type: string
+          example: document.pdf
+          description: Artifact source (file path, URL, etc.)
+        artifactName:
+          type:
+          - string
+          - 'null'
+          example: document.pdf
+          description: Artifact name
+        type:
+          example: S3_FILE
+          description: Type of artifact
+          allOf:
+          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
+        artifactVersion:
+          type: number
+          example: 1
+          description: Version number of this artifact
+        filedAt:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: The user selected creation date for the artifact
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the artifact was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the artifact was last updated
+        metadata:
+          description: Metadata information for the artifact (file name, extension, etc.)
+          allOf:
+          - $ref: '#/components/schemas/EvidenceArtifactMetadataPublicV2Dto'
+        ticketUrl:
+          type:
+          - string
+          - 'null'
+          description: Original user-provided ticket URL for TICKET_PROVIDER artifacts. Null for non-ticket artifacts.
+      required:
+      - id
+      - source
+      - artifactName
+      - type
+      - artifactVersion
+      - filedAt
+      - createdAt
+      - updatedAt
+    EvidenceArtifactUploadRequestPublicV2Dto:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: 'Artifact source as a file. Provide exactly one of `file` or `base64File`. Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .json, .csv, .md, .markdown, .txt, .html, .log, .zip, .msg, .mp4'
+        base64File:
+          type: string
+          example:
+            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
+            filename: security-certificate.pdf
+          description: Artifact source as a Base64-encoded file in data URL format (alternative to `file`). Provide exactly one of `file` or `base64File`.
+    OwnersSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of owners. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all owners for this control.
+      required:
+      - data
+      - totalCount
+    EvidenceLinkedWorkspaceCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Workspace id
+        name:
+          type: string
+          example: Drata
+          description: Workspace name
+      required:
+      - id
+      - name
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    EvidenceCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Security Training
+          description: Evidence name
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Security Training completed evidence
+          description: Evidence description
+        implementationGuidance:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Example of architectural diagram www.drata/arch-diagram-example.com
+          description: Guidance for implementing evidence
+        stepsToReproduce:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Steps to reproduce the issue or evidence collection process
+          description: Steps to reproduce or collect this evidence
+        artifacts:
+          description: Array of artifacts to create for this evidence. Each artifact should reference a pre-uploaded file (via fileKey) or a URL.
+          example:
+          - type: S3_FILE
+            artifactName: Security Policy v2.pdf
+            fileKey: 123/evidence-library/62545abd-5469-4a19-abc2-55df8809b225/policy.pdf
+            filedAt: '2020-07-06'
+          - type: URL
+            artifactName: External Documentation
+            url: https://example.com/docs
+            filedAt: '2020-07-06'
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceArtifactRequestPublicV2Dto'
+        ownerId:
+          type: number
+          example: 1
+          description: Owner user ID
+        controlIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of control IDs to link to this evidence
+          type:
+          - array
+          - 'null'
+          items:
+            type: number
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2020-07-06'
+          description: Evidence renewal date. Optional - if not provided and renewalScheduleType is set, it may be auto-calculated by the backend based on the schedule type.
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: Evidence renewal schedule type
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+      required:
+      - name
+      - artifacts
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    EvidenceArtifactActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: 'Action to execute: `archive` moves the artifact to past artifacts, `restore` moves it back to current artifacts. Both are reversible; to remove an artifact and its version history permanently, use the delete artifact endpoint instead.'
+          example: archive
+          allOf:
+          - $ref: '#/components/schemas/EvidenceArtifactActionEnum'
+      required:
+      - action
+    RenewalScheduleTypeEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+      - CUSTOM
+      - NONE
+    EvidenceArtifactActionEnum:
+      type: string
+      enum:
+      - archive
+      - restore
+    EvidenceArtifactsSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of artifacts. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all artifacts for this evidence item.
+      required:
+      - data
+      - totalCount
+    EvidenceExpandEnum:
+      type: string
+      enum:
+      - owners
+      - artifacts
+      - controls
+    EvidenceListResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of evidence items
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     EvidenceUpdateRequestPublicV2Dto:
       type: object
       properties:
@@ -1446,421 +1823,44 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/EvidenceArtifactReplaceRequestPublicV2Dto'
-    EvidenceMutationResponsePublicV2Dto:
+    EvidenceArtifactsListResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 1
-          description: Evidence ID
-        name:
-          type: string
-          example: Security Policy Document
-          description: Evidence name
-        description:
-          type:
-          - string
-          - 'null'
-          example: This document outlines our security policies and procedures.
-          description: Evidence description
-        implementationGuidance:
-          type:
-          - string
-          - 'null'
-          example: Follow the company security training guidelines and ensure all employees complete the training within 30 days of onboarding.
-          description: Implementation guidance for this evidence
-        evidenceTemplateCode:
-          type:
-          - string
-          - 'null'
-          example: REQ-12
-          description: Unique code identifying the system-generated evidence template this item is based on; null for user-created custom evidence.
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2020-07-06'
-          description: Date when the evidence is due for renewal
-        renewalScheduleType:
-          example: ONE_YEAR
-          description: The interval the evidence should be renewed on
-          allOf:
-          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Evidence created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Evidence last updated date timestamp
-        artifactsRequested:
-          type: number
-          example: 3
-          description: Total number of artifacts in the request
-        artifactsCreated:
-          type: number
-          example: 2
-          description: Number of artifacts that were created successfully. When less than artifactsRequested, some artifact uploads failed but the evidence row was still created.
-        controls:
-          description: Controls linked to this evidence
+        data:
+          description: Array of artifacts belonging to the evidence item
           type: array
           items:
-            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
-        linkedWorkspaces:
-          description: Workspaces mapped to the controls of this evidence
-          type: array
-          items:
-            $ref: '#/components/schemas/EvidenceLinkedWorkspaceCompactResponsePublicV2Dto'
-        artifacts:
-          description: Artifacts for this evidence
-          type: array
-          items:
-            $ref: '#/components/schemas/EvidenceMutationArtifactResponsePublicV2Dto'
+            $ref: '#/components/schemas/EvidenceArtifactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
       required:
-      - id
-      - name
-      - description
-      - implementationGuidance
-      - evidenceTemplateCode
-      - renewalDate
-      - renewalScheduleType
-      - createdAt
-      - updatedAt
-      - artifactsRequested
-      - artifactsCreated
-      - controls
-      - linkedWorkspaces
-      - artifacts
-    EvidenceResponsePublicV2Dto:
+      - data
+      - pagination
+    EvidenceArtifactUploadResponsePublicV2Dto:
       type: object
       properties:
-        id:
+        fileKey:
+          type: string
+          example: account-id/evidence-library/uuid/file.pdf
+          description: The S3 key for the uploaded file
+        originalFilename:
+          type: string
+          example: My Security Training (v2).pdf
+          description: The original filename before sanitization
+        mimeType:
+          type: string
+          example: application/pdf
+          description: The MIME type of the uploaded file
+        fileSize:
           type: number
-          example: 1
-          description: Evidence ID
-        name:
-          type: string
-          example: Security Policy Document
-          description: Evidence name
-        description:
-          type:
-          - string
-          - 'null'
-          example: This document outlines our security policies and procedures.
-          description: Evidence description. May contain %s placeholders replaced with company name.
-        implementationGuidance:
-          type:
-          - string
-          - 'null'
-          example: Follow the company security training guidelines and ensure all employees complete the training within 30 days of onboarding.
-          description: Implementation guidance for this evidence. May contain %s placeholders replaced with company name.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Evidence created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Evidence last updated date timestamp
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2020-07-06'
-          description: Date when the evidence is due for renewal
-        renewalScheduleType:
-          example: ONE_YEAR
-          description: The interval the evidence should be renewed on
-          allOf:
-          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
-        status:
-          example: READY
-          description: 'Computed status of the evidence. Values: NEEDS_ARTIFACT, ERROR, EXPIRED, EXPIRING_SOON, READY'
-          allOf:
-          - $ref: '#/components/schemas/EvidenceStatusEnum'
-        safeBaseSyncStatus:
-          type:
-          - string
-          - 'null'
-          example: COMPLETE
-          description: SafeBase sync status
-          enum:
-          - NOT_SYNCED
-          - PENDING
-          - COMPLETE
-          - ERROR
-        owners:
-          description: Evidence owners with total count. Returned when `expand[]=owners` is passed.
-          allOf:
-          - $ref: '#/components/schemas/OwnersSubcollectionResponsePublicV2Dto'
-        artifacts:
-          description: Evidence artifacts with total count. Returned when `expand[]=artifacts` is passed.
-          allOf:
-          - $ref: '#/components/schemas/EvidenceArtifactsSubcollectionResponsePublicV2Dto'
-        controls:
-          description: Controls linked to this evidence with total count. Returned when `expand[]=controls` is passed.
-          allOf:
-          - $ref: '#/components/schemas/EvidenceControlsSubcollectionResponsePublicV2Dto'
+          example: 1024
+          description: The size of the uploaded file in bytes
       required:
-      - id
-      - name
-      - description
-      - implementationGuidance
-      - createdAt
-      - updatedAt
-      - renewalDate
-      - renewalScheduleType
-      - status
+      - fileKey
+      - originalFilename
+      - mimeType
+      - fileSize
     ArtifactTypeEnum:
-      type: string
-      enum:
-      - URL
-      - S3_FILE
-      - TICKET_PROVIDER
-      - NONE
-      - GOOGLE_DRIVE
-      - ONE_DRIVE
-      - BOX
-      - DROPBOX
-      - SHARE_POINT
-      - TEST_RESULT
-    ArtifactType:
-      type: string
-      enum:
-      - URL
-      - S3_FILE
-      - TICKET_PROVIDER
-      - NONE
-      - GOOGLE_DRIVE
-      - ONE_DRIVE
-      - BOX
-      - DROPBOX
-      - SHARE_POINT
-      - TEST_RESULT
-    EvidenceLinkedWorkspaceCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Workspace id
-        name:
-          type: string
-          example: Drata
-          description: Workspace name
-      required:
-      - id
-      - name
-    EvidenceControlsSubcollectionResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of controls. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 15
-          description: Total count of all controls for this evidence item.
-      required:
-      - data
-      - totalCount
-    OwnersSubcollectionResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of owners. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 15
-          description: Total count of all owners for this control.
-      required:
-      - data
-      - totalCount
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    EvidenceArtifactUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        artifactName:
-          type:
-          - string
-          - 'null'
-          maxLength: 191
-          example: Q4 Security Review
-          description: Custom name for the artifact. Omit to leave unchanged; send null to clear it.
-        filedAt:
-          type:
-          - string
-          - 'null'
-          example: '2020-07-06'
-          description: The date when the artifact was filed/effective. Omit to leave unchanged; send null to clear it.
-    EvidenceArtifactActionEnum:
-      type: string
-      enum:
-      - archive
-      - restore
-    ControlCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Control ID
-        code:
-          type: string
-          example: AC-1
-          description: Control code
-        name:
-          type: string
-          example: Access Control
-          description: Control name
-        description:
-          type:
-          - string
-          - 'null'
-          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
-          description: Control description
-        isReady:
-          type: boolean
-          example: true
-          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was last updated
-      required:
-      - id
-      - code
-      - name
-      - description
-      - createdAt
-      - updatedAt
-    EvidenceExpandEnum:
-      type: string
-      enum:
-      - owners
-      - artifacts
-      - controls
-    EvidenceMutationArtifactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Artifact ID
-        source:
-          type: string
-          example: document.pdf
-          description: Artifact source (file path, URL, etc.)
-        artifactName:
-          type:
-          - string
-          - 'null'
-          example: document.pdf
-          description: Artifact name
-        type:
-          example: S3_FILE
-          description: Type of artifact
-          allOf:
-          - $ref: '#/components/schemas/LibraryDocumentVersionTypeEnum'
-        artifactVersion:
-          type: number
-          example: 1
-          description: Version number of this artifact
-        filedAt:
-          type:
-          - string
-          - 'null'
-          example: '2020-07-06'
-          description: The user selected creation date for the artifact
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the artifact was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the artifact was last updated
-        metadata:
-          description: Metadata information for the artifact (file name, extension, etc.)
-          allOf:
-          - $ref: '#/components/schemas/EvidenceArtifactMetadataPublicV2Dto'
-        ticketUrl:
-          type:
-          - string
-          - 'null'
-          description: Original user-provided ticket URL for TICKET_PROVIDER artifacts. Null for non-ticket artifacts.
-      required:
-      - id
-      - source
-      - artifactName
-      - type
-      - artifactVersion
-      - filedAt
-      - createdAt
-      - updatedAt
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    LibraryDocumentVersionTypeEnum:
       type: string
       enum:
       - URL

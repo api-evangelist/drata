@@ -266,11 +266,21 @@ paths:
       - POLICY_CENTER
 components:
   schemas:
-    SortDirectionEnum:
+    PolicyLanguageSettingsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: The organization's configured Policy languages, alphabetized by locale code. Empty when the Policy languages feature is disabled or none are configured.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyLanguageCompactResponsePublicV2Dto'
+      required:
+      - data
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - createdAt
+      - updatedAt
     PolicyLanguageVersionResponsePublicV2Dto:
       type: object
       properties:
@@ -453,6 +463,54 @@ components:
       - statusCode
       - message
       - code
+    PolicyCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy ID
+        name:
+          type: string
+          example: Acceptable Use Policy
+          description: The Policy name
+        description:
+          type: string
+          description: The Policy description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy last updated date timestamp
+        assignedTo:
+          example: ALL
+          description: The scope of Users the Policy is assigned to
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        policyStatus:
+          example: ACTIVE
+          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyStatusEnum'
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy renewal date
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - policyStatus
+      - renewalDate
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -468,6 +526,39 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
+    PolicyStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    PolicyScopeEnum:
+      type: string
+      enum:
+      - ALL
+      - GROUP
+      - NONE
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    PolicyVersionStatusEnum:
+      type: string
+      enum:
+      - NEEDS_APPROVAL
+      - APPROVED
+      - PUBLISHED
+      - DRAFT
+      - DISCARDED
+    PolicyTypeEnum:
+      type: string
+      enum:
+      - BUILDER
+      - UPLOADED
+      - EXTERNAL
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -496,6 +587,21 @@ components:
       - statusCode
       - message
       - code
+    PolicyLanguageCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        language:
+          example: en-US
+          description: Policy language, as a BCP-47 locale code
+          allOf:
+          - $ref: '#/components/schemas/PolicyLanguageEnum'
+        default:
+          type: boolean
+          example: true
+          description: Whether this is the organization default Policy language
+      required:
+      - language
+      - default
     PolicyLanguageVersionsResponsePublicV2Dto:
       type: object
       properties:
@@ -509,16 +615,11 @@ components:
       required:
       - data
       - pagination
-    PolicyLanguageSettingsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: The organization's configured Policy languages, alphabetized by locale code. Empty when the Policy languages feature is disabled or none are configured.
-          type: array
-          items:
-            $ref: '#/components/schemas/PolicyLanguageCompactResponsePublicV2Dto'
-      required:
-      - data
+    PolicyLanguageVersionExpandEnum:
+      type: string
+      enum:
+      - policyVersion
+      - policy
     PolicyVersionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -601,107 +702,6 @@ components:
       - changesExplanation
       - publishedAt
       - requiresAcknowledgment
-    PolicyLanguageCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        language:
-          example: en-US
-          description: Policy language, as a BCP-47 locale code
-          allOf:
-          - $ref: '#/components/schemas/PolicyLanguageEnum'
-        default:
-          type: boolean
-          example: true
-          description: Whether this is the organization default Policy language
-      required:
-      - language
-      - default
-    PolicyScopeEnum:
-      type: string
-      enum:
-      - ALL
-      - GROUP
-      - NONE
-    PolicyVersionStatusEnum:
-      type: string
-      enum:
-      - NEEDS_APPROVAL
-      - APPROVED
-      - PUBLISHED
-      - DRAFT
-      - DISCARDED
-    PolicyStatusEnum:
-      type: string
-      enum:
-      - ACTIVE
-      - ARCHIVED
-      - REPLACED
-      - UNACCEPTABLE
-      - OUTDATED
-    PolicyCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Policy ID
-        name:
-          type: string
-          example: Acceptable Use Policy
-          description: The Policy name
-        description:
-          type: string
-          description: The Policy description
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy last updated date timestamp
-        assignedTo:
-          example: ALL
-          description: The scope of Users the Policy is assigned to
-          allOf:
-          - $ref: '#/components/schemas/PolicyScopeEnum'
-        policyStatus:
-          example: ACTIVE
-          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
-          allOf:
-          - $ref: '#/components/schemas/PolicyStatusEnum'
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy renewal date
-      required:
-      - id
-      - name
-      - description
-      - createdAt
-      - updatedAt
-      - policyStatus
-      - renewalDate
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    PolicyTypeEnum:
-      type: string
-      enum:
-      - BUILDER
-      - UPLOADED
-      - EXTERNAL
-    PolicyLanguageVersionExpandEnum:
-      type: string
-      enum:
-      - policyVersion
-      - policy
   securitySchemes:
     bearer:
       scheme: bearer

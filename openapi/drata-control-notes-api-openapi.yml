@@ -449,38 +449,15 @@ paths:
       - REQUIREMENTS_FRAMEWORKS
 components:
   schemas:
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ControlNotesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    NoteRequestPublicDto:
+    ControlNoteCreateRequestPublicV2Dto:
       type: object
       properties:
         comment:
           type: string
           maxLength: 191
-          example: Note comment
-          description: The text of the note
+          description: The text of the Note
       required:
       - comment
-    ControlNotesExpandEnum:
-      type: string
-      enum:
-      - owner
     ExceptionResponseDto:
       type: object
       properties:
@@ -546,58 +523,6 @@ components:
       - lastName
       - createdAt
       - updatedAt
-    ControlNoteCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        comment:
-          type: string
-          maxLength: 191
-          description: The text of the Note
-      required:
-      - comment
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
     ControlNoteResponsePublicV2Dto:
       type: object
       properties:
@@ -632,11 +557,86 @@ components:
       - comment
       - createdAt
       - updatedAt
+    ControlNotesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    NoteRequestPublicDto:
+      type: object
+      properties:
+        comment:
+          type: string
+          maxLength: 191
+          example: Note comment
+          description: The text of the note
+      required:
+      - comment
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ControlNotesExpandEnum:
+      type: string
+      enum:
+      - owner
   securitySchemes:
     bearer:
       scheme: bearer

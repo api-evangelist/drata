@@ -505,19 +505,107 @@ paths:
       - TBD
 components:
   schemas:
-    RolesResponsePublicV2Dto:
+    RoleEnum:
+      type: string
+      enum:
+      - EMPLOYEE
+      - TECHGOV
+      - AUDITOR
+      - ADMIN
+      - ACT_AS_READ_ONLY
+      - APP
+      - RISK_MANAGER
+      - WORKSPACE_ADMINISTRATOR
+      - SERVICE_USER
+      - REVIEWER
+      - CONTROL_MANAGER
+      - PEOPLE_OPS
+      - POLICY_MANAGER
+      - DEVOPS_ENGINEER
+      - KNOWLEDGE_BASE
+      - TRUST_CENTER_MANAGER
+      - TRUST_CENTER_REVIEWER
+      - RISK_REGISTER_OWNER
+      - INTERNAL_AUDITOR
+      - RESTRICTED_CONTROL_MANAGER
+      - RESTRICTED_RISK_MANAGER
+      - READONLY_ADMIN
+      - READONLY_TECHGOV
+      - READONLY_RISK_MANAGER
+      - READONLY_CONTROL_MANAGER
+      - READONLY_POLICY_MANAGER
+      - READONLY_PEOPLE_OPS
+      - READONLY_WORKSPACE_ADMINISTRATOR
+      - READONLY_RESTRICTED_CONTROL_MANAGER
+      - READONLY_RESTRICTED_RISK_MANAGER
+      - READONLY_RISK_REGISTER_OWNER
+      - READONLY_REVIEWER
+      - READONLY_DEVOPS_ENGINEER
+      - READONLY_TRUST_CENTER_MANAGER
+      - TRUST_USER
+    UserExpandEnum:
+      type: string
+      enum:
+      - backgroundChecks
+      - documents
+      - personnel
+      - identities
+      - roles
+    PermissionResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RoleResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        id:
+          type:
+          - number
+          - 'null'
+          deprecated: true
+          example: null
+          description: 'Deprecated: no longer provided. Always returns `null`.'
+        action:
+          example: READ
+          description: Permission action
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+        subject:
+          example: Asset
+          description: Permission subject
+          allOf:
+          - $ref: '#/components/schemas/SubjectEnum'
+        createdAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          deprecated: true
+          description: 'Deprecated: no longer provided. Always returns `null`.'
       required:
-      - data
-      - pagination
+      - action
+      - subject
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
     UserIdentityResponsePublicV2Dto:
       type: object
       properties:
@@ -664,97 +752,21 @@ components:
       - managerName
       - createdAt
       - updatedAt
-    UserDocumentResponsePublicV2Dto:
+    PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 1
-          description: User document ID
-        userId:
-          type: number
-          description: The User ID the Document belongs to
-        downloadUrl:
-          description: The signed URL to download the User Document, only returned when `expand[]=downloadUrl` is passed.
-          allOf:
-          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
-        name:
-          type: string
-          example: Security Training
-          description: The name the file
-        type:
-          type: string
-          enum:
-          - SEC_TRAINING
-          - PASSWORD_MANAGER_EVIDENCE
-          - AUTO_UPDATES_EVIDENCE
-          - HARD_DRIVE_ENCRYPTION_EVIDENCE
-          - ANTIVIRUS_EVIDENCE
-          - LOCK_SCREEN_EVIDENCE
-          - MFA_EVIDENCE
-          - HIPAA_TRAINING_EVIDENCE
-          - OFFBOARDING_EVIDENCE
-          - NIST_AI_TRAINING_EVIDENCE
-          example: SEC_TRAINING
-          description: The User Document type
-        fileUrl:
+        cursor:
           type:
           - string
           - 'null'
-          example: http://localhost:5000/download/documents/1
-          description: The secure URL to the user document
-        renewalDate:
-          type: string
-          format: date
-          example: '2026-10-27'
-          description: Document's renewal date, after which the document is no longer consider valid evidence
-        createdAt:
-          type: string
-          format: date-time
-          example: '2020-07-06'
-          description: Document created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2020-07-06'
-          description: Document updated at
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
-      - id
-      - userId
-      - name
-      - type
-      - fileUrl
-      - renewalDate
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
+      - cursor
     SubjectEnum:
       type: string
       enum:
@@ -875,424 +887,11 @@ components:
       - Webhooks
       - ALL
       - DenyControl
-    SignedUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        signedUrl:
-          type: string
-          example: https://somedomain.com/filename.pdf?Signature=ABC123
-          description: The short lived signed URL to link directly to the private file
-        fileBuffer:
-          type:
-          - object
-          - 'null'
-          description: The file on buffer format. This only applies for txt files.
-          example:
-            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
-        fileName:
-          type:
-          - string
-          - 'null'
-          example: Artifact 3.png
-          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
-      required:
-      - signedUrl
-      - fileBuffer
-      - fileName
-    PermissionResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type:
-          - number
-          - 'null'
-          deprecated: true
-          example: null
-          description: 'Deprecated: no longer provided. Always returns `null`.'
-        action:
-          example: READ
-          description: Permission action
-          allOf:
-          - $ref: '#/components/schemas/ActionEnum'
-        subject:
-          example: Asset
-          description: Permission subject
-          allOf:
-          - $ref: '#/components/schemas/SubjectEnum'
-        createdAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          deprecated: true
-          description: 'Deprecated: no longer provided. Always returns `null`.'
-      required:
-      - action
-      - subject
-    RoleExpandEnum:
-      type: string
-      enum:
-      - permissions
-    UserExpandEnum:
-      type: string
-      enum:
-      - backgroundChecks
-      - documents
-      - personnel
-      - identities
-      - roles
     SortDirectionEnum:
       type: string
       enum:
       - ASC
       - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    RoleResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Role ID
-        role:
-          example: ADMIN
-          description: Role type
-          allOf:
-          - $ref: '#/components/schemas/RoleEnum'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Role created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Role last updated at
-        permissions:
-          description: Permissions associated with this Role, only returned when `expand[]=permissions` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/PermissionResponsePublicV2Dto'
-      required:
-      - id
-      - role
-      - createdAt
-      - updatedAt
-    UserResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-        jobTitle:
-          type:
-          - string
-          - 'null'
-          example: CEO
-          description: User job title
-        avatarUrl:
-          type:
-          - string
-          - 'null'
-          example: https://cdn-prod.imgpilot.com/avatar.png
-          description: User avatar URL
-        drataTermsAgreedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User agreed to the Drata terms date timestamp
-        roles:
-          example:
-          - ROLE
-          - ANOTHER_ROLE
-          description: User roles, only returned when `expand[]=roles` is passed.
-          type: array
-          items:
-            type: string
-        backgroundChecks:
-          description: The Background Checks array DTO, only returned when `expand[]=backgroundChecks` is passed.
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/BackgroundCheckResponsePublicV2Dto'
-        documents:
-          description: Full list of user documents, only returned when `expand[]=documents` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
-        identities:
-          description: User identities, only returned when `expand[]=identities` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserIdentityResponsePublicV2Dto'
-      required:
-      - id
-      - email
-      - createdAt
-      - updatedAt
-    ActionEnum:
-      type: string
-      enum:
-      - READ
-      - MANAGE
-      - CREATE
-      - UPDATE
-      - DELETE
-    RoleEnum:
-      type: string
-      enum:
-      - EMPLOYEE
-      - TECHGOV
-      - AUDITOR
-      - ADMIN
-      - ACT_AS_READ_ONLY
-      - APP
-      - RISK_MANAGER
-      - WORKSPACE_ADMINISTRATOR
-      - SERVICE_USER
-      - REVIEWER
-      - CONTROL_MANAGER
-      - PEOPLE_OPS
-      - POLICY_MANAGER
-      - DEVOPS_ENGINEER
-      - KNOWLEDGE_BASE
-      - TRUST_CENTER_MANAGER
-      - TRUST_CENTER_REVIEWER
-      - RISK_REGISTER_OWNER
-      - INTERNAL_AUDITOR
-      - RESTRICTED_CONTROL_MANAGER
-      - RESTRICTED_RISK_MANAGER
-      - READONLY_ADMIN
-      - READONLY_TECHGOV
-      - READONLY_RISK_MANAGER
-      - READONLY_CONTROL_MANAGER
-      - READONLY_POLICY_MANAGER
-      - READONLY_PEOPLE_OPS
-      - READONLY_WORKSPACE_ADMINISTRATOR
-      - READONLY_RESTRICTED_CONTROL_MANAGER
-      - READONLY_RESTRICTED_RISK_MANAGER
-      - READONLY_RISK_REGISTER_OWNER
-      - READONLY_REVIEWER
-      - READONLY_DEVOPS_ENGINEER
-      - READONLY_TRUST_CENTER_MANAGER
-      - TRUST_USER
-    UsersResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/UserResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    BackgroundCheckResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          description: The Background Check Id
-        userId:
-          type:
-          - number
-          - 'null'
-          description: The user ID
-        status:
-          type: string
-          enum:
-          - PENDING
-          - OK
-          - ISSUE
-          - CANCELED
-          - EXPIRED
-          - OUT_OF_SCOPE
-          example: OK
-          description: The status of the background check
-        caseId:
-          type:
-          - string
-          - 'null'
-          example: abc123
-          description: The case ID of the KarmaCheck background check
-        caseInvitationId:
-          type: string
-          example: abc123
-          description: The case invitation ID of the KarmaCheck background check
-        url:
-          type: string
-          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: The URL of the background check
-        manualCheckDate:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2020-07-06'
-          description: The date this background check was manually uploaded
-        manuallyCheckUrl:
-          type:
-          - string
-          - 'null'
-          example: url.com
-          description: The url of manual background check
-        type:
-          type: string
-          enum:
-          - KARMACHECK
-          - MANUAL
-          - CERTN
-          - CHECKR
-          - HRIS_RIPPLING
-          - STERLING
-          - HIRERIGHT
-          - VETTY
-          example: CERTN
-          description: The background check type
-        source:
-          type:
-          - string
-          - 'null'
-          enum:
-          - DRATA
-          - CHECKR
-          - KARMACHECK
-          - RIPPLING_CHECKR
-          - CERTN
-          - STERLING
-          - HIRERIGHT
-          - VETTY
-          example: DRATA
-          description: The background check source
-        reportData:
-          type: string
-          description: The background check report data
-        outOfScopeReason:
-          type:
-          - string
-          - 'null'
-          example: abc123
-          description: the reason it was marked out of scope
-        outOfScopeAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When it was marked out of scope
-        invitationEmail:
-          type:
-          - string
-          - 'null'
-          example: email@email.com
-          description: Invitation email
-        linkedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the report was linked to a user
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Report created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Report updated date timestamp
-      required:
-      - id
-      - userId
-      - status
-      - caseId
-      - caseInvitationId
-      - url
-      - manualCheckDate
-      - manuallyCheckUrl
-      - type
-      - source
-      - reportData
-      - outOfScopeReason
-      - outOfScopeAt
-      - invitationEmail
-      - linkedAt
-      - createdAt
-      - updatedAt
     SortTypeLimitedEnum:
       type: string
       enum:
@@ -1672,6 +1271,407 @@ components:
       - connectedAt
       - failedAt
       - deletedAt
+    BackgroundCheckResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The Background Check Id
+        userId:
+          type:
+          - number
+          - 'null'
+          description: The user ID
+        status:
+          type: string
+          enum:
+          - PENDING
+          - OK
+          - ISSUE
+          - CANCELED
+          - EXPIRED
+          - OUT_OF_SCOPE
+          example: OK
+          description: The status of the background check
+        caseId:
+          type:
+          - string
+          - 'null'
+          example: abc123
+          description: The case ID of the KarmaCheck background check
+        caseInvitationId:
+          type: string
+          example: abc123
+          description: The case invitation ID of the KarmaCheck background check
+        url:
+          type: string
+          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: The URL of the background check
+        manualCheckDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2020-07-06'
+          description: The date this background check was manually uploaded
+        manuallyCheckUrl:
+          type:
+          - string
+          - 'null'
+          example: url.com
+          description: The url of manual background check
+        type:
+          type: string
+          enum:
+          - KARMACHECK
+          - MANUAL
+          - CERTN
+          - CHECKR
+          - HRIS_RIPPLING
+          - STERLING
+          - HIRERIGHT
+          - VETTY
+          example: CERTN
+          description: The background check type
+        source:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DRATA
+          - CHECKR
+          - KARMACHECK
+          - RIPPLING_CHECKR
+          - CERTN
+          - STERLING
+          - HIRERIGHT
+          - VETTY
+          example: DRATA
+          description: The background check source
+        reportData:
+          type: string
+          description: The background check report data
+        outOfScopeReason:
+          type:
+          - string
+          - 'null'
+          example: abc123
+          description: the reason it was marked out of scope
+        outOfScopeAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When it was marked out of scope
+        invitationEmail:
+          type:
+          - string
+          - 'null'
+          example: email@email.com
+          description: Invitation email
+        linkedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the report was linked to a user
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Report created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Report updated date timestamp
+      required:
+      - id
+      - userId
+      - status
+      - caseId
+      - caseInvitationId
+      - url
+      - manualCheckDate
+      - manuallyCheckUrl
+      - type
+      - source
+      - reportData
+      - outOfScopeReason
+      - outOfScopeAt
+      - invitationEmail
+      - linkedAt
+      - createdAt
+      - updatedAt
+    UsersResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    RoleResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Role ID
+        role:
+          example: ADMIN
+          description: Role type
+          allOf:
+          - $ref: '#/components/schemas/RoleEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Role created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Role last updated at
+        permissions:
+          description: Permissions associated with this Role, only returned when `expand[]=permissions` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/PermissionResponsePublicV2Dto'
+      required:
+      - id
+      - role
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ActionEnum:
+      type: string
+      enum:
+      - READ
+      - MANAGE
+      - CREATE
+      - UPDATE
+      - DELETE
+    RoleExpandEnum:
+      type: string
+      enum:
+      - permissions
+    RolesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    UserDocumentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User document ID
+        userId:
+          type: number
+          description: The User ID the Document belongs to
+        downloadUrl:
+          description: The signed URL to download the User Document, only returned when `expand[]=downloadUrl` is passed.
+          allOf:
+          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
+        name:
+          type: string
+          example: Security Training
+          description: The name the file
+        type:
+          type: string
+          enum:
+          - SEC_TRAINING
+          - PASSWORD_MANAGER_EVIDENCE
+          - AUTO_UPDATES_EVIDENCE
+          - HARD_DRIVE_ENCRYPTION_EVIDENCE
+          - ANTIVIRUS_EVIDENCE
+          - LOCK_SCREEN_EVIDENCE
+          - MFA_EVIDENCE
+          - HIPAA_TRAINING_EVIDENCE
+          - OFFBOARDING_EVIDENCE
+          - NIST_AI_TRAINING_EVIDENCE
+          example: SEC_TRAINING
+          description: The User Document type
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          example: http://localhost:5000/download/documents/1
+          description: The secure URL to the user document
+        renewalDate:
+          type: string
+          format: date
+          example: '2026-10-27'
+          description: Document's renewal date, after which the document is no longer consider valid evidence
+        createdAt:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: Document created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2020-07-06'
+          description: Document updated at
+      required:
+      - id
+      - userId
+      - name
+      - type
+      - fileUrl
+      - renewalDate
+      - createdAt
+      - updatedAt
+    SignedUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+      required:
+      - signedUrl
+      - fileBuffer
+      - fileName
+    UserResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+        jobTitle:
+          type:
+          - string
+          - 'null'
+          example: CEO
+          description: User job title
+        avatarUrl:
+          type:
+          - string
+          - 'null'
+          example: https://cdn-prod.imgpilot.com/avatar.png
+          description: User avatar URL
+        drataTermsAgreedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User agreed to the Drata terms date timestamp
+        roles:
+          example:
+          - ROLE
+          - ANOTHER_ROLE
+          description: User roles, only returned when `expand[]=roles` is passed.
+          type: array
+          items:
+            type: string
+        backgroundChecks:
+          description: The Background Checks array DTO, only returned when `expand[]=backgroundChecks` is passed.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/BackgroundCheckResponsePublicV2Dto'
+        documents:
+          description: Full list of user documents, only returned when `expand[]=documents` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
+        identities:
+          description: User identities, only returned when `expand[]=identities` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserIdentityResponsePublicV2Dto'
+      required:
+      - id
+      - email
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer

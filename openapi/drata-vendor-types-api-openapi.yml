@@ -311,39 +311,20 @@ paths:
       - VENDOR_PUBLIC_API
 components:
   schemas:
-    VendorTypeModifyRequestPublicV2Dto:
+    VendorTypeResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor Type ID
         name:
           type: string
-          maxLength: 191
-          example: Cloud Service Provider
+          example: Cloud Provider
           description: The name of the Vendor Type
       required:
+      - id
       - name
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    VendorTypesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorTypeResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
     ExceptionResponseDto:
       type: object
       properties:
@@ -384,6 +365,26 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    VendorTypeCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Cloud Provider
+          description: The name of the Vendor Type
+      required:
+      - name
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -412,27 +413,26 @@ components:
       - statusCode
       - message
       - code
-    VendorTypeResponsePublicV2Dto:
+    VendorTypesResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor Type ID
-        name:
-          type: string
-          example: Cloud Provider
-          description: The name of the Vendor Type
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorTypeResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - id
-      - name
-    VendorTypeCreateRequestPublicV2Dto:
+      - data
+      - pagination
+    VendorTypeModifyRequestPublicV2Dto:
       type: object
       properties:
         name:
           type: string
           maxLength: 191
-          example: Cloud Provider
+          example: Cloud Service Provider
           description: The name of the Vendor Type
       required:
       - name
