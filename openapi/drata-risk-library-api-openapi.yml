@@ -323,26 +323,6 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    RiskLibraryCopyResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of created risk objects.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
-      required:
-      - data
     RiskLibraryCopyRequestPublicV2Dto:
       type: object
       properties:
@@ -390,6 +370,16 @@ components:
       - riskIds
       - riskGroups
       - registerId
+    RiskLibraryCopyResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of created risk objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
+      required:
+      - data
     RiskControlCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -421,6 +411,88 @@ components:
       - name
       - createdAt
       - updatedAt
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    RiskLibraryExpandEnum:
+      type: string
+      enum:
+      - controls
+      - categories
+    RiskCategoryCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Risk Category ID
+        name:
+          type: string
+          example: Access Control
+          description: Risk Category name used to group and organize related Risks
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was last updated
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RiskLibraryResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     ExceptionResponseDto:
       type: object
       properties:
@@ -480,6 +552,16 @@ components:
       - riskId
       - title
       - description
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
     RiskCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -509,88 +591,6 @@ components:
       - title
       - description
       - registerId
-    RiskLibraryExpandEnum:
-      type: string
-      enum:
-      - controls
-      - categories
-    RiskCategoryCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Risk Category ID
-        name:
-          type: string
-          example: Access Control
-          description: Risk Category name used to group and organize related Risks
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was last updated
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    RiskLibraryResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
   securitySchemes:
     bearer:
       scheme: bearer

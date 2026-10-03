@@ -80,6 +80,49 @@ paths:
       - EVIDENCE_LIBRARY
 components:
   schemas:
+    UploadPurposeEnum:
+      type: string
+      enum:
+      - evidence
+      - background_check
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RenewalScheduleTypeEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+      - CUSTOM
+      - NONE
     MultiArtifactCreateEvidencePublicV2Dto:
       type: object
       properties:
@@ -125,6 +168,54 @@ components:
       - name
       - ownerId
       - renewalScheduleType
+    UploadUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        presignedUrl:
+          type: string
+          example: https://s3.amazonaws.com/drata-bucket/account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf?X-Amz-Algorithm=...
+          description: Full pre-signed AWS S3 URL to perform the HTTP PUT operation against to upload the file.
+        objectKey:
+          type: string
+          example: account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf
+          description: The S3 object key the uploaded file will be stored under. Reference this value per the semantics of the request `purpose` (e.g. as the `fileKey` when creating the Evidence item).
+        expiresAt:
+          type: string
+          example: '2026-07-08T15:04:05.000Z'
+          description: ISO-8601 timestamp indicating when the pre-signed URL expires.
+        webUploadUrl:
+          type: string
+          example: https://api.drata.com/upload/abc123XYZ_-
+          description: 'Browser-facing upload URL. Present only when the request included `includeWebUploadUrl: true`. Point a user at this URL to upload the file via a drag-and-drop page; the URL expires alongside `presignedUrl`.'
+      required:
+      - presignedUrl
+      - objectKey
+      - expiresAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
     UploadUrlRequestPublicV2Dto:
       type: object
       properties:
@@ -168,97 +259,6 @@ components:
           - $ref: '#/components/schemas/MultiArtifactCreateEvidencePublicV2Dto'
       required:
       - purpose
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    UploadPurposeEnum:
-      type: string
-      enum:
-      - evidence
-      - background_check
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    RenewalScheduleTypeEnum:
-      type: string
-      enum:
-      - ONE_MONTH
-      - TWO_MONTHS
-      - THREE_MONTHS
-      - SIX_MONTHS
-      - ONE_YEAR
-      - CUSTOM
-      - NONE
-    UploadUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        presignedUrl:
-          type: string
-          example: https://s3.amazonaws.com/drata-bucket/account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf?X-Amz-Algorithm=...
-          description: Full pre-signed AWS S3 URL to perform the HTTP PUT operation against to upload the file.
-        objectKey:
-          type: string
-          example: account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf
-          description: The S3 object key the uploaded file will be stored under. Reference this value per the semantics of the request `purpose` (e.g. as the `fileKey` when creating the Evidence item).
-        expiresAt:
-          type: string
-          example: '2026-07-08T15:04:05.000Z'
-          description: ISO-8601 timestamp indicating when the pre-signed URL expires.
-        webUploadUrl:
-          type: string
-          example: https://api.drata.com/upload/abc123XYZ_-
-          description: 'Browser-facing upload URL. Present only when the request included `includeWebUploadUrl: true`. Point a user at this URL to upload the file via a drag-and-drop page; the URL expires alongside `presignedUrl`.'
-      required:
-      - presignedUrl
-      - objectKey
-      - expiresAt
   securitySchemes:
     bearer:
       scheme: bearer

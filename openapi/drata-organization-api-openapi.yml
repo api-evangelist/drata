@@ -236,18 +236,6 @@ paths:
         - organization:view
 components:
   schemas:
-    ApiResponseInvalidRequest:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 400
-        error:
-          type: string
-          example: bad_request
-        message:
-          type: string
-          example: Invalid request.
     NdaProvider:
       type: string
       description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
@@ -256,18 +244,6 @@ components:
       - clickwrap
       - docusign
       - override
-    ApiResponseNotFound:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 404
-        error:
-          type: string
-          example: not_found
-        message:
-          type: string
-          example: Not found
     ApiResponseInvalidApiKeyOrMissingScope:
       type: object
       properties:
@@ -280,7 +256,37 @@ components:
         message:
           type: string
           example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
   responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
     '404':
       description: Not found or no access
       content:
@@ -299,12 +305,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseNotFound'
-    '400':
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidRequest'
   securitySchemes:
     apiKey:
       type: apiKey

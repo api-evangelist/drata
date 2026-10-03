@@ -380,6 +380,78 @@ paths:
       description: '🔒 Requires **Controls: Manage Control Owners** permission.'
 components:
   schemas:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ControlOwnerModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        ownerUserIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: User IDs of the Control's owners
+          type: array
+          items:
+            type: number
+      required:
+      - ownerUserIds
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ControlOwnersModifyResponsePublicV2Dto:
+      type: object
+      properties:
+        ownerIds:
+          description: User IDs of the Control's owners
+          type: array
+          items:
+            type: number
+      required:
+      - ownerIds
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
     ControlOwnerCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -389,6 +461,11 @@ components:
           description: Owner ID
       required:
       - ownerId
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     ExceptionResponseDto:
       type: object
       properties:
@@ -454,20 +531,6 @@ components:
       - lastName
       - createdAt
       - updatedAt
-    ControlOwnerModifyRequestPublicV2Dto:
-      type: object
-      properties:
-        ownerUserIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: User IDs of the Control's owners
-          type: array
-          items:
-            type: number
-      required:
-      - ownerUserIds
     ControlOwnersResponsePublicV2Dto:
       type: object
       properties:
@@ -481,69 +544,6 @@ components:
       required:
       - data
       - pagination
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    ControlOwnersModifyResponsePublicV2Dto:
-      type: object
-      properties:
-        ownerIds:
-          description: User IDs of the Control's owners
-          type: array
-          items:
-            type: number
-      required:
-      - ownerIds
   securitySchemes:
     bearer:
       scheme: bearer

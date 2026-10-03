@@ -311,80 +311,21 @@ paths:
       - VENDOR_PUBLIC_API
 components:
   schemas:
-    VendorTypeResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor Type ID
-        name:
-          type: string
-          example: Cloud Provider
-          description: The name of the Vendor Type
-      required:
-      - id
-      - name
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    VendorTypeCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: Cloud Provider
-          description: The name of the Vendor Type
-      required:
-      - name
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
+    VendorTypeModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Cloud Service Provider
+          description: The name of the Vendor Type
+      required:
+      - name
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -413,6 +354,35 @@ components:
       - statusCode
       - message
       - code
+    VendorTypeResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor Type ID
+        name:
+          type: string
+          example: Cloud Provider
+          description: The name of the Vendor Type
+      required:
+      - id
+      - name
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
     VendorTypesResponsePublicV2Dto:
       type: object
       properties:
@@ -426,13 +396,43 @@ components:
       required:
       - data
       - pagination
-    VendorTypeModifyRequestPublicV2Dto:
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    VendorTypeCreateRequestPublicV2Dto:
       type: object
       properties:
         name:
           type: string
           maxLength: 191
-          example: Cloud Service Provider
+          example: Cloud Provider
           description: The name of the Vendor Type
       required:
       - name

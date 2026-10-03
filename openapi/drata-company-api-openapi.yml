@@ -77,6 +77,65 @@ paths:
       description: '🔒 Requires **Company Settings: Get Company Settings** permission.'
 components:
   schemas:
+    HipaaTrainingTypeEnum:
+      type: string
+      enum:
+      - DRATA_PROVIDED
+      - LINK_PROVIDED
+      - MANUAL
+      - NOT_REQUIRED
+      - KNOWBE4
+      - MANUAL_EVIDENCE_FIRST
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    LanguageEnum:
+      type: string
+      enum:
+      - ENGLISH_US
+      - SPANISH_LA
+      - GERMAN_DE
+      - FRENCH_FR
+      - ITALIAN_IT
+      - DUTCH_NL
+      - PSEUDO
+      - PSEUDOX
+    BackgroundCheckTypeEnum:
+      type: string
+      enum:
+      - KARMACHECK
+      - MANUAL
+      - CERTN
+      - CHECKR
+      - HRIS_RIPPLING
+      - STERLING
+      - HIRERIGHT
+      - VETTY
     SecurityTrainingTypeEnum:
       type: string
       enum:
@@ -101,31 +160,6 @@ components:
       - STACKONE_INFOSEC
       - STACKONE_UDEMY
       - STACKONE_PEOPLE_FLUENT
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
     CompanyResponsePublicV2Dto:
       type: object
       properties:
@@ -231,42 +265,9 @@ components:
       - manualUploadEnabled
       - entitlements
       - language
-    HipaaTrainingTypeEnum:
-      type: string
-      enum:
-      - DRATA_PROVIDED
-      - LINK_PROVIDED
-      - MANUAL
-      - NOT_REQUIRED
-      - KNOWBE4
-      - MANUAL_EVIDENCE_FIRST
-    LanguageEnum:
-      type: string
-      enum:
-      - ENGLISH_US
-      - SPANISH_LA
-      - GERMAN_DE
-      - FRENCH_FR
-      - ITALIAN_IT
-      - DUTCH_NL
-      - PSEUDO
-      - PSEUDOX
-    BackgroundCheckTypeEnum:
-      type: string
-      enum:
-      - KARMACHECK
-      - MANUAL
-      - CERTN
-      - CHECKR
-      - HRIS_RIPPLING
-      - STERLING
-      - HIRERIGHT
-      - VETTY
-    ExceptionResponsePublicV2Dto:
+    ExceptionResponseDto:
       type: object
       properties:
-        name:
-          type: string
         statusCode:
           type: number
         message:
@@ -286,7 +287,6 @@ components:
           - name
           - message
       required:
-      - name
       - statusCode
       - message
       - code

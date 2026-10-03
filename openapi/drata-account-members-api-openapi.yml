@@ -176,103 +176,6 @@ paths:
         - accounts:edit
 components:
   schemas:
-    AccountMemberResponse:
-      type: object
-      properties:
-        accountId:
-          type: string
-          example: 88f54931-f4c6-454e-8c3d-1462df981b4d
-        firstName:
-          type: string
-          example: Safe
-        lastName:
-          type: string
-          example: Base
-        name:
-          type: string
-          example: Safe Base
-          deprecated: true
-        email:
-          type: string
-          example: user@safebase.io
-        createdAt:
-          type: string
-          format: date-time
-          example: '2017-07-21T17:32:28Z'
-        lastSeen:
-          oneOf:
-          - type: 'null'
-          - type: string
-            format: date-time
-          example: '2017-07-21T17:32:28Z'
-    AccountMemberPayload:
-      type: object
-      required:
-      - email
-      properties:
-        firstName:
-          type: string
-          example: Safe
-          description: Required if name is not set.
-        lastName:
-          type: string
-          example: Base
-          description: Required if name is not set.
-        name:
-          type: string
-          example: Safe Base
-          description: Either firstName and lastName, or name must be supplied, but never all three.
-          deprecated: true
-        email:
-          type: string
-          example: user@safebase.io
-    ApiResponseInvalidRequest:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 400
-        error:
-          type: string
-          example: bad_request
-        message:
-          type: string
-          example: Invalid request.
-    ApiResponseNotFound:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 404
-        error:
-          type: string
-          example: not_found
-        message:
-          type: string
-          example: Not found
-    AccountMemberEmails:
-      type: object
-      required:
-      - members
-      properties:
-        members:
-          type: array
-          description: Array of member emails to delete
-          minItems: 1
-          uniqueItems: true
-          example:
-          - user1@safebase.io
-          - user2@safebase.io
-          items:
-            type: string
-    AccountMemberArrayResponse:
-      type: array
-      items:
-        type: object
-        $ref: '#/components/schemas/AccountMemberResponse'
-    AccountMemberEmail:
-      type: string
-      example: user1@safebase.io
     AccountMemberPayloadArray:
       type: object
       required:
@@ -321,6 +224,58 @@ components:
           productId:
             description: The specific product to link to
             type: string
+    AccountMemberEmails:
+      type: object
+      required:
+      - members
+      properties:
+        members:
+          type: array
+          description: Array of member emails to delete
+          minItems: 1
+          uniqueItems: true
+          example:
+          - user1@safebase.io
+          - user2@safebase.io
+          items:
+            type: string
+    AccountMemberArrayResponse:
+      type: array
+      items:
+        type: object
+        $ref: '#/components/schemas/AccountMemberResponse'
+    AccountMemberResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: 88f54931-f4c6-454e-8c3d-1462df981b4d
+        firstName:
+          type: string
+          example: Safe
+        lastName:
+          type: string
+          example: Base
+        name:
+          type: string
+          example: Safe Base
+          deprecated: true
+        email:
+          type: string
+          example: user@safebase.io
+        createdAt:
+          type: string
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        lastSeen:
+          oneOf:
+          - type: 'null'
+          - type: string
+            format: date-time
+          example: '2017-07-21T17:32:28Z'
+    AccountMemberEmail:
+      type: string
+      example: user1@safebase.io
     ApiResponseInvalidApiKeyOrMissingScope:
       type: object
       properties:
@@ -333,7 +288,58 @@ components:
         message:
           type: string
           example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    AccountMemberPayload:
+      type: object
+      required:
+      - email
+      properties:
+        firstName:
+          type: string
+          example: Safe
+          description: Required if name is not set.
+        lastName:
+          type: string
+          example: Base
+          description: Required if name is not set.
+        name:
+          type: string
+          example: Safe Base
+          description: Either firstName and lastName, or name must be supplied, but never all three.
+          deprecated: true
+        email:
+          type: string
+          example: user@safebase.io
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
   responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
     '404':
       description: Not found or no access
       content:
@@ -352,12 +358,6 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseNotFound'
-    '400':
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidRequest'
   parameters:
     accountId:
       name: id

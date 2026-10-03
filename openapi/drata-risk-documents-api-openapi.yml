@@ -451,6 +451,11 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     RiskDocumentsResponsePublicV2Dto:
       type: object
       properties:
@@ -464,9 +469,11 @@ components:
       required:
       - data
       - pagination
-    ExceptionResponseDto:
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
+        name:
+          type: string
         statusCode:
           type: number
         message:
@@ -486,19 +493,10 @@ components:
           - name
           - message
       required:
+      - name
       - statusCode
       - message
       - code
-    RiskDocumentsUploadResponsePublicV2Dto:
-      type: object
-      properties:
-        documents:
-          description: List of uploaded Risk Documents
-          type: array
-          items:
-            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
-      required:
-      - documents
     DocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -546,16 +544,9 @@ components:
       enum:
       - ASC
       - DESC
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
+    ExceptionResponseDto:
       type: object
       properties:
-        name:
-          type: string
         statusCode:
           type: number
         message:
@@ -575,10 +566,19 @@ components:
           - name
           - message
       required:
-      - name
       - statusCode
       - message
       - code
+    RiskDocumentsUploadResponsePublicV2Dto:
+      type: object
+      properties:
+        documents:
+          description: List of uploaded Risk Documents
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
+      required:
+      - documents
   securitySchemes:
     bearer:
       scheme: bearer

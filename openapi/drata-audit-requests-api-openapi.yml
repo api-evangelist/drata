@@ -223,240 +223,30 @@ paths:
       description: '🔒 Requires **Customer Request: Get Customer Request** permission.'
 components:
   schemas:
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    AuditRequestExpandEnum:
+    CustomerRequestStatus:
+      type: string
+      enum:
+      - OUTSTANDING
+      - IN_REVIEW
+      - ACCEPTED
+      - CHANGES_REQUESTED
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    CustomerRequestStatusEnum:
+      type: string
+      enum:
+      - OUTSTANDING
+      - IN_REVIEW
+      - ACCEPTED
+      - CHANGES_REQUESTED
+    AuditRequestListExpandEnum:
       type: string
       enum:
       - owners
       - messages
-      - controls
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    AuditRequestItemResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique identifier of the Audit Request
-        code:
-          type: string
-          example: REQ-001
-          description: Short identifier code for the Audit Request
-        title:
-          type: string
-          example: Provide SOC 2 report
-          description: Title of the Audit Request
-        description:
-          type:
-          - string
-          - 'null'
-          example: Please provide the latest SOC 2 Type II report.
-          description: Detailed description of the Audit Request
-        status:
-          example: OUTSTANDING
-          description: Current status of the Audit Request
-          allOf:
-          - $ref: '#/components/schemas/CustomerRequestStatusEnum'
-        auditId:
-          type: string
-          format: uuid
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: ID of the Audit this Request belongs to
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Audit Request was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Audit Request was last updated
-        owners:
-          description: Owners of the Request, only returned when `expand[]=owners` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        messages:
-          description: Messages on the Request, only returned when `expand[]=messages` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditRequestMessageCompactResponsePublicV2Dto'
-      required:
-      - id
-      - code
-      - title
-      - description
-      - status
-      - auditId
-      - createdAt
-      - updatedAt
-    AuditRequestMessageCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique identifier of the Audit Request Message
-        message:
-          type: string
-          example: Please provide the latest SOC 2 report.
-          description: Message content
-        sentByEmail:
-          type:
-          - string
-          - 'null'
-          format: email
-          example: jane.smith@company.com
-          description: Email of the User who sent the Message, or null for system-generated messages
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the message was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the message was last updated
-      required:
-      - id
-      - message
-      - sentByEmail
-      - createdAt
-      - updatedAt
-    AuditControlCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Control ID
-        code:
-          type: string
-          example: DCF-1001
-          description: Control code
-        name:
-          type: string
-          example: Vulnerability Management
-          description: Control name
-        controlNumber:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: Control number used for ordering
-      required:
-      - id
-      - code
-      - name
-      - controlNumber
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
     AuditRequestGetResponsePublicV2Dto:
       type: object
       properties:
@@ -522,9 +312,228 @@ components:
       - auditId
       - createdAt
       - updatedAt
-    SortTypeLimitedEnum:
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    AuditRequestMessageCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier of the Audit Request Message
+        message:
+          type: string
+          example: Please provide the latest SOC 2 report.
+          description: Message content
+        sentByEmail:
+          type:
+          - string
+          - 'null'
+          format: email
+          example: jane.smith@company.com
+          description: Email of the User who sent the Message, or null for system-generated messages
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the message was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the message was last updated
+      required:
+      - id
+      - message
+      - sentByEmail
+      - createdAt
+      - updatedAt
+    AuditRequestItemResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier of the Audit Request
+        code:
+          type: string
+          example: REQ-001
+          description: Short identifier code for the Audit Request
+        title:
+          type: string
+          example: Provide SOC 2 report
+          description: Title of the Audit Request
+        description:
+          type:
+          - string
+          - 'null'
+          example: Please provide the latest SOC 2 Type II report.
+          description: Detailed description of the Audit Request
+        status:
+          example: OUTSTANDING
+          description: Current status of the Audit Request
+          allOf:
+          - $ref: '#/components/schemas/CustomerRequestStatusEnum'
+        auditId:
+          type: string
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: ID of the Audit this Request belongs to
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit Request was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Audit Request was last updated
+        owners:
+          description: Owners of the Request, only returned when `expand[]=owners` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        messages:
+          description: Messages on the Request, only returned when `expand[]=messages` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditRequestMessageCompactResponsePublicV2Dto'
+      required:
+      - id
+      - code
+      - title
+      - description
+      - status
+      - auditId
+      - createdAt
+      - updatedAt
+    AuditRequestExpandEnum:
       type: string
       enum:
+      - owners
+      - messages
+      - controls
+    AuditControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: DCF-1001
+          description: Control code
+        name:
+          type: string
+          example: Vulnerability Management
+          description: Control name
+        controlNumber:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: Control number used for ordering
+      required:
+      - id
+      - code
+      - name
+      - controlNumber
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
       - createdAt
       - updatedAt
     AuditRequestsResponsePublicV2Dto:
@@ -540,25 +549,16 @@ components:
       required:
       - data
       - pagination
-    CustomerRequestStatusEnum:
-      type: string
-      enum:
-      - OUTSTANDING
-      - IN_REVIEW
-      - ACCEPTED
-      - CHANGES_REQUESTED
-    CustomerRequestStatus:
-      type: string
-      enum:
-      - OUTSTANDING
-      - IN_REVIEW
-      - ACCEPTED
-      - CHANGES_REQUESTED
-    AuditRequestListExpandEnum:
-      type: string
-      enum:
-      - owners
-      - messages
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
   securitySchemes:
     bearer:
       scheme: bearer

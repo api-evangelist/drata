@@ -210,25 +210,85 @@ paths:
       description: '🔒 Requires **User Policies: Acknowledge User''s Assigned Policy** permission.'
 components:
   schemas:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    UserPoliciesExpandEnum:
+      type: string
+      enum:
+      - policy
+      - policyVersion
+    PolicyScopeEnum:
+      type: string
+      enum:
+      - ALL
+      - GROUP
+      - NONE
     PolicyTypeEnum:
       type: string
       enum:
       - BUILDER
       - UPLOADED
       - EXTERNAL
-    PolicyApprovalsSourceTypeEnum:
-      type: string
-      enum:
-      - UNKNOWN
-      - BAMBOO_HR
-      - CSV
-      - MY_DRATA
-      - PUBLIC_API
-    UserPoliciesExpandEnum:
-      type: string
-      enum:
-      - policy
-      - policyVersion
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    UserPolicyAcceptRequestPublicV2Dto:
+      type: object
+      properties:
+        acceptedAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: When the user accepted the Policy. Must be within the last year.
+        details:
+          type: string
+          description: Additional details on how and where the User acknowledged the Policy
+          example: Accepted in Confluence via plugin
+      required:
+      - acceptedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
     UserPolicyVersionResponsePublicV2Dto:
       type: object
       properties:
@@ -292,6 +352,27 @@ components:
       - details
       - policyId
       - policyVersionId
+    PolicyStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    PolicyApprovalsSourceTypeEnum:
+      type: string
+      enum:
+      - UNKNOWN
+      - BAMBOO_HR
+      - CSV
+      - MY_DRATA
+      - PUBLIC_API
     ExceptionResponseDto:
       type: object
       properties:
@@ -330,135 +411,6 @@ components:
       required:
       - data
       - pagination
-    UserPolicyAcceptRequestPublicV2Dto:
-      type: object
-      properties:
-        acceptedAt:
-          type: string
-          format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: When the user accepted the Policy. Must be within the last year.
-        details:
-          type: string
-          description: Additional details on how and where the User acknowledged the Policy
-          example: Accepted in Confluence via plugin
-      required:
-      - acceptedAt
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    PolicyStatusEnum:
-      type: string
-      enum:
-      - ACTIVE
-      - ARCHIVED
-      - REPLACED
-      - UNACCEPTABLE
-      - OUTDATED
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PolicyScopeEnum:
-      type: string
-      enum:
-      - ALL
-      - GROUP
-      - NONE
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PolicyCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Policy ID
-        name:
-          type: string
-          example: Acceptable Use Policy
-          description: The Policy name
-        description:
-          type: string
-          description: The Policy description
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy last updated date timestamp
-        assignedTo:
-          example: ALL
-          description: The scope of Users the Policy is assigned to
-          allOf:
-          - $ref: '#/components/schemas/PolicyScopeEnum'
-        policyStatus:
-          example: ACTIVE
-          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
-          allOf:
-          - $ref: '#/components/schemas/PolicyStatusEnum'
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy renewal date
-      required:
-      - id
-      - name
-      - description
-      - createdAt
-      - updatedAt
-      - policyStatus
-      - renewalDate
     PolicyVersionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -541,6 +493,54 @@ components:
       - changesExplanation
       - publishedAt
       - requiresAcknowledgment
+    PolicyCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy ID
+        name:
+          type: string
+          example: Acceptable Use Policy
+          description: The Policy name
+        description:
+          type: string
+          description: The Policy description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy last updated date timestamp
+        assignedTo:
+          example: ALL
+          description: The scope of Users the Policy is assigned to
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        policyStatus:
+          example: ACTIVE
+          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyStatusEnum'
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy renewal date
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - policyStatus
+      - renewalDate
   securitySchemes:
     bearer:
       scheme: bearer

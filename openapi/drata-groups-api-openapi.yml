@@ -116,31 +116,11 @@ paths:
       - PERSONNEL_PAGE
 components:
   schemas:
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     GroupsListResponsePublicV2Dto:
       type: object
       properties:
@@ -154,31 +134,6 @@ components:
       required:
       - data
       - pagination
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -250,6 +205,51 @@ components:
       - source
       - createdAt
       - updatedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

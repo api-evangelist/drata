@@ -490,19 +490,98 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
-    RiskNotesResponsePublicV2Dto:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    RiskNoteWriteRequestPublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        comment:
+          type: string
+          maxLength: 768
+          example: This is a note about the risk assessment findings.
+          description: The comment content for the note
       required:
-      - data
-      - pagination
+      - comment
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RiskNoteResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: Note ID
+        comment:
+          type: string
+          description: The Note comment
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note updated date timestamp
+        owner:
+          description: The User that created the Note, only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - id
+      - comment
+      - createdAt
+      - updatedAt
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     ExceptionResponseDto:
       type: object
       properties:
@@ -568,102 +647,23 @@ components:
       - lastName
       - createdAt
       - updatedAt
-    RiskNoteWriteRequestPublicV2Dto:
-      type: object
-      properties:
-        comment:
-          type: string
-          maxLength: 768
-          example: This is a note about the risk assessment findings.
-          description: The comment content for the note
-      required:
-      - comment
-    RiskNoteResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 123
-          description: Note ID
-        comment:
-          type: string
-          description: The Note comment
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Note created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Note updated date timestamp
-        owner:
-          description: The User that created the Note, only returned when `expand[]=owner` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-      required:
-      - id
-      - comment
-      - createdAt
-      - updatedAt
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
     RiskNotesExpandEnum:
       type: string
       enum:
       - owner
+    RiskNotesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
   securitySchemes:
     bearer:
       scheme: bearer

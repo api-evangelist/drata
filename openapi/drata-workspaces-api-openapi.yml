@@ -114,108 +114,6 @@ paths:
       description: '🔒 Requires **Workspaces: List Workspaces** permission.'
 components:
   schemas:
-    FrameworkCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 13
-          description: Framework ID
-        name:
-          type: string
-          example: NIST AI RMF
-          description: Framework name
-        description:
-          type: string
-          example: The NIST AI Risk Management Framework (AI RMF) is a set of suggestions and guidelines for incorporating trustworthiness considerations in the design, development, deployment, and use of AI systems.
-          description: Framework description
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Framework created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Framework updated date timestamp
-        enabledAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the framework was enabled
-      required:
-      - id
-      - name
-      - description
-      - createdAt
-      - updatedAt
-      - enabledAt
-    WorkspacesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/WorkspaceResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    WorkspaceExpandEnum:
-      type: string
-      enum:
-      - frameworks
-      - personnelScope
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
     WorkspaceResponsePublicV2Dto:
       type: object
       properties:
@@ -286,11 +184,55 @@ components:
       - howItWorks
       - url
       - logo
+    FrameworkCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 13
+          description: Framework ID
+        name:
+          type: string
+          example: NIST AI RMF
+          description: Framework name
+        description:
+          type: string
+          example: The NIST AI Risk Management Framework (AI RMF) is a set of suggestions and guidelines for incorporating trustworthiness considerations in the design, development, deployment, and use of AI systems.
+          description: Framework description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Framework updated date timestamp
+        enabledAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the framework was enabled
+      required:
+      - id
+      - name
+      - description
+      - createdAt
+      - updatedAt
+      - enabledAt
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
+    WorkspaceExpandEnum:
+      type: string
+      enum:
+      - frameworks
+      - personnelScope
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -319,6 +261,64 @@ components:
       - statusCode
       - message
       - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    WorkspacesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkspaceResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
   securitySchemes:
     bearer:
       scheme: bearer

@@ -635,119 +635,6 @@ paths:
       - TASKS
 components:
   schemas:
-    ExpandDataWithCountDto:
-      type: object
-      properties:
-        data:
-          type: array
-          items:
-            type: array
-        totalCount:
-          type: number
-          description: Total count of linked items
-      required:
-      - data
-      - totalCount
-    UpcomingTaskResponsePublicV2Dto:
-      type: object
-      properties:
-        sourceId:
-          type: number
-          example: 123
-          description: 'ID of the underlying source entity for this task. Meaning varies by `taskType`:
-
-            - POLICY_RENEWALS: policy ID → GET /policies/{sourceId}
-
-            - VENDOR: vendor ID → GET /vendors/{sourceId}
-
-            - GENERAL, CONTROL, RISK, POLICY_APPROVALS: custom task ID → GET /workspaces/{workspaceId}/tasks/{sourceId}
-
-            - EXTERNAL_EVIDENCE, CONTROL_APPROVALS: control ID → GET /workspaces/{workspaceId}/controls/{sourceId}
-
-            - REPORT: evidence library document ID → GET /workspaces/{workspaceId}/evidence-library/{sourceId}'
-        name:
-          type: string
-          example: Acme Corp Vendor Review
-          description: Display name of the task. Sourced from the underlying entity (policy name, vendor name, task title, etc.)
-        taskType:
-          description: Task type
-          example: VENDOR
-          allOf:
-          - $ref: '#/components/schemas/TaskTypeEnum'
-        dueDate:
-          type: string
-          format: date
-          example: '2020-07-06'
-          description: Due date
-        status:
-          description: 'Task status: PAST_DUE (due date passed, not completed), COMPLETED (marked complete), INCOMPLETE (not yet due and not completed)'
-          example: INCOMPLETE
-          allOf:
-          - $ref: '#/components/schemas/TaskStatus'
-        completedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Completion timestamp
-        assigneeIds:
-          example:
-          - 456
-          - 789
-          description: IDs of users assigned to this task. May contain multiple users. Empty array if no assignee.
-          type: array
-          items:
-            type: number
-      required:
-      - sourceId
-      - name
-      - taskType
-      - dueDate
-      - status
-      - completedAt
-      - assigneeIds
-    TaskUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        title:
-          type: string
-          maxLength: 255
-          description: Task title
-        description:
-          type:
-          - string
-          - 'null'
-          maxLength: 768
-          description: Task description. Set to null to clear.
-        dueDate:
-          type: string
-          format: date
-          description: Due date
-          example: '2020-07-06'
-        assigneeId:
-          type:
-          - number
-          - 'null'
-          description: ID of the User who should complete the task. Set to null to unassign.
-        controlIds:
-          uniqueItems: true
-          description: IDs of Controls to link to this task. Associates the task with compliance controls, making it visible in control detail views and filterable by control. Replaces all existing control links. Pass `[]` to clear all links. Omit to leave unchanged.
-          type: array
-          items:
-            type: number
-        riskIds:
-          uniqueItems: true
-          description: IDs of Risks to link. Replaces all existing links. Pass `[]` to clear. Omit to leave unchanged.
-          type: array
-          items:
-            type: number
-        policyIds:
-          uniqueItems: true
-          description: IDs of Policies to link. Replaces all existing links. Pass `[]` to clear. Omit to leave unchanged.
-          type: array
-          items:
-            type: number
     UpcomingTasksResponsePublicV2Dto:
       type: object
       properties:
@@ -761,6 +648,10 @@ components:
       required:
       - data
       - pagination
+    UpcomingTaskSortEnum:
+      type: string
+      enum:
+      - dueDate
     ExceptionResponseDto:
       type: object
       properties:
@@ -786,6 +677,32 @@ components:
       - statusCode
       - message
       - code
+    TaskTypeEnum:
+      type: string
+      enum:
+      - POLICY_RENEWALS
+      - EVIDENCE
+      - VENDOR
+      - EXTERNAL_EVIDENCE
+      - REPORT
+      - GENERAL
+      - CONTROL
+      - RISK
+      - CONTROL_APPROVALS
+      - POLICY_APPROVALS
+    TaskActionEnum:
+      type: string
+      enum:
+      - complete
+      - uncomplete
+    TaskExpandEnum:
+      type: string
+      enum:
+      - assignee
+      - createdBy
+      - controls
+      - risks
+      - policies
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -801,44 +718,6 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    TaskActionEnum:
-      type: string
-      enum:
-      - complete
-      - uncomplete
-    TaskSortEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-      - dueDate
-    UpcomingTaskSortEnum:
-      type: string
-      enum:
-      - dueDate
-    TaskActionRequestPublicV2Dto:
-      type: object
-      properties:
-        action:
-          description: 'Action to execute: `complete` marks the task as completed, `uncomplete` marks it as incomplete'
-          example: complete
-          allOf:
-          - $ref: '#/components/schemas/TaskActionEnum'
-      required:
-      - action
-    TaskExpandEnum:
-      type: string
-      enum:
-      - assignee
-      - createdBy
-      - controls
-      - risks
-      - policies
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -867,126 +746,19 @@ components:
       - statusCode
       - message
       - code
-    TaskTypeEnum:
-      type: string
-      enum:
-      - POLICY_RENEWALS
-      - EVIDENCE
-      - VENDOR
-      - EXTERNAL_EVIDENCE
-      - REPORT
-      - GENERAL
-      - CONTROL
-      - RISK
-      - CONTROL_APPROVALS
-      - POLICY_APPROVALS
-    TaskStatus:
-      type: string
-      enum:
-      - PAST_DUE
-      - COMPLETED
-      - INCOMPLETE
-      x-enumDescriptions:
-        PAST_DUE: Past Due – Due date has passed and task is not completed
-        COMPLETED: Completed – Task has been marked as complete
-        INCOMPLETE: Incomplete – Task is not yet due and not completed
-    TaskCreateRequestPublicV2Dto:
+    ExpandDataWithCountDto:
       type: object
       properties:
-        title:
-          type: string
-          maxLength: 255
-          description: Task title
-          example: Review access controls
-        description:
-          type: string
-          maxLength: 768
-          description: Task description
-          example: Quarterly review of access control policies
-        dueDate:
-          type: string
-          format: date
-          description: Due date
-          example: '2020-07-06'
-        assigneeId:
+        data:
+          type: array
+          items:
+            type: array
+        totalCount:
           type: number
-          description: ID of the User to assign the task to
-          example: 456
-        taskType:
-          default: GENERAL
-          description: Task type
-          example: GENERAL
-          allOf:
-          - $ref: '#/components/schemas/TaskTypeEnum'
-        controlIds:
-          uniqueItems: true
-          description: IDs of Controls to link to this Task. Can be combined with `riskIds` and `policyIds`.
-          example:
-          - 101
-          - 102
-          type: array
-          items:
-            type: number
-        riskIds:
-          uniqueItems: true
-          description: IDs of Risks to link to this Task. Can be combined with `controlIds` and `policyIds`.
-          example:
-          - 201
-          type: array
-          items:
-            type: number
-        policyIds:
-          uniqueItems: true
-          description: IDs of Policies to link to this Task. Can be combined with `controlIds` and `riskIds`.
-          example:
-          - 301
-          - 302
-          type: array
-          items:
-            type: number
+          description: Total count of linked items
       required:
-      - title
-      - dueDate
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
+      - data
+      - totalCount
     TaskResponsePublicV2Dto:
       type: object
       properties:
@@ -1080,6 +852,26 @@ components:
       - updatedAt
       - assigneeId
       - createdById
+    TaskStatus:
+      type: string
+      enum:
+      - PAST_DUE
+      - COMPLETED
+      - INCOMPLETE
+      x-enumDescriptions:
+        PAST_DUE: Past Due – Due date has passed and task is not completed
+        COMPLETED: Completed – Task has been marked as complete
+        INCOMPLETE: Incomplete – Task is not yet due and not completed
+    TaskActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: 'Action to execute: `complete` marks the task as completed, `uncomplete` marks it as incomplete'
+          example: complete
+          allOf:
+          - $ref: '#/components/schemas/TaskActionEnum'
+      required:
+      - action
     TasksResponsePublicV2Dto:
       type: object
       properties:
@@ -1093,6 +885,214 @@ components:
       required:
       - data
       - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    TaskSortEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+      - dueDate
+    TaskUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          description: Task title
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          description: Task description. Set to null to clear.
+        dueDate:
+          type: string
+          format: date
+          description: Due date
+          example: '2020-07-06'
+        assigneeId:
+          type:
+          - number
+          - 'null'
+          description: ID of the User who should complete the task. Set to null to unassign.
+        controlIds:
+          uniqueItems: true
+          description: IDs of Controls to link to this task. Associates the task with compliance controls, making it visible in control detail views and filterable by control. Replaces all existing control links. Pass `[]` to clear all links. Omit to leave unchanged.
+          type: array
+          items:
+            type: number
+        riskIds:
+          uniqueItems: true
+          description: IDs of Risks to link. Replaces all existing links. Pass `[]` to clear. Omit to leave unchanged.
+          type: array
+          items:
+            type: number
+        policyIds:
+          uniqueItems: true
+          description: IDs of Policies to link. Replaces all existing links. Pass `[]` to clear. Omit to leave unchanged.
+          type: array
+          items:
+            type: number
+    TaskCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 255
+          description: Task title
+          example: Review access controls
+        description:
+          type: string
+          maxLength: 768
+          description: Task description
+          example: Quarterly review of access control policies
+        dueDate:
+          type: string
+          format: date
+          description: Due date
+          example: '2020-07-06'
+        assigneeId:
+          type: number
+          description: ID of the User to assign the task to
+          example: 456
+        taskType:
+          default: GENERAL
+          description: Task type
+          example: GENERAL
+          allOf:
+          - $ref: '#/components/schemas/TaskTypeEnum'
+        controlIds:
+          uniqueItems: true
+          description: IDs of Controls to link to this Task. Can be combined with `riskIds` and `policyIds`.
+          example:
+          - 101
+          - 102
+          type: array
+          items:
+            type: number
+        riskIds:
+          uniqueItems: true
+          description: IDs of Risks to link to this Task. Can be combined with `controlIds` and `policyIds`.
+          example:
+          - 201
+          type: array
+          items:
+            type: number
+        policyIds:
+          uniqueItems: true
+          description: IDs of Policies to link to this Task. Can be combined with `controlIds` and `riskIds`.
+          example:
+          - 301
+          - 302
+          type: array
+          items:
+            type: number
+      required:
+      - title
+      - dueDate
+    UpcomingTaskResponsePublicV2Dto:
+      type: object
+      properties:
+        sourceId:
+          type: number
+          example: 123
+          description: 'ID of the underlying source entity for this task. Meaning varies by `taskType`:
+
+            - POLICY_RENEWALS: policy ID → GET /policies/{sourceId}
+
+            - VENDOR: vendor ID → GET /vendors/{sourceId}
+
+            - GENERAL, CONTROL, RISK, POLICY_APPROVALS: custom task ID → GET /workspaces/{workspaceId}/tasks/{sourceId}
+
+            - EXTERNAL_EVIDENCE, CONTROL_APPROVALS: control ID → GET /workspaces/{workspaceId}/controls/{sourceId}
+
+            - REPORT: evidence library document ID → GET /workspaces/{workspaceId}/evidence-library/{sourceId}'
+        name:
+          type: string
+          example: Acme Corp Vendor Review
+          description: Display name of the task. Sourced from the underlying entity (policy name, vendor name, task title, etc.)
+        taskType:
+          description: Task type
+          example: VENDOR
+          allOf:
+          - $ref: '#/components/schemas/TaskTypeEnum'
+        dueDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Due date
+        status:
+          description: 'Task status: PAST_DUE (due date passed, not completed), COMPLETED (marked complete), INCOMPLETE (not yet due and not completed)'
+          example: INCOMPLETE
+          allOf:
+          - $ref: '#/components/schemas/TaskStatus'
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Completion timestamp
+        assigneeIds:
+          example:
+          - 456
+          - 789
+          description: IDs of users assigned to this task. May contain multiple users. Empty array if no assignee.
+          type: array
+          items:
+            type: number
+      required:
+      - sourceId
+      - name
+      - taskType
+      - dueDate
+      - status
+      - completedAt
+      - assigneeIds
   securitySchemes:
     bearer:
       scheme: bearer

@@ -92,32 +92,6 @@ paths:
       - BACKGROUND_CHECK_SYNC
 components:
   schemas:
-    BackgroundCheckCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        userId:
-          type: number
-          example: 1
-          description: The ID of the User for whom the Background Check is being uploaded
-        url:
-          type: string
-          maxLength: 768
-          format: uri
-          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: The URL of the Background Check document or report. Provide EITHER `url` or `fileKey`, never both. A `url` is recorded as-is — Drata does not fetch or scan it.
-        fileKey:
-          type: string
-          maxLength: 191
-          example: a1b2c3d4-.../background-check-evidence/9f8e.../report.pdf
-          description: The `objectKey` returned by `POST /upload-urls` with `purpose=background_check`, after the file has been PUT to the presigned URL. The check is created but does NOT count toward the Background Check requirement until an antivirus scan clears the file; an infected, oversized, or never-uploaded file is quarantined and never credited.
-        filedAt:
-          type: string
-          format: date
-          example: '2020-07-06'
-          description: The date when this Background Check data was completed.
-      required:
-      - userId
-      - filedAt
     PersonCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -154,55 +128,6 @@ components:
       - email
       - createdAt
       - updatedAt
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    EmploymentStatusEnum:
-      type: string
-      enum:
-      - CURRENT_EMPLOYEE
-      - FORMER_EMPLOYEE
-      - CURRENT_CONTRACTOR
-      - FORMER_CONTRACTOR
-      - OUT_OF_SCOPE
-      - UNKNOWN
-      - SPECIAL_FORMER_EMPLOYEE
-      - SPECIAL_FORMER_CONTRACTOR
-      - FUTURE_HIRE
-      - SERVICE_ACCOUNT
-      x-enumDescriptions:
-        CURRENT_EMPLOYEE: Current Employee
-        FORMER_EMPLOYEE: Former Employee
-        CURRENT_CONTRACTOR: Current Contractor
-        FORMER_CONTRACTOR: Former Contractor
-        FUTURE_HIRE: Future Hire – Based on the HRIS data
-        UNKNOWN: Unknown – The personnel did not match an HRIS record
-        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
-        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
-        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
-        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -231,6 +156,81 @@ components:
       - statusCode
       - message
       - code
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    BackgroundCheckCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        userId:
+          type: number
+          example: 1
+          description: The ID of the User for whom the Background Check is being uploaded
+        url:
+          type: string
+          maxLength: 768
+          format: uri
+          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: The URL of the Background Check document or report. Provide EITHER `url` or `fileKey`, never both. A `url` is recorded as-is — Drata does not fetch or scan it.
+        fileKey:
+          type: string
+          maxLength: 191
+          example: a1b2c3d4-.../background-check-evidence/9f8e.../report.pdf
+          description: The `objectKey` returned by `POST /upload-urls` with `purpose=background_check`, after the file has been PUT to the presigned URL. The check is created but does NOT count toward the Background Check requirement until an antivirus scan clears the file; an infected, oversized, or never-uploaded file is quarantined and never credited.
+        filedAt:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: The date when this Background Check data was completed.
+      required:
+      - userId
+      - filedAt
+    EmploymentStatusEnum:
+      type: string
+      enum:
+      - CURRENT_EMPLOYEE
+      - FORMER_EMPLOYEE
+      - CURRENT_CONTRACTOR
+      - FORMER_CONTRACTOR
+      - OUT_OF_SCOPE
+      - UNKNOWN
+      - SPECIAL_FORMER_EMPLOYEE
+      - SPECIAL_FORMER_CONTRACTOR
+      - FUTURE_HIRE
+      - SERVICE_ACCOUNT
+      x-enumDescriptions:
+        CURRENT_EMPLOYEE: Current Employee
+        FORMER_EMPLOYEE: Former Employee
+        CURRENT_CONTRACTOR: Current Contractor
+        FORMER_CONTRACTOR: Former Contractor
+        FUTURE_HIRE: Future Hire – Based on the HRIS data
+        UNKNOWN: Unknown – The personnel did not match an HRIS record
+        OUT_OF_SCOPE: Out of Scope – Manually marked as out of scope
+        SERVICE_ACCOUNT: Service Account – Automatically marked as out of scope
+        SPECIAL_FORMER_EMPLOYEE: Special Former Employee – Deprecated status for manually created personnel
+        SPECIAL_FORMER_CONTRACTOR: Special Former Contractor – Deprecated status for manually created personnel
   securitySchemes:
     bearer:
       scheme: bearer

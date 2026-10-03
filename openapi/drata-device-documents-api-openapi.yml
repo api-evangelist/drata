@@ -324,48 +324,46 @@ paths:
       - MDM
 components:
   schemas:
-    DeviceDocumentResponsePublicV2Dto:
+    DeviceDocumentTypeEnum:
+      type: string
+      enum:
+      - PASSWORD_MANAGER_EVIDENCE
+      - AUTO_UPDATES_EVIDENCE
+      - HARD_DRIVE_ENCRYPTION_EVIDENCE
+      - ANTIVIRUS_EVIDENCE
+      - LOCK_SCREEN_EVIDENCE
+    DeviceDocumentExpandEnum:
+      type: string
+      enum:
+      - downloadUrl
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 1
-          description: Device document ID
-        type:
-          type: string
-          example: PASSWORD_MANAGER_EVIDENCE
-          description: The device document type
         name:
           type: string
-          example: Password Manager Evidence
-          description: The document name
-        fileUrl:
-          type:
-          - string
-          - 'null'
-          example: http://localhost:5000/download/device-documents/1
-          description: The secure URL to the device document
-        createdAt:
+        statusCode:
+          type: number
+        message:
           type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Device document created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Device document updated date timestamp
-        downloadUrl:
-          description: The signed URL to download the Device Document, only returned when `expand[]=downloadUrl` is passed.
-          allOf:
-          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - id
-      - type
       - name
-      - fileUrl
-      - createdAt
-      - updatedAt
+      - statusCode
+      - message
+      - code
     DeviceDocumentCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -416,6 +414,16 @@ components:
       - statusCode
       - message
       - code
+    DeviceDocumentsResponsePublicV2Dto:
+      type: object
+      properties:
+        documents:
+          description: Full list of device documents
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+      required:
+      - documents
     SignedUrlResponsePublicV2Dto:
       type: object
       properties:
@@ -440,56 +448,48 @@ components:
       - signedUrl
       - fileBuffer
       - fileName
-    DeviceDocumentsResponsePublicV2Dto:
+    DeviceDocumentResponsePublicV2Dto:
       type: object
       properties:
-        documents:
-          description: Full list of device documents
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
-      required:
-      - documents
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
+        id:
+          type: number
+          example: 1
+          description: Device document ID
+        type:
+          type: string
+          example: PASSWORD_MANAGER_EVIDENCE
+          description: The device document type
         name:
           type: string
-        statusCode:
-          type: number
-        message:
+          example: Password Manager Evidence
+          description: The document name
+        fileUrl:
+          type:
+          - string
+          - 'null'
+          example: http://localhost:5000/download/device-documents/1
+          description: The secure URL to the device document
+        createdAt:
           type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Device document created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Device document updated date timestamp
+        downloadUrl:
+          description: The signed URL to download the Device Document, only returned when `expand[]=downloadUrl` is passed.
+          allOf:
+          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
       required:
+      - id
+      - type
       - name
-      - statusCode
-      - message
-      - code
-    DeviceDocumentExpandEnum:
-      type: string
-      enum:
-      - downloadUrl
-    DeviceDocumentTypeEnum:
-      type: string
-      enum:
-      - PASSWORD_MANAGER_EVIDENCE
-      - AUTO_UPDATES_EVIDENCE
-      - HARD_DRIVE_ENCRYPTION_EVIDENCE
-      - ANTIVIRUS_EVIDENCE
-      - LOCK_SCREEN_EVIDENCE
+      - fileUrl
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer
