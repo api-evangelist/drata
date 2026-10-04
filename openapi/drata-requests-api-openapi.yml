@@ -201,21 +201,21 @@ paths:
         - accounts:edit
 components:
   schemas:
-    NdaProvider:
-      type: string
-      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
-      enum:
-      - none
-      - clickwrap
-      - docusign
-      - override
-    CreateAccountPayload:
+    ApiResponseConflict:
       type: object
-      description: Account object that needs to be added to SafeBase
-      required:
-      - name
       properties:
-        $ref: '#/paths/~1accounts/post/requestBody/content/application~1json/schema/properties/input/properties'
+        ok:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: request_already_handled
+        errors:
+          type: array
+          items:
+            type: string
+          example:
+          - Request has already been handled.
     ApiResponseInvalidApiKeyOrMissingScope:
       type: object
       properties:
@@ -240,21 +240,13 @@ components:
         message:
           type: string
           example: Invalid request.
-    ApiResponseConflict:
+    CreateAccountPayload:
       type: object
+      description: Account object that needs to be added to SafeBase
+      required:
+      - name
       properties:
-        ok:
-          type: boolean
-          example: false
-        errorCode:
-          type: string
-          example: request_already_handled
-        errors:
-          type: array
-          items:
-            type: string
-          example:
-          - Request has already been handled.
+        $ref: '#/paths/~1accounts/post/requestBody/content/application~1json/schema/properties/input/properties'
     ApiResponseNotFound:
       type: object
       properties:
@@ -267,6 +259,14 @@ components:
         message:
           type: string
           example: Not found
+    NdaProvider:
+      type: string
+      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
+      enum:
+      - none
+      - clickwrap
+      - docusign
+      - override
     AccountOutput:
       type: object
       properties:
@@ -290,30 +290,30 @@ components:
           format: date-time
           example: '2022-01-01T12:00:00Z'
   responses:
-    '400':
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidRequest'
-    '409':
-      description: Conflict - Resource already handled
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseConflict'
-    '403':
-      description: Invalid api key / missing scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
     '404':
       description: Not found or no access
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseNotFound'
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+    '409':
+      description: Conflict - Resource already handled
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseConflict'
     '405':
       description: Method not allowed
       content:

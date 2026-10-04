@@ -266,73 +266,265 @@ paths:
       - POLICY_CENTER
 components:
   schemas:
-    PolicyLanguageVersionResponsePublicV2Dto:
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    PolicyLanguageSettingsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: The organization's configured Policy languages, alphabetized by locale code. Empty when the Policy languages feature is disabled or none are configured.
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyLanguageCompactResponsePublicV2Dto'
+      required:
+      - data
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PolicyVersionCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Policy Version Language ID. Pass this to `GET /policy-language-versions/{policyLanguageVersionId}` to retrieve this specific language variant.
-        language:
-          example: en-US
-          description: The language of this variant, as a BCP-47 locale code
+          description: Policy Version ID
+        version:
+          type: number
+          example: 1
+          description: The Policy Version
+        current:
+          type: boolean
+          example: true
+          description: Indicates if is this the current Policy
+        type:
+          example: UPLOADED
+          description: The Policy Version type
           allOf:
-          - $ref: '#/components/schemas/PolicyLanguageEnum'
-        default:
-          type: boolean
-          example: false
-          description: 'Whether this variant is the default language for its Policy Version, as recorded on the version rather than the organization default as it stands today. Reserved: no current flow records a per-version default, so this is `false` for every variant until per-version defaults are written. Do not branch on it yet.'
-        hasFile:
-          type: boolean
-          example: true
-          description: Whether this language variant has an uploaded file available for download in its original format
-        hasPdf:
-          type: boolean
-          example: true
-          description: Whether this language variant has a PDF rendering available for download
-        hasHtml:
-          type: boolean
-          example: false
-          description: Whether this language variant has authored HTML content
-        originalFileName:
-          type:
-          - string
-          - 'null'
-          example: information-security-policy-es.pdf
-          description: Original file name of the uploaded document for this language variant
+          - $ref: '#/components/schemas/PolicyTypeEnum'
         createdAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Created date timestamp
+          description: Policy Version created date timestamp
         updatedAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Updated date timestamp
-        policyVersion:
-          description: The Policy Version this language variant belongs to. Only returned when `expand[]=policyVersion` is passed.
-          allOf:
-          - $ref: '#/components/schemas/PolicyVersionCompactResponsePublicV2Dto'
-        policy:
-          description: The Policy owning the parent Policy Version. Only returned when `expand[]=policy` is passed.
-          allOf:
-          - $ref: '#/components/schemas/PolicyCompactResponsePublicV2Dto'
+          description: Policy Version last updated date timestamp
+        renewalDate:
+          type: string
+          example: '2025-07-01T16:45:55.246Z'
+          description: "Policy renewal date. At the renewal date the administrator needs to review the policy and decide if\n         re-acceptance is necessary."
+        subVersion:
+          type: number
+          example: 1
+          description: The Policy sub-version
+        description:
+          type:
+          - string
+          - 'null'
+          description: The Policy Version description
+        approvedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy Version approved at date timestamp
+        changesExplanation:
+          type:
+          - string
+          - 'null'
+          description: The description of the changes done in this update
+        publishedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy Version published at date timestamp
+        requiresAcknowledgment:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Indicates if acknowledgment is required
       required:
       - id
-      - language
-      - default
-      - hasFile
-      - hasPdf
-      - hasHtml
-      - originalFileName
+      - version
+      - current
+      - type
       - createdAt
       - updatedAt
-    SortTypeLimitedEnum:
+      - renewalDate
+      - subVersion
+      - description
+      - approvedAt
+      - changesExplanation
+      - publishedAt
+      - requiresAcknowledgment
+    PolicyStatusEnum:
       type: string
       enum:
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    PolicyTypeEnum:
+      type: string
+      enum:
+      - BUILDER
+      - UPLOADED
+      - EXTERNAL
+    PolicyScopeEnum:
+      type: string
+      enum:
+      - ALL
+      - GROUP
+      - NONE
+    PolicyCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Policy ID
+        name:
+          type: string
+          example: Acceptable Use Policy
+          description: The Policy name
+        description:
+          type: string
+          description: The Policy description
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy last updated date timestamp
+        assignedTo:
+          example: ALL
+          description: The scope of Users the Policy is assigned to
+          allOf:
+          - $ref: '#/components/schemas/PolicyScopeEnum'
+        policyStatus:
+          example: ACTIVE
+          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          allOf:
+          - $ref: '#/components/schemas/PolicyStatusEnum'
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Policy renewal date
+      required:
+      - id
+      - name
+      - description
       - createdAt
       - updatedAt
+      - policyStatus
+      - renewalDate
+    PolicyLanguageVersionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/PolicyLanguageVersionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    PolicyLanguageCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        language:
+          example: en-US
+          description: Policy language, as a BCP-47 locale code
+          allOf:
+          - $ref: '#/components/schemas/PolicyLanguageEnum'
+        default:
+          type: boolean
+          example: true
+          description: Whether this is the organization default Policy language
+      required:
+      - language
+      - default
+    PolicyVersionStatusEnum:
+      type: string
+      enum:
+      - NEEDS_APPROVAL
+      - APPROVED
+      - PUBLISHED
+      - DRAFT
+      - DISCARDED
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    PolicyLanguageVersionExpandEnum:
+      type: string
+      enum:
+      - policyVersion
+      - policy
     PolicyLanguageEnum:
       type: string
       enum:
@@ -428,82 +620,6 @@ components:
       - zu-ZA
       - xx-LS
       - en-XA
-    PolicyVersionStatusEnum:
-      type: string
-      enum:
-      - NEEDS_APPROVAL
-      - APPROVED
-      - PUBLISHED
-      - DRAFT
-      - DISCARDED
-    PolicyLanguageVersionExpandEnum:
-      type: string
-      enum:
-      - policyVersion
-      - policy
-    PolicyScopeEnum:
-      type: string
-      enum:
-      - ALL
-      - GROUP
-      - NONE
-    PolicyLanguageVersionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/PolicyLanguageVersionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    PolicyTypeEnum:
-      type: string
-      enum:
-      - BUILDER
-      - UPLOADED
-      - EXTERNAL
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PolicyLanguageSettingsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: The organization's configured Policy languages, alphabetized by locale code. Empty when the Policy languages feature is disabled or none are configured.
-          type: array
-          items:
-            $ref: '#/components/schemas/PolicyLanguageCompactResponsePublicV2Dto'
-      required:
-      - data
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -519,189 +635,73 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PolicyStatusEnum:
-      type: string
-      enum:
-      - ACTIVE
-      - ARCHIVED
-      - REPLACED
-      - UNACCEPTABLE
-      - OUTDATED
-    PolicyLanguageCompactResponsePublicV2Dto:
+    PolicyLanguageVersionResponsePublicV2Dto:
       type: object
       properties:
+        id:
+          type: number
+          example: 1
+          description: Policy Version Language ID. Pass this to `GET /policy-language-versions/{policyLanguageVersionId}` to retrieve this specific language variant.
         language:
           example: en-US
-          description: Policy language, as a BCP-47 locale code
+          description: The language of this variant, as a BCP-47 locale code
           allOf:
           - $ref: '#/components/schemas/PolicyLanguageEnum'
         default:
           type: boolean
-          example: true
-          description: Whether this is the organization default Policy language
-      required:
-      - language
-      - default
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    PolicyVersionCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Policy Version ID
-        version:
-          type: number
-          example: 1
-          description: The Policy Version
-        current:
+          example: false
+          description: 'Whether this variant is the default language for its Policy Version, as recorded on the version rather than the organization default as it stands today. Reserved: no current flow records a per-version default, so this is `false` for every variant until per-version defaults are written. Do not branch on it yet.'
+        hasFile:
           type: boolean
           example: true
-          description: Indicates if is this the current Policy
-        type:
-          example: UPLOADED
-          description: The Policy Version type
-          allOf:
-          - $ref: '#/components/schemas/PolicyTypeEnum'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy Version created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy Version last updated date timestamp
-        renewalDate:
-          type: string
-          example: '2025-07-01T16:45:55.246Z'
-          description: "Policy renewal date. At the renewal date the administrator needs to review the policy and decide if\n         re-acceptance is necessary."
-        subVersion:
-          type: number
-          example: 1
-          description: The Policy sub-version
-        description:
-          type:
-          - string
-          - 'null'
-          description: The Policy Version description
-        approvedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy Version approved at date timestamp
-        changesExplanation:
-          type:
-          - string
-          - 'null'
-          description: The description of the changes done in this update
-        publishedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy Version published at date timestamp
-        requiresAcknowledgment:
-          type:
-          - boolean
-          - 'null'
+          description: Whether this language variant has an uploaded file available for download in its original format
+        hasPdf:
+          type: boolean
           example: true
-          description: Indicates if acknowledgment is required
-      required:
-      - id
-      - version
-      - current
-      - type
-      - createdAt
-      - updatedAt
-      - renewalDate
-      - subVersion
-      - description
-      - approvedAt
-      - changesExplanation
-      - publishedAt
-      - requiresAcknowledgment
-    PolicyCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Policy ID
-        name:
-          type: string
-          example: Acceptable Use Policy
-          description: The Policy name
-        description:
-          type: string
-          description: The Policy description
+          description: Whether this language variant has a PDF rendering available for download
+        hasHtml:
+          type: boolean
+          example: false
+          description: Whether this language variant has authored HTML content
+        originalFileName:
+          type:
+          - string
+          - 'null'
+          example: information-security-policy-es.pdf
+          description: Original file name of the uploaded document for this language variant
         createdAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Policy created date timestamp
+          description: Created date timestamp
         updatedAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Policy last updated date timestamp
-        assignedTo:
-          example: ALL
-          description: The scope of Users the Policy is assigned to
+          description: Updated date timestamp
+        policyVersion:
+          description: The Policy Version this language variant belongs to. Only returned when `expand[]=policyVersion` is passed.
           allOf:
-          - $ref: '#/components/schemas/PolicyScopeEnum'
-        policyStatus:
-          example: ACTIVE
-          description: The current status of the Policy (e.g. ACTIVE, ARCHIVED, REPLACED)
+          - $ref: '#/components/schemas/PolicyVersionCompactResponsePublicV2Dto'
+        policy:
+          description: The Policy owning the parent Policy Version. Only returned when `expand[]=policy` is passed.
           allOf:
-          - $ref: '#/components/schemas/PolicyStatusEnum'
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2025-07-01T16:45:55.246Z'
-          description: Policy renewal date
+          - $ref: '#/components/schemas/PolicyCompactResponsePublicV2Dto'
       required:
       - id
-      - name
-      - description
+      - language
+      - default
+      - hasFile
+      - hasPdf
+      - hasHtml
+      - originalFileName
       - createdAt
       - updatedAt
-      - policyStatus
-      - renewalDate
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
   securitySchemes:
     bearer:
       scheme: bearer

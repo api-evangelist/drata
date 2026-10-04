@@ -778,699 +778,6 @@ paths:
       - VENDOR_PUBLIC_API
 components:
   schemas:
-    VendorSecurityReviewDecisionEnum:
-      type: string
-      enum:
-      - PENDING
-      - APPROVED
-      - APPROVED_WITH_CONDITIONS
-      - REJECTED
-    RenewalDateStatusEnum:
-      type: string
-      enum:
-      - NO_RENEWAL
-      - COMPLETED
-      - RENEWAL_DUE_SOON
-      - RENEWAL_DUE
-    VendorStatusEnum:
-      type: string
-      enum:
-      - PROSPECTIVE
-      - ACTIVE
-      - ARCHIVED
-      - APPROVED
-      - REJECTED
-      - FLAGGED
-      - ON_HOLD
-      - OFFBOARDED
-      - UNDER_REVIEW
-      - NONE
-    VendorQuestionnaireCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        email:
-          type: string
-          maxLength: 191
-          format: email
-          example: vendor@example.com
-          description: The email address to receive the Questionnaire
-        questionnaireId:
-          type: number
-          example: 1
-          description: Vendor Questionnaire ID
-        emailSubject:
-          type: string
-          maxLength: 191
-          description: The email subject for the vendor questionnaire
-          example: Drata is conducting a security review of you.
-        emailContent:
-          type: string
-          maxLength: 30000
-          description: The email content for the Vendor
-          example: 'Hi,
-
-
-            We''d like to conduct a security review and would like some information from you. Use this link to complete the questionnaire.
-
-
-            Thank you.'
-        securityReviewId:
-          type: number
-          example: 1
-          description: Security Review ID to associate the Questionnaire with. When provided, the sent Questionnaire will be linked to the specified security review as a document of type QUESTIONNAIRE.
-      required:
-      - email
-      - questionnaireId
-      - emailContent
-      - securityReviewId
-    VendorStatsExpandEnum:
-      type: string
-      enum:
-      - reminder
-      - hasPii
-      - businessUnits
-      - passwordPolicy
-      - status
-      - isCritical
-      - isSubProcessor
-      - type
-      - risk
-      - impactLevel
-    VendorReviewLocationResponsePublicDto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor review location ID
-        city:
-          type: string
-          example: San Diego
-          description: Vendor review location city
-        stateCountry:
-          type: string
-          example: CA
-          description: Vendor review location state
-      required:
-      - id
-      - city
-      - stateCountry
-    VendorTypeEnum:
-      type: string
-      enum:
-      - VENDOR
-      - SUPPLIER
-      - CONTRACTOR
-      - PARTNER
-      - OTHER
-      - NONE
-    VendorImpactLevelForStatsEnum:
-      type: string
-      enum:
-      - INSIGNIFICANT
-      - MINOR
-      - MODERATE
-      - MAJOR
-      - CRITICAL
-      - UNSCORED
-    VendorOperationalImpactEnum:
-      type: string
-      enum:
-      - NONE
-      - LOW
-      - NORMAL
-      - IMPORTANT
-      - CRITICAL
-    VendorsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    VendorModifyRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: Acme
-          description: The name of the Vendor
-        hasPii:
-          type: boolean
-          example: true
-          description: Indicates whether this Vendor stores any type of Personally Identifiable Information (PII)
-        passwordRequiresNumber:
-          type: boolean
-          example: true
-          description: Indicates whether a password requires numbers
-        passwordRequiresSymbol:
-          type: boolean
-          example: true
-          description: Indicates whether a password requires non-alpha-numeric characters
-        passwordMfaEnabled:
-          type: boolean
-          example: true
-          description: Indicates whether multi-factor authentication is enabled for this Vendor
-        passwordRequiresMinLength:
-          type: boolean
-          example: true
-          description: Indicates whether there is a minimum length requirement for password
-        isSubProcessor:
-          type: boolean
-          example: false
-          description: Indicates whether this Vendor is considered a subprocessor
-        isSubProcessorActive:
-          type: boolean
-          example: false
-          description: '[Deprecated] Indicates whether this subprocessor is active'
-          deprecated: true
-        category:
-          example: ENGINEERING
-          description: The type of Vendor
-          allOf:
-          - $ref: '#/components/schemas/VendorCategoryEnum'
-        risk:
-          example: MODERATE
-          description: The level of risk associated with customer data
-          allOf:
-          - $ref: '#/components/schemas/VendorRiskEnum'
-        status:
-          example: UNDER_REVIEW
-          description: The status of Vendor
-          allOf:
-          - $ref: '#/components/schemas/VendorStatusEnum'
-        critical:
-          type:
-          - boolean
-          - 'null'
-          example: false
-          description: Indicates if the Vendor is considered critical
-        userId:
-          type:
-          - number
-          - 'null'
-          maximum: 1000000000
-          example: 1
-          description: The user ID of the person responsible for Vendor compliance
-        url:
-          type:
-          - string
-          - 'null'
-          maxLength: 768
-          format: uri
-          example: https://acme.com
-          description: Vendor URL
-        privacyUrl:
-          type: string
-          maxLength: 768
-          format: uri
-          example: https://acme.com/privacy
-          description: Vendor Privacy Policy URL
-        termsUrl:
-          type: string
-          maxLength: 768
-          format: uri
-          example: https://acme.com/terms
-          description: Vendor Terms of Use URL
-        trustCenterUrl:
-          type: string
-          maxLength: 768
-          format: uri
-          example: https://trust.example.com
-          description: Vendor Trust Center URL
-        servicesProvided:
-          type:
-          - string
-          - 'null'
-          maxLength: 30000
-          example: Perform security scans once a month
-          description: Description of the services provided by the Vendor
-        dataStored:
-          type:
-          - string
-          - 'null'
-          maxLength: 30000
-          example: resulting reports of security scans
-          description: Description of the type of data the Vendor stores
-        location:
-          type: string
-          maxLength: 30000
-          example: San Diego
-          description: Location where the Vendor services are provided
-        passwordPolicy:
-          example: USERNAME_PASSWORD
-          description: The Vendor password policy
-          allOf:
-          - $ref: '#/components/schemas/VendorPasswordPolicyEnum'
-        passwordMinLength:
-          type:
-          - number
-          - 'null'
-          minimum: 6
-          maximum: 12
-          example: 8
-          description: Minimum character length required for a password
-        contactAtVendor:
-          type:
-          - string
-          - 'null'
-          maxLength: 191
-          example: John Doe
-          description: Name of the corresponding account manager for this Vendor
-        contactsEmail:
-          type:
-          - string
-          - 'null'
-          maxLength: 191
-          example: jdoe@company.com;jane@company.com
-          description: Semicolon-separated list of vendor contact email addresses
-        notes:
-          type: string
-          maxLength: 30000
-          example: Meeting once a month to adjust contract
-          description: Additional notes for Vendor
-        renewalDate:
-          type:
-          - string
-          - 'null'
-          example: '2025-07-01T16:45:55.246Z'
-          description: Vendor renewal date
-        renewalScheduleType:
-          example: ONE_YEAR
-          description: Vendor renewal schedule type
-          allOf:
-          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
-        confirmed:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Indicate if all Vendor data is confirmed
-        type:
-          example: VENDOR
-          description: Vendor type identifier
-          allOf:
-          - $ref: '#/components/schemas/VendorTypeEnum'
-        vendorTypeId:
-          type:
-          - number
-          - 'null'
-          maximum: 1000000000
-          example: 1
-          description: Custom vendor type ID. Only honored when custom vendor types are enabled. Mutually exclusive with "type".
-        accountId:
-          type: string
-          maxLength: 36
-          example: 36
-          description: Account Id
-        operationalImpact:
-          example: IMPORTANT
-          description: Vendor level of operational impact
-          allOf:
-          - $ref: '#/components/schemas/VendorOperationalImpactEnum'
-        environmentAccess:
-          example: READ_ONLY
-          description: Vendor environment access privileges
-          allOf:
-          - $ref: '#/components/schemas/VendorEnvironmentAccessEnum'
-        impactLevel:
-          example: INSIGNIFICANT
-          description: Vendor overall impact level
-          allOf:
-          - $ref: '#/components/schemas/VendorImpactLevelEnum'
-        residualRiskLevelId:
-          type:
-          - number
-          - 'null'
-          maximum: 1000000000
-          example: 1
-          description: Custom residual risk level ID. Only honored when custom vendor risk levels are enabled.
-        inherentRiskLevelId:
-          type:
-          - number
-          - 'null'
-          maximum: 1000000000
-          example: 1
-          description: Custom inherent risk level ID. Only honored when custom vendor risk levels are enabled.
-        dataAccessedOrProcessedList:
-          uniqueItems: true
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/VendorDataAccessedOrProcessedEnum'
-          example:
-          - FINANCIAL
-          - GENERAL
-          description: List of data accessed or processed enum type
-          maxItems: 300
-        integrations:
-          uniqueItems: true
-          example:
-          - 1
-          - 2
-          - 3
-          description: List of vendor IDs
-          type: array
-          items:
-            type: number
-        cost:
-          type:
-          - string
-          - 'null'
-          example: '1088'
-          description: Annual Contract Value for the Vendor in cents unit
-        customFields:
-          description: "Custom Fields for the Vendor. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-        vendorRelationshipContact:
-          description: The Vendor relationship contact. Pass `null` to clear the currently assigned contact.
-          allOf:
-          - $ref: '#/components/schemas/VendorRelationshipContactRequestPublicV2Dto'
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    VendorPasswordPolicyStatsItemPublicV2Dto:
-      type: object
-      properties:
-        count:
-          type: number
-          description: Number of vendors in this category
-          example: 25
-          minimum: 0
-        key:
-          example: SSO
-          description: Authentication method used for vendor access. SSO is generally more secure and easier to manage.
-          allOf:
-          - $ref: '#/components/schemas/VendorPasswordPolicyEnum'
-      required:
-      - count
-      - key
-    VendorQuestionnaireSentResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Questionnaire ID
-        title:
-          type: string
-          example: Vendor Security Questionnaire
-          description: Questionnaire title
-        recipientEmail:
-          type: string
-          example: wc@example.com
-          description: The email address that received the Questionnaire
-        isCompleted:
-          type: boolean
-          example: true
-          description: Whether the Questionnaire has been completed
-        completedBy:
-          type:
-          - string
-          - 'null'
-          example: Acme
-          description: Who answered the Questionnaire
-        responseId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: The Questionnaire response ID for the Questionnaire data file
-        dateSent:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Questionnaire was sent
-        isManualUpload:
-          type: boolean
-          example: false
-          description: Whether the questionnaire was manually uploaded
-      required:
-      - id
-      - recipientEmail
-      - isCompleted
-      - dateSent
-      - isManualUpload
-    CustomFieldResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field
-        name:
-          type: string
-          example: Stakeholders
-          description: The name of the Custom Field
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field
-      required:
-      - customFieldId
-      - name
-    VendorCategoryEnum:
-      type: string
-      enum:
-      - ENGINEERING
-      - PRODUCT
-      - MARKETING
-      - CS
-      - SALES
-      - FINANCE
-      - HR
-      - ADMINISTRATIVE
-      - SECURITY
-      - LEGAL
-      - INFORMATION_TECHNOLOGY
-      - NONE
-    VendorStatsResponsePublicV2Dto:
-      type: object
-      properties:
-        reminder:
-          example:
-          - key: RENEWAL_DUE
-            count: 1
-          - key: RENEWAL_DUE_SOON
-            count: 1
-          description: Renewal reminder statistics for active vendors. Shows distribution of vendors by renewal status (due soon, overdue, etc.). Only returned when expand[]=reminder is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorReminderStatsItemPublicV2Dto'
-        hasPii:
-          example:
-          - key: true
-            count: 1
-          - key: false
-            count: 1
-          description: PII (Personally Identifiable Information) statistics. Shows how many vendors contain PII, which is important for data privacy compliance. Only returned when expand[]=hasPii is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorHasPiiStatsItemPublicV2Dto'
-        businessUnits:
-          example:
-          - key: ENGINEERING
-            count: 118
-          - key: PRODUCT
-            count: 2
-          description: Business unit/department distribution statistics. Shows which teams or departments use which vendors. Includes percentage of total for easy analysis. Only returned when expand[]=businessUnits is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorBusinessUnitStatsItemPublicV2Dto'
-        passwordPolicy:
-          example:
-          - key: USERNAME_PASSWORD
-            count: 118
-          - key: SSO
-            count: 32
-          description: Authentication method statistics. Shows how many vendors use SSO vs traditional passwords. SSO adoption percentage helps track security posture improvements. Only returned when expand[]=passwordPolicy is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorPasswordPolicyStatsItemPublicV2Dto'
-        status:
-          example:
-          - key: ACTIVE
-            count: 118
-          - key: UNDER_REVIEW
-            count: 20
-          description: Vendor status distribution statistics. Shows lifecycle stage of vendors (active, archived, under review, etc.). Percentages help identify status trends. Only returned when expand[]=status is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorStatusStatsItemPublicV2Dto'
-        isCritical:
-          example:
-          - key: 'Yes'
-            count: 10
-          - key: 'No'
-            count: 20
-          description: Vendor criticality statistics. Shows how many vendors are mission-critical to business operations. Critical vendors require enhanced monitoring and SLAs. Only returned when expand[]=isCritical is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorIsCriticalStatsItemPublicV2Dto'
-        isSubProcessor:
-          example:
-          - key: true
-            count: 10
-          - key: false
-            count: 20
-          description: Sub-processor statistics. Shows how many vendors process data on your behalf, which is critical for GDPR/CCPA compliance. Sub-processors require DPAs and additional documentation. Only returned when expand[]=isSubProcessor is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorIsSubProcessorStatsItemPublicV2Dto'
-        type:
-          example:
-          - key: CONTRACTOR
-            count: 15
-          - key: VENDOR
-            count: 45
-          description: Vendor type classification statistics. Shows distribution across vendor, supplier, contractor, partner categories. Helps with vendor segmentation and management strategies. Only returned when expand[]=type is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorTypeStatsItemPublicV2Dto'
-        risk:
-          example:
-          - key: HIGH
-            count: 15
-          - key: MODERATE
-            count: 50
-          - key: LOW
-            count: 45
-          - key: NONE
-            count: 10
-          description: Vendor risk level distribution statistics. Shows security and compliance risk assessment across all vendors. Use percentages to track risk reduction over time. Only returned when expand[]=risk is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorRiskStatsItemPublicV2Dto'
-        impactLevel:
-          example:
-          - key: CRITICAL
-            count: 7
-          - key: MAJOR
-            count: 12
-          - key: UNSCORED
-            count: 0
-          description: Business impact level statistics. Shows potential business disruption if vendors become unavailable. Critical/Major vendors need business continuity plans. Only returned when expand[]=impactLevel is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorImpactLevelStatsItemPublicV2Dto'
-    CustomFieldSubmitRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: The ID of the Custom Field. Either this or the name must be provided.
-        name:
-          type: string
-          example: Compliance Status
-          description: The name of the Custom Field. Either this or the ID must be provided.
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
-      required:
-      - value
-    VendorDocumentTypeEnum:
-      type: string
-      enum:
-      - COMPLIANCE_REPORT
-      - COMPLIANCE_REPORT_REVIEW
-      - BRIDGE_LETTER
-      - UPLOADED_COMPLIANCE_REPORT_REVIEW
-      - QUESTIONNAIRE_ATTACHMENT
-      - SOC_DOCUMENT
-      - QUESTIONNAIRE_REPORT
-      - TRUST_CENTER_PAGE
-    RenewalScheduleTypeEnum:
-      type: string
-      enum:
-      - ONE_MONTH
-      - TWO_MONTHS
-      - THREE_MONTHS
-      - SIX_MONTHS
-      - ONE_YEAR
-      - CUSTOM
-      - NONE
-    VendorExpandEnum:
-      type: string
-      enum:
-      - customFields
-      - documents
-      - integrations
-      - lastQuestionnaire
-      - latestSecurityReviews
-      - reviews
-      - vendorUser
-      - vendorRelationshipContact
-      - dataAccessedOrProcessed
-      - scheduleConfiguration
-      - customVendorType
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    VendorIsSubProcessorStatsItemPublicV2Dto:
-      type: object
-      properties:
-        count:
-          type: number
-          description: Number of vendors in this category
-          example: 25
-          minimum: 0
-        key:
-          type: boolean
-          example: true
-          description: Whether vendors act as sub-processors (process data on behalf of your organization). Sub-processors require Data Processing Agreements (DPAs) and additional compliance documentation for GDPR, CCPA, and other privacy regulations.
-      required:
-      - count
-      - key
     VendorHasPiiStatsItemPublicV2Dto:
       type: object
       properties:
@@ -1486,28 +793,76 @@ components:
       required:
       - count
       - key
-    VendorCriticalityEnum:
-      type: string
-      enum:
-      - 'Yes'
-      - 'No'
-      - None
-    VendorSecurityReviewStatusEnum:
-      type: string
-      enum:
-      - NOT_YET_STARTED
-      - IN_PROGRESS
-      - COMPLETED
-      - NOT_REQUIRED
-    HateoasLinksPublicV2Dto:
+    SignedUrlResponsePublicV2Dto:
       type: object
       properties:
-        self:
-          description: Link to the resource in the Drata application
-          allOf:
-          - $ref: '#/components/schemas/HateoasLinkPublicV2Dto'
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
       required:
-      - self
+      - signedUrl
+      - fileBuffer
+      - fileName
+    VendorQuestionnaireResponsePublicV2Dto:
+      type: object
+      properties:
+        vendorId:
+          type: number
+          example: 1
+          description: Vendor ID of the Questionnaire
+        sendAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Questionnaire was sent
+        sentEmail:
+          type: string
+          example: jdoe@company.com
+          description: The recipient email address of the Questionnaire
+        file:
+          type: string
+          example: questionnaire.pdf
+          description: The file name of the Questionnaire
+        respondedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date timestamp of the Questionnaire response
+        responseId:
+          type: number
+          example: 1
+          description: The response ID of the Questionnaire data file
+        isManualUpload:
+          type: boolean
+          example: true
+          description: Indicates if the Questionnaire was manually uploaded
+        completedBy:
+          type: string
+          example: Acme
+          description: Questionnaire respondent
+      required:
+      - vendorId
+      - sendAt
+      - sentEmail
+      - file
+      - respondedAt
+      - responseId
+      - isManualUpload
+      - completedBy
     VendorReviewResponsePublicDto:
       type: object
       properties:
@@ -1693,6 +1048,128 @@ components:
       - services
       - locations
       - findings
+    VendorStatsResponsePublicV2Dto:
+      type: object
+      properties:
+        reminder:
+          example:
+          - key: RENEWAL_DUE
+            count: 1
+          - key: RENEWAL_DUE_SOON
+            count: 1
+          description: Renewal reminder statistics for active vendors. Shows distribution of vendors by renewal status (due soon, overdue, etc.). Only returned when expand[]=reminder is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorReminderStatsItemPublicV2Dto'
+        hasPii:
+          example:
+          - key: true
+            count: 1
+          - key: false
+            count: 1
+          description: PII (Personally Identifiable Information) statistics. Shows how many vendors contain PII, which is important for data privacy compliance. Only returned when expand[]=hasPii is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorHasPiiStatsItemPublicV2Dto'
+        businessUnits:
+          example:
+          - key: ENGINEERING
+            count: 118
+          - key: PRODUCT
+            count: 2
+          description: Business unit/department distribution statistics. Shows which teams or departments use which vendors. Includes percentage of total for easy analysis. Only returned when expand[]=businessUnits is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorBusinessUnitStatsItemPublicV2Dto'
+        passwordPolicy:
+          example:
+          - key: USERNAME_PASSWORD
+            count: 118
+          - key: SSO
+            count: 32
+          description: Authentication method statistics. Shows how many vendors use SSO vs traditional passwords. SSO adoption percentage helps track security posture improvements. Only returned when expand[]=passwordPolicy is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorPasswordPolicyStatsItemPublicV2Dto'
+        status:
+          example:
+          - key: ACTIVE
+            count: 118
+          - key: UNDER_REVIEW
+            count: 20
+          description: Vendor status distribution statistics. Shows lifecycle stage of vendors (active, archived, under review, etc.). Percentages help identify status trends. Only returned when expand[]=status is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorStatusStatsItemPublicV2Dto'
+        isCritical:
+          example:
+          - key: 'Yes'
+            count: 10
+          - key: 'No'
+            count: 20
+          description: Vendor criticality statistics. Shows how many vendors are mission-critical to business operations. Critical vendors require enhanced monitoring and SLAs. Only returned when expand[]=isCritical is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorIsCriticalStatsItemPublicV2Dto'
+        isSubProcessor:
+          example:
+          - key: true
+            count: 10
+          - key: false
+            count: 20
+          description: Sub-processor statistics. Shows how many vendors process data on your behalf, which is critical for GDPR/CCPA compliance. Sub-processors require DPAs and additional documentation. Only returned when expand[]=isSubProcessor is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorIsSubProcessorStatsItemPublicV2Dto'
+        type:
+          example:
+          - key: CONTRACTOR
+            count: 15
+          - key: VENDOR
+            count: 45
+          description: Vendor type classification statistics. Shows distribution across vendor, supplier, contractor, partner categories. Helps with vendor segmentation and management strategies. Only returned when expand[]=type is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorTypeStatsItemPublicV2Dto'
+        risk:
+          example:
+          - key: HIGH
+            count: 15
+          - key: MODERATE
+            count: 50
+          - key: LOW
+            count: 45
+          - key: NONE
+            count: 10
+          description: Vendor risk level distribution statistics. Shows security and compliance risk assessment across all vendors. Use percentages to track risk reduction over time. Only returned when expand[]=risk is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorRiskStatsItemPublicV2Dto'
+        impactLevel:
+          example:
+          - key: CRITICAL
+            count: 7
+          - key: MAJOR
+            count: 12
+          - key: UNSCORED
+            count: 0
+          description: Business impact level statistics. Shows potential business disruption if vendors become unavailable. Critical/Major vendors need business continuity plans. Only returned when expand[]=impactLevel is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorImpactLevelStatsItemPublicV2Dto'
+    VendorOperationalImpactEnum:
+      type: string
+      enum:
+      - NONE
+      - LOW
+      - NORMAL
+      - IMPORTANT
+      - CRITICAL
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     VendorDataAccessedOrProcessedEnum:
       type: string
       enum:
@@ -1706,159 +1183,6 @@ components:
       - PROTECTED_HEALTH_INFORMATION
       - OTHER_PERSONAL_OR_SENSITIVE
       - CARDHOLDER_DATA
-    VendorQuestionnaireResponsePublicV2Dto:
-      type: object
-      properties:
-        vendorId:
-          type: number
-          example: 1
-          description: Vendor ID of the Questionnaire
-        sendAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Questionnaire was sent
-        sentEmail:
-          type: string
-          example: jdoe@company.com
-          description: The recipient email address of the Questionnaire
-        file:
-          type: string
-          example: questionnaire.pdf
-          description: The file name of the Questionnaire
-        respondedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date timestamp of the Questionnaire response
-        responseId:
-          type: number
-          example: 1
-          description: The response ID of the Questionnaire data file
-        isManualUpload:
-          type: boolean
-          example: true
-          description: Indicates if the Questionnaire was manually uploaded
-        completedBy:
-          type: string
-          example: Acme
-          description: Questionnaire respondent
-      required:
-      - vendorId
-      - sendAt
-      - sentEmail
-      - file
-      - respondedAt
-      - responseId
-      - isManualUpload
-      - completedBy
-    VendorIntegrationResponsePublicDto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor ID
-        name:
-          type: string
-          example: Acme
-          description: The name of a vendor
-      required:
-      - id
-      - name
-    VendorPasswordPolicyEnum:
-      type: string
-      enum:
-      - USERNAME_PASSWORD
-      - SSO
-      - LDAP
-      - NONE
-      - NOT_APPLICABLE
-      - SCIM
-      - OTHER
-    VendorReviewServiceResponsePublicDto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor review service ID
-        name:
-          type: string
-          example: Service 1
-          description: Vendor review service name
-      required:
-      - id
-      - name
-    VendorRiskEnum:
-      type: string
-      enum:
-      - NONE
-      - LOW
-      - MODERATE
-      - HIGH
-    VendorDocumentResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor document ID
-        name:
-          type: string
-          example: AWS SOC 2 2025
-          description: The name the file
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Vendor Document created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Vendor Document last updated at
-        type:
-          description: The type of the Vendor document
-          allOf:
-          - $ref: '#/components/schemas/VendorDocumentTypeEnum'
-        downloadUrl:
-          description: A time-limited signed URL to download the Vendor document. Valid for 10 minutes.
-          allOf:
-          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
-      - type
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    VendorSecurityReviewTypeEnum:
-      type: string
-      enum:
-      - SECURITY
-      - SOC_REPORT
-      - UPLOAD_REPORT
-    VendorRiskStatsItemPublicV2Dto:
-      type: object
-      properties:
-        count:
-          type: number
-          description: Number of vendors in this category
-          example: 25
-          minimum: 0
-        key:
-          example: HIGH
-          description: Vendor risk level. Higher risk vendors typically require more frequent reviews and monitoring.
-          allOf:
-          - $ref: '#/components/schemas/VendorRiskEnum'
-      required:
-      - count
-      - key
     VendorReviewFindingResponsePublicDto:
       type: object
       properties:
@@ -1873,195 +1197,6 @@ components:
       required:
       - id
       - description
-    VendorImpactLevelStatsItemPublicV2Dto:
-      type: object
-      properties:
-        count:
-          type: number
-          description: Number of vendors in this category
-          example: 25
-          minimum: 0
-        key:
-          example: CRITICAL
-          description: Business impact level if vendor service is disrupted. Use this to prioritize business continuity planning and vendor relationship management.
-          allOf:
-          - $ref: '#/components/schemas/VendorImpactLevelForStatsEnum'
-      required:
-      - count
-      - key
-    VendorBusinessUnitStatsItemPublicV2Dto:
-      type: object
-      properties:
-        count:
-          type: number
-          description: Number of vendors in this category
-          example: 25
-          minimum: 0
-        key:
-          example: ENGINEERING
-          description: Business unit or category. Helps track vendor usage and costs by department.
-          allOf:
-          - $ref: '#/components/schemas/VendorCategoryEnum'
-      required:
-      - count
-      - key
-    VendorRelationshipContactRequestPublicV2Dto:
-      type: object
-      properties:
-        userId:
-          type: number
-          maximum: 1000000000
-          example: 1
-          description: The Drata user ID of the Vendor relationship contact
-          minimum: 1
-      required:
-      - userId
-    VendorImpactLevelEnum:
-      type: string
-      enum:
-      - INSIGNIFICANT
-      - MINOR
-      - MODERATE
-      - MAJOR
-      - CRITICAL
-      - UNSCORED
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    VendorSecurityReviewCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor Security Review ID
-        requestedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Requested date
-        reviewDeadlineAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Review deadline date
-        decision:
-          description: The decision about the Security Review
-          example: APPROVED
-          allOf:
-          - $ref: '#/components/schemas/VendorSecurityReviewDecisionEnum'
-        title:
-          type:
-          - string
-          - 'null'
-          description: Vendor Security Review title
-        note:
-          type:
-          - string
-          - 'null'
-          description: Vendor Security Review note
-        status:
-          description: The status for the Security Review
-          example: NOT_YET_STARTED
-          allOf:
-          - $ref: '#/components/schemas/VendorSecurityReviewStatusEnum'
-        type:
-          description: The type for the Security Review
-          example: SECURITY
-          allOf:
-          - $ref: '#/components/schemas/VendorSecurityReviewTypeEnum'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Timestamp when the Security Review was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Timestamp when the Security Review was last updated
-        vendorId:
-          type: number
-          example: 1
-          description: ID of the Vendor this Security Review belongs to
-        vendor:
-          description: Compact Vendor payload. Included only when `expand[]=vendor` is requested.
-          allOf:
-          - $ref: '#/components/schemas/VendorCompactResponsePublicV2Dto'
-      required:
-      - id
-      - requestedAt
-      - reviewDeadlineAt
-      - decision
-      - title
-      - note
-      - status
-      - type
-      - createdAt
-      - updatedAt
-      - vendorId
-    TrustCenterProviderEnum:
-      type: string
-      enum:
-      - ANECDOTES
-      - CONVEYOR
-      - DRATA
-      - HYPERCOMPLY
-      - SAFEBASE
-      - SCRUT
-      - SECUREFRAME
-      - SECURITYPAL
-      - SKYPHER
-      - SPRINTO
-      - TRUSTARC
-      - TRUSTCLOUD
-      - VANTA
-      - WHISTIC
-      - ZENGRC
-    VendorReviewUserControlResponsePublicDto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Vendor review user control ID
-        name:
-          type: string
-          example: End User Control 1
-          description: Vendor review user control name
-        inPlace:
-          type: boolean
-          example: true
-          description: Vendor review user control in place
-      required:
-      - id
-      - name
-      - inPlace
     VendorResponsePublicV2Dto:
       type: object
       properties:
@@ -2394,6 +1529,37 @@ components:
       - impactLevel
       - dataAccessedOrProcessedList
       - catalogProductCandidateId
+    VendorsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    TrustCenterProviderEnum:
+      type: string
+      enum:
+      - ANECDOTES
+      - CONVEYOR
+      - DRATA
+      - HYPERCOMPLY
+      - SAFEBASE
+      - SCRUT
+      - SECUREFRAME
+      - SECURITYPAL
+      - SKYPHER
+      - SPRINTO
+      - TRUSTARC
+      - TRUSTCLOUD
+      - VANTA
+      - WHISTIC
+      - ZENGRC
     VendorReviewTrustServiceCategoryMapResponsePublicDto:
       type: object
       properties:
@@ -2410,44 +1576,146 @@ components:
       required:
       - id
       - category
-    VendorReminderStatsItemPublicV2Dto:
+    RenewalDateStatusEnum:
+      type: string
+      enum:
+      - NO_RENEWAL
+      - COMPLETED
+      - RENEWAL_DUE_SOON
+      - RENEWAL_DUE
+    VendorCriticalityEnum:
+      type: string
+      enum:
+      - 'Yes'
+      - 'No'
+      - None
+    VendorStatusEnum:
+      type: string
+      enum:
+      - PROSPECTIVE
+      - ACTIVE
+      - ARCHIVED
+      - APPROVED
+      - REJECTED
+      - FLAGGED
+      - ON_HOLD
+      - OFFBOARDED
+      - UNDER_REVIEW
+      - NONE
+    VendorDocumentTypeEnum:
+      type: string
+      enum:
+      - COMPLIANCE_REPORT
+      - COMPLIANCE_REPORT_REVIEW
+      - BRIDGE_LETTER
+      - UPLOADED_COMPLIANCE_REPORT_REVIEW
+      - QUESTIONNAIRE_ATTACHMENT
+      - SOC_DOCUMENT
+      - QUESTIONNAIRE_REPORT
+      - TRUST_CENTER_PAGE
+    ExceptionResponseDto:
       type: object
       properties:
-        count:
+        statusCode:
           type: number
-          description: Number of vendors in this category
-          example: 25
-          minimum: 0
-        key:
-          example: RENEWAL_DUE
-          description: Renewal reminder status. Use this to prioritize vendor renewals and avoid service interruptions.
-          allOf:
-          - $ref: '#/components/schemas/RenewalDateStatusEnum'
-      required:
-      - count
-      - key
-    HateoasLinkPublicV2Dto:
-      type: object
-      properties:
-        href:
+        message:
           type: string
-          description: The URL of the linked resource
-          example: https://app.drata.com/risk/vendors/profile/1/overview
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - href
-    VendorQuestionnairesResponsePublicV2Dto:
+      - statusCode
+      - message
+      - code
+    VendorCompactResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorQuestionnaireSentResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        id:
+          type: number
+          example: 1
+          description: Vendor ID
+        name:
+          type: string
+          example: Acme
+          description: Vendor name
       required:
-      - data
-      - pagination
+      - id
+      - name
+    VendorPasswordPolicyEnum:
+      type: string
+      enum:
+      - USERNAME_PASSWORD
+      - SSO
+      - LDAP
+      - NONE
+      - NOT_APPLICABLE
+      - SCIM
+      - OTHER
+    VendorReviewUserControlResponsePublicDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor review user control ID
+        name:
+          type: string
+          example: End User Control 1
+          description: Vendor review user control name
+        inPlace:
+          type: boolean
+          example: true
+          description: Vendor review user control in place
+      required:
+      - id
+      - name
+      - inPlace
+    VendorDocumentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor document ID
+        name:
+          type: string
+          example: AWS SOC 2 2025
+          description: The name the file
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Vendor Document created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Vendor Document last updated at
+        type:
+          description: The type of the Vendor document
+          allOf:
+          - $ref: '#/components/schemas/VendorDocumentTypeEnum'
+        downloadUrl:
+          description: A time-limited signed URL to download the Vendor document. Valid for 10 minutes.
+          allOf:
+          - $ref: '#/components/schemas/SignedUrlResponsePublicV2Dto'
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+      - type
     VendorIsCriticalStatsItemPublicV2Dto:
       type: object
       properties:
@@ -2464,7 +1732,41 @@ components:
       required:
       - count
       - key
-    VendorStatusStatsItemPublicV2Dto:
+    VendorReviewServiceResponsePublicDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor review service ID
+        name:
+          type: string
+          example: Service 1
+          description: Vendor review service name
+      required:
+      - id
+      - name
+    VendorQuestionnairesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorQuestionnaireSentResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    VendorSecurityReviewStatusEnum:
+      type: string
+      enum:
+      - NOT_YET_STARTED
+      - IN_PROGRESS
+      - COMPLETED
+      - NOT_REQUIRED
+    VendorImpactLevelStatsItemPublicV2Dto:
       type: object
       properties:
         count:
@@ -2473,18 +1775,34 @@ components:
           example: 25
           minimum: 0
         key:
-          example: ACTIVE
-          description: Vendor status category. Use this to track vendor lifecycle stages.
+          example: CRITICAL
+          description: Business impact level if vendor service is disrupted. Use this to prioritize business continuity planning and vendor relationship management.
           allOf:
-          - $ref: '#/components/schemas/VendorStatusEnum'
+          - $ref: '#/components/schemas/VendorImpactLevelForStatsEnum'
       required:
       - count
       - key
-    SortDirectionEnum:
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - createdAt
+      - updatedAt
+    VendorRiskStatsItemPublicV2Dto:
+      type: object
+      properties:
+        count:
+          type: number
+          description: Number of vendors in this category
+          example: 25
+          minimum: 0
+        key:
+          example: HIGH
+          description: Vendor risk level. Higher risk vendors typically require more frequent reviews and monitoring.
+          allOf:
+          - $ref: '#/components/schemas/VendorRiskEnum'
+      required:
+      - count
+      - key
     VendorTypeStatsItemPublicV2Dto:
       type: object
       properties:
@@ -2501,82 +1819,160 @@ components:
       required:
       - count
       - key
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    VendorEnvironmentAccessEnum:
-      type: string
-      enum:
-      - 'NO'
-      - READ_ONLY
-      - READ_WRITE
-    SignedUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        signedUrl:
-          type: string
-          example: https://somedomain.com/filename.pdf?Signature=ABC123
-          description: The short lived signed URL to link directly to the private file
-        fileBuffer:
-          type:
-          - object
-          - 'null'
-          description: The file on buffer format. This only applies for txt files.
-          example:
-            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
-        fileName:
-          type:
-          - string
-          - 'null'
-          example: Artifact 3.png
-          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
-      required:
-      - signedUrl
-      - fileBuffer
-      - fileName
     NextReviewDeadlineStatusEnum:
       type: string
       enum:
       - NO_RENEWAL
       - DUE_SOON
       - OVERDUE
+    RenewalScheduleTypeEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+      - CUSTOM
+      - NONE
+    VendorSecurityReviewDecisionEnum:
+      type: string
+      enum:
+      - PENDING
+      - APPROVED
+      - APPROVED_WITH_CONDITIONS
+      - REJECTED
+    VendorReminderStatsItemPublicV2Dto:
+      type: object
+      properties:
+        count:
+          type: number
+          description: Number of vendors in this category
+          example: 25
+          minimum: 0
+        key:
+          example: RENEWAL_DUE
+          description: Renewal reminder status. Use this to prioritize vendor renewals and avoid service interruptions.
+          allOf:
+          - $ref: '#/components/schemas/RenewalDateStatusEnum'
+      required:
+      - count
+      - key
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    VendorStatusStatsItemPublicV2Dto:
+      type: object
+      properties:
+        count:
+          type: number
+          description: Number of vendors in this category
+          example: 25
+          minimum: 0
+        key:
+          example: ACTIVE
+          description: Vendor status category. Use this to track vendor lifecycle stages.
+          allOf:
+          - $ref: '#/components/schemas/VendorStatusEnum'
+      required:
+      - count
+      - key
+    VendorImpactLevelForStatsEnum:
+      type: string
+      enum:
+      - INSIGNIFICANT
+      - MINOR
+      - MODERATE
+      - MAJOR
+      - CRITICAL
+      - UNSCORED
+    VendorEnvironmentAccessEnum:
+      type: string
+      enum:
+      - 'NO'
+      - READ_ONLY
+      - READ_WRITE
+    VendorIsSubProcessorStatsItemPublicV2Dto:
+      type: object
+      properties:
+        count:
+          type: number
+          description: Number of vendors in this category
+          example: 25
+          minimum: 0
+        key:
+          type: boolean
+          example: true
+          description: Whether vendors act as sub-processors (process data on behalf of your organization). Sub-processors require Data Processing Agreements (DPAs) and additional compliance documentation for GDPR, CCPA, and other privacy regulations.
+      required:
+      - count
+      - key
+    VendorPasswordPolicyStatsItemPublicV2Dto:
+      type: object
+      properties:
+        count:
+          type: number
+          description: Number of vendors in this category
+          example: 25
+          minimum: 0
+        key:
+          example: SSO
+          description: Authentication method used for vendor access. SSO is generally more secure and easier to manage.
+          allOf:
+          - $ref: '#/components/schemas/VendorPasswordPolicyEnum'
+      required:
+      - count
+      - key
+    VendorRelationshipContactRequestPublicV2Dto:
+      type: object
+      properties:
+        userId:
+          type: number
+          maximum: 1000000000
+          example: 1
+          description: The Drata user ID of the Vendor relationship contact
+          minimum: 1
+      required:
+      - userId
+    VendorImpactLevelEnum:
+      type: string
+      enum:
+      - INSIGNIFICANT
+      - MINOR
+      - MODERATE
+      - MAJOR
+      - CRITICAL
+      - UNSCORED
+    VendorIntegrationResponsePublicDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor ID
+        name:
+          type: string
+          example: Acme
+          description: The name of a vendor
+      required:
+      - id
+      - name
     VendorCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -2821,20 +2217,624 @@ components:
           - $ref: '#/components/schemas/VendorRelationshipContactRequestPublicV2Dto'
       required:
       - name
-    VendorCompactResponsePublicV2Dto:
+    VendorSecurityReviewCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Vendor ID
-        name:
+          description: Vendor Security Review ID
+        requestedAt:
           type: string
-          example: Acme
-          description: Vendor name
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Requested date
+        reviewDeadlineAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Review deadline date
+        decision:
+          description: The decision about the Security Review
+          example: APPROVED
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewDecisionEnum'
+        title:
+          type:
+          - string
+          - 'null'
+          description: Vendor Security Review title
+        note:
+          type:
+          - string
+          - 'null'
+          description: Vendor Security Review note
+        status:
+          description: The status for the Security Review
+          example: NOT_YET_STARTED
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewStatusEnum'
+        type:
+          description: The type for the Security Review
+          example: SECURITY
+          allOf:
+          - $ref: '#/components/schemas/VendorSecurityReviewTypeEnum'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when the Security Review was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp when the Security Review was last updated
+        vendorId:
+          type: number
+          example: 1
+          description: ID of the Vendor this Security Review belongs to
+        vendor:
+          description: Compact Vendor payload. Included only when `expand[]=vendor` is requested.
+          allOf:
+          - $ref: '#/components/schemas/VendorCompactResponsePublicV2Dto'
       required:
       - id
+      - requestedAt
+      - reviewDeadlineAt
+      - decision
+      - title
+      - note
+      - status
+      - type
+      - createdAt
+      - updatedAt
+      - vendorId
+    VendorBusinessUnitStatsItemPublicV2Dto:
+      type: object
+      properties:
+        count:
+          type: number
+          description: Number of vendors in this category
+          example: 25
+          minimum: 0
+        key:
+          example: ENGINEERING
+          description: Business unit or category. Helps track vendor usage and costs by department.
+          allOf:
+          - $ref: '#/components/schemas/VendorCategoryEnum'
+      required:
+      - count
+      - key
+    VendorQuestionnaireCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        email:
+          type: string
+          maxLength: 191
+          format: email
+          example: vendor@example.com
+          description: The email address to receive the Questionnaire
+        questionnaireId:
+          type: number
+          example: 1
+          description: Vendor Questionnaire ID
+        emailSubject:
+          type: string
+          maxLength: 191
+          description: The email subject for the vendor questionnaire
+          example: Drata is conducting a security review of you.
+        emailContent:
+          type: string
+          maxLength: 30000
+          description: The email content for the Vendor
+          example: 'Hi,
+
+
+            We''d like to conduct a security review and would like some information from you. Use this link to complete the questionnaire.
+
+
+            Thank you.'
+        securityReviewId:
+          type: number
+          example: 1
+          description: Security Review ID to associate the Questionnaire with. When provided, the sent Questionnaire will be linked to the specified security review as a document of type QUESTIONNAIRE.
+      required:
+      - email
+      - questionnaireId
+      - emailContent
+      - securityReviewId
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
       - name
+      - statusCode
+      - message
+      - code
+    HateoasLinkPublicV2Dto:
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the linked resource
+          example: https://app.drata.com/risk/vendors/profile/1/overview
+      required:
+      - href
+    HateoasLinksPublicV2Dto:
+      type: object
+      properties:
+        self:
+          description: Link to the resource in the Drata application
+          allOf:
+          - $ref: '#/components/schemas/HateoasLinkPublicV2Dto'
+      required:
+      - self
+    VendorModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Acme
+          description: The name of the Vendor
+        hasPii:
+          type: boolean
+          example: true
+          description: Indicates whether this Vendor stores any type of Personally Identifiable Information (PII)
+        passwordRequiresNumber:
+          type: boolean
+          example: true
+          description: Indicates whether a password requires numbers
+        passwordRequiresSymbol:
+          type: boolean
+          example: true
+          description: Indicates whether a password requires non-alpha-numeric characters
+        passwordMfaEnabled:
+          type: boolean
+          example: true
+          description: Indicates whether multi-factor authentication is enabled for this Vendor
+        passwordRequiresMinLength:
+          type: boolean
+          example: true
+          description: Indicates whether there is a minimum length requirement for password
+        isSubProcessor:
+          type: boolean
+          example: false
+          description: Indicates whether this Vendor is considered a subprocessor
+        isSubProcessorActive:
+          type: boolean
+          example: false
+          description: '[Deprecated] Indicates whether this subprocessor is active'
+          deprecated: true
+        category:
+          example: ENGINEERING
+          description: The type of Vendor
+          allOf:
+          - $ref: '#/components/schemas/VendorCategoryEnum'
+        risk:
+          example: MODERATE
+          description: The level of risk associated with customer data
+          allOf:
+          - $ref: '#/components/schemas/VendorRiskEnum'
+        status:
+          example: UNDER_REVIEW
+          description: The status of Vendor
+          allOf:
+          - $ref: '#/components/schemas/VendorStatusEnum'
+        critical:
+          type:
+          - boolean
+          - 'null'
+          example: false
+          description: Indicates if the Vendor is considered critical
+        userId:
+          type:
+          - number
+          - 'null'
+          maximum: 1000000000
+          example: 1
+          description: The user ID of the person responsible for Vendor compliance
+        url:
+          type:
+          - string
+          - 'null'
+          maxLength: 768
+          format: uri
+          example: https://acme.com
+          description: Vendor URL
+        privacyUrl:
+          type: string
+          maxLength: 768
+          format: uri
+          example: https://acme.com/privacy
+          description: Vendor Privacy Policy URL
+        termsUrl:
+          type: string
+          maxLength: 768
+          format: uri
+          example: https://acme.com/terms
+          description: Vendor Terms of Use URL
+        trustCenterUrl:
+          type: string
+          maxLength: 768
+          format: uri
+          example: https://trust.example.com
+          description: Vendor Trust Center URL
+        servicesProvided:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: Perform security scans once a month
+          description: Description of the services provided by the Vendor
+        dataStored:
+          type:
+          - string
+          - 'null'
+          maxLength: 30000
+          example: resulting reports of security scans
+          description: Description of the type of data the Vendor stores
+        location:
+          type: string
+          maxLength: 30000
+          example: San Diego
+          description: Location where the Vendor services are provided
+        passwordPolicy:
+          example: USERNAME_PASSWORD
+          description: The Vendor password policy
+          allOf:
+          - $ref: '#/components/schemas/VendorPasswordPolicyEnum'
+        passwordMinLength:
+          type:
+          - number
+          - 'null'
+          minimum: 6
+          maximum: 12
+          example: 8
+          description: Minimum character length required for a password
+        contactAtVendor:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: John Doe
+          description: Name of the corresponding account manager for this Vendor
+        contactsEmail:
+          type:
+          - string
+          - 'null'
+          maxLength: 191
+          example: jdoe@company.com;jane@company.com
+          description: Semicolon-separated list of vendor contact email addresses
+        notes:
+          type: string
+          maxLength: 30000
+          example: Meeting once a month to adjust contract
+          description: Additional notes for Vendor
+        renewalDate:
+          type:
+          - string
+          - 'null'
+          example: '2025-07-01T16:45:55.246Z'
+          description: Vendor renewal date
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: Vendor renewal schedule type
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        confirmed:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Indicate if all Vendor data is confirmed
+        type:
+          example: VENDOR
+          description: Vendor type identifier
+          allOf:
+          - $ref: '#/components/schemas/VendorTypeEnum'
+        vendorTypeId:
+          type:
+          - number
+          - 'null'
+          maximum: 1000000000
+          example: 1
+          description: Custom vendor type ID. Only honored when custom vendor types are enabled. Mutually exclusive with "type".
+        accountId:
+          type: string
+          maxLength: 36
+          example: 36
+          description: Account Id
+        operationalImpact:
+          example: IMPORTANT
+          description: Vendor level of operational impact
+          allOf:
+          - $ref: '#/components/schemas/VendorOperationalImpactEnum'
+        environmentAccess:
+          example: READ_ONLY
+          description: Vendor environment access privileges
+          allOf:
+          - $ref: '#/components/schemas/VendorEnvironmentAccessEnum'
+        impactLevel:
+          example: INSIGNIFICANT
+          description: Vendor overall impact level
+          allOf:
+          - $ref: '#/components/schemas/VendorImpactLevelEnum'
+        residualRiskLevelId:
+          type:
+          - number
+          - 'null'
+          maximum: 1000000000
+          example: 1
+          description: Custom residual risk level ID. Only honored when custom vendor risk levels are enabled.
+        inherentRiskLevelId:
+          type:
+          - number
+          - 'null'
+          maximum: 1000000000
+          example: 1
+          description: Custom inherent risk level ID. Only honored when custom vendor risk levels are enabled.
+        dataAccessedOrProcessedList:
+          uniqueItems: true
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/VendorDataAccessedOrProcessedEnum'
+          example:
+          - FINANCIAL
+          - GENERAL
+          description: List of data accessed or processed enum type
+          maxItems: 300
+        integrations:
+          uniqueItems: true
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of vendor IDs
+          type: array
+          items:
+            type: number
+        cost:
+          type:
+          - string
+          - 'null'
+          example: '1088'
+          description: Annual Contract Value for the Vendor in cents unit
+        customFields:
+          description: "Custom Fields for the Vendor. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+        vendorRelationshipContact:
+          description: The Vendor relationship contact. Pass `null` to clear the currently assigned contact.
+          allOf:
+          - $ref: '#/components/schemas/VendorRelationshipContactRequestPublicV2Dto'
+    VendorReviewLocationResponsePublicDto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Vendor review location ID
+        city:
+          type: string
+          example: San Diego
+          description: Vendor review location city
+        stateCountry:
+          type: string
+          example: CA
+          description: Vendor review location state
+      required:
+      - id
+      - city
+      - stateCountry
+    VendorTypeEnum:
+      type: string
+      enum:
+      - VENDOR
+      - SUPPLIER
+      - CONTRACTOR
+      - PARTNER
+      - OTHER
+      - NONE
+    CustomFieldResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
+      required:
+      - customFieldId
+      - name
+    VendorRiskEnum:
+      type: string
+      enum:
+      - NONE
+      - LOW
+      - MODERATE
+      - HIGH
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    VendorQuestionnaireSentResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Questionnaire ID
+        title:
+          type: string
+          example: Vendor Security Questionnaire
+          description: Questionnaire title
+        recipientEmail:
+          type: string
+          example: wc@example.com
+          description: The email address that received the Questionnaire
+        isCompleted:
+          type: boolean
+          example: true
+          description: Whether the Questionnaire has been completed
+        completedBy:
+          type:
+          - string
+          - 'null'
+          example: Acme
+          description: Who answered the Questionnaire
+        responseId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: The Questionnaire response ID for the Questionnaire data file
+        dateSent:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Questionnaire was sent
+        isManualUpload:
+          type: boolean
+          example: false
+          description: Whether the questionnaire was manually uploaded
+      required:
+      - id
+      - recipientEmail
+      - isCompleted
+      - dateSent
+      - isManualUpload
+    VendorSecurityReviewTypeEnum:
+      type: string
+      enum:
+      - SECURITY
+      - SOC_REPORT
+      - UPLOAD_REPORT
+    VendorStatsExpandEnum:
+      type: string
+      enum:
+      - reminder
+      - hasPii
+      - businessUnits
+      - passwordPolicy
+      - status
+      - isCritical
+      - isSubProcessor
+      - type
+      - risk
+      - impactLevel
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    VendorExpandEnum:
+      type: string
+      enum:
+      - customFields
+      - documents
+      - integrations
+      - lastQuestionnaire
+      - latestSecurityReviews
+      - reviews
+      - vendorUser
+      - vendorRelationshipContact
+      - dataAccessedOrProcessed
+      - scheduleConfiguration
+      - customVendorType
+    VendorCategoryEnum:
+      type: string
+      enum:
+      - ENGINEERING
+      - PRODUCT
+      - MARKETING
+      - CS
+      - SALES
+      - FINANCE
+      - HR
+      - ADMINISTRATIVE
+      - SECURITY
+      - LEGAL
+      - INFORMATION_TECHNOLOGY
+      - NONE
   securitySchemes:
     bearer:
       scheme: bearer

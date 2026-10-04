@@ -311,21 +311,44 @@ paths:
       - VENDOR_PUBLIC_API
 components:
   schemas:
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    VendorTypeModifyRequestPublicV2Dto:
+    VendorTypesResponsePublicV2Dto:
       type: object
       properties:
-        name:
-          type: string
-          maxLength: 191
-          example: Cloud Service Provider
-          description: The name of the Vendor Type
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorTypeResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - name
+      - data
+      - pagination
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -354,6 +377,16 @@ components:
       - statusCode
       - message
       - code
+    VendorTypeModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Cloud Service Provider
+          description: The name of the Vendor Type
+      required:
+      - name
     VendorTypeResponsePublicV2Dto:
       type: object
       properties:
@@ -368,6 +401,11 @@ components:
       required:
       - id
       - name
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -383,49 +421,11 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    VendorTypesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorTypeResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortDirectionEnum:
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
+      - createdAt
+      - updatedAt
     VendorTypeCreateRequestPublicV2Dto:
       type: object
       properties:

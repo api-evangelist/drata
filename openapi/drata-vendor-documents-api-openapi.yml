@@ -271,6 +271,59 @@ paths:
       description: '🔒 Requires **Vendors: Get Vendor** permission.'
 components:
   schemas:
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
     VendorDocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -306,119 +359,19 @@ components:
       - createdAt
       - updatedAt
       - type
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
+    VendorDocumentsResponsePublicV2Dto:
       type: object
       properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+        data:
+          description: Full list of Vendor Documents
+          type: array
+          items:
+            $ref: '#/components/schemas/VendorDocumentResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - name
-      - statusCode
-      - message
-      - code
-    VendorDocumentTypeEnum:
-      type: string
-      enum:
-      - COMPLIANCE_REPORT
-      - COMPLIANCE_REPORT_REVIEW
-      - BRIDGE_LETTER
-      - UPLOADED_COMPLIANCE_REPORT_REVIEW
-      - QUESTIONNAIRE_ATTACHMENT
-      - SOC_DOCUMENT
-      - QUESTIONNAIRE_REPORT
-      - TRUST_CENTER_PAGE
-    VendorDocumentExpandEnum:
-      type: string
-      enum:
-      - downloadUrl
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    VendorDocumentCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        file:
-          type: string
-          format: binary
-          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .csv. MIME type must match the file extension'
-        securityReviewId:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: Security Review ID, when set this will attach the document to this security review
-        type:
-          example: COMPLIANCE_REPORT
-          description: Vendor Document type
-          allOf:
-          - $ref: '#/components/schemas/VendorDocumentTypeEnum'
-      required:
-      - file
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
+      - data
+      - pagination
     SignedUrlResponsePublicV2Dto:
       type: object
       properties:
@@ -443,19 +396,66 @@ components:
       - signedUrl
       - fileBuffer
       - fileName
-    VendorDocumentsResponsePublicV2Dto:
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Full list of Vendor Documents
-          type: array
-          items:
-            $ref: '#/components/schemas/VendorDocumentResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
-      - data
-      - pagination
+      - cursor
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    VendorDocumentExpandEnum:
+      type: string
+      enum:
+      - downloadUrl
+    VendorDocumentCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        file:
+          type: string
+          format: binary
+          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png, .csv. MIME type must match the file extension'
+        securityReviewId:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: Security Review ID, when set this will attach the document to this security review
+        type:
+          example: COMPLIANCE_REPORT
+          description: Vendor Document type
+          allOf:
+          - $ref: '#/components/schemas/VendorDocumentTypeEnum'
+      required:
+      - file
+    VendorDocumentTypeEnum:
+      type: string
+      enum:
+      - COMPLIANCE_REPORT
+      - COMPLIANCE_REPORT_REVIEW
+      - BRIDGE_LETTER
+      - UPLOADED_COMPLIANCE_REPORT_REVIEW
+      - QUESTIONNAIRE_ATTACHMENT
+      - SOC_DOCUMENT
+      - QUESTIONNAIRE_REPORT
+      - TRUST_CENTER_PAGE
   securitySchemes:
     bearer:
       scheme: bearer

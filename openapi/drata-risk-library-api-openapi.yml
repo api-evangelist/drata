@@ -323,6 +323,164 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    RiskLibraryExpandEnum:
+      type: string
+      enum:
+      - controls
+      - categories
+    RiskControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 10
+          description: Unique identifier of the Control
+        code:
+          type: string
+          example: AC-2
+          description: Human-readable Control identifier
+        name:
+          type: string
+          example: Account Management
+          description: Control name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Control was last updated
+      required:
+      - id
+      - code
+      - name
+      - createdAt
+      - updatedAt
+    RiskCategoryCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Risk Category ID
+        name:
+          type: string
+          example: Access Control
+          description: Risk Category name used to group and organize related Risks
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was last updated
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RiskLibraryCopyResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of created risk objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
+      required:
+      - data
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    RiskLibraryResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     RiskLibraryCopyRequestPublicV2Dto:
       type: object
       properties:
@@ -370,154 +528,35 @@ components:
       - riskIds
       - riskGroups
       - registerId
-    RiskLibraryCopyResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of created risk objects.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
-      required:
-      - data
-    RiskControlCompactResponsePublicV2Dto:
+    RiskCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
-          example: 10
-          description: Unique identifier of the Control
-        code:
+          example: 100
+          description: Unique identifier of the newly created Risk in the register
+        riskId:
           type: string
-          example: AC-2
-          description: Human-readable Control identifier
-        name:
+          example: AC-04
+          description: Human-readable Risk Identifier
+        title:
           type: string
-          example: Account Management
-          description: Control name
-        createdAt:
+          example: Password Management - Password Cracking
+          description: Title of the Risk
+        description:
           type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Control was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Control was last updated
+          example: An attacker attempts to gain access to organizational information by guessing passwords.
+          description: Description of the Risk
+        registerId:
+          type: number
+          example: 5
+          description: ID of the Risk Register where the Risk was created
       required:
       - id
-      - code
-      - name
-      - createdAt
-      - updatedAt
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    RiskLibraryExpandEnum:
-      type: string
-      enum:
-      - controls
-      - categories
-    RiskCategoryCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Risk Category ID
-        name:
-          type: string
-          example: Access Control
-          description: Risk Category name used to group and organize related Risks
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was last updated
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    RiskLibraryResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
+      - riskId
+      - title
+      - description
+      - registerId
     RiskLibraryItemResponsePublicV2Dto:
       type: object
       properties:
@@ -552,45 +591,6 @@ components:
       - riskId
       - title
       - description
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    RiskCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 100
-          description: Unique identifier of the newly created Risk in the register
-        riskId:
-          type: string
-          example: AC-04
-          description: Human-readable Risk Identifier
-        title:
-          type: string
-          example: Password Management - Password Cracking
-          description: Title of the Risk
-        description:
-          type: string
-          example: An attacker attempts to gain access to organizational information by guessing passwords.
-          description: Description of the Risk
-        registerId:
-          type: number
-          example: 5
-          description: ID of the Risk Register where the Risk was created
-      required:
-      - id
-      - riskId
-      - title
-      - description
-      - registerId
   securitySchemes:
     bearer:
       scheme: bearer

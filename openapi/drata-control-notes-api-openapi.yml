@@ -449,58 +449,35 @@ paths:
       - REQUIREMENTS_FRAMEWORKS
 components:
   schemas:
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
     ControlNotesExpandEnum:
       type: string
       enum:
       - owner
-    ControlNoteResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: string
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: Note ID
-        ownerId:
-          type: number
-          example: 60
-          description: Note Owner ID
-        comment:
-          type: string
-          description: The main comment of the Note
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Note created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Note updated date timestamp
-        owner:
-          description: The User that created the Note, only returned when `expand[]=owner` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-      required:
-      - id
-      - ownerId
-      - comment
-      - createdAt
-      - updatedAt
-    ControlNoteCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        comment:
-          type: string
-          maxLength: 191
-          description: The text of the Note
-      required:
-      - comment
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -529,6 +506,33 @@ components:
       - statusCode
       - message
       - code
+    ControlNotesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ControlNoteCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        comment:
+          type: string
+          maxLength: 191
+          description: The text of the Note
+      required:
+      - comment
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -544,49 +548,6 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ControlNotesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlNoteResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
     UserCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -625,6 +586,45 @@ components:
       - email
       - firstName
       - lastName
+      - createdAt
+      - updatedAt
+    ControlNoteResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Note ID
+        ownerId:
+          type: number
+          example: 60
+          description: Note Owner ID
+        comment:
+          type: string
+          description: The main comment of the Note
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note updated date timestamp
+        owner:
+          description: The User that created the Note, only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - id
+      - ownerId
+      - comment
+      - createdAt
+      - updatedAt
+    SortTypeLimitedEnum:
+      type: string
+      enum:
       - createdAt
       - updatedAt
     NoteRequestPublicDto:

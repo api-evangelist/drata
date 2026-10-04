@@ -236,14 +236,6 @@ paths:
         - organization:view
 components:
   schemas:
-    NdaProvider:
-      type: string
-      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
-      enum:
-      - none
-      - clickwrap
-      - docusign
-      - override
     ApiResponseInvalidApiKeyOrMissingScope:
       type: object
       properties:
@@ -280,19 +272,27 @@ components:
         message:
           type: string
           example: Not found
+    NdaProvider:
+      type: string
+      description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
+      enum:
+      - none
+      - clickwrap
+      - docusign
+      - override
   responses:
-    '400':
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidRequest'
     '404':
       description: Not found or no access
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/ApiResponseNotFound'
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
     '403':
       description: Invalid api key / missing scope
       content:

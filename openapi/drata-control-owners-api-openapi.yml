@@ -380,25 +380,54 @@ paths:
       description: '🔒 Requires **Controls: Manage Control Owners** permission.'
 components:
   schemas:
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ControlOwnerModifyRequestPublicV2Dto:
+    ControlOwnersModifyResponsePublicV2Dto:
       type: object
       properties:
-        ownerUserIds:
-          example:
-          - 1
-          - 2
-          - 3
+        ownerIds:
           description: User IDs of the Control's owners
           type: array
           items:
             type: number
       required:
-      - ownerUserIds
+      - ownerIds
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    ControlOwnersResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -427,16 +456,11 @@ components:
       - statusCode
       - message
       - code
-    ControlOwnersModifyResponsePublicV2Dto:
-      type: object
-      properties:
-        ownerIds:
-          description: User IDs of the Control's owners
-          type: array
-          items:
-            type: number
-      required:
-      - ownerIds
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -452,45 +476,6 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    ControlOwnerCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        ownerId:
-          type: number
-          example: 56
-          description: Owner ID
-      required:
-      - ownerId
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
     UserCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -531,19 +516,34 @@ components:
       - lastName
       - createdAt
       - updatedAt
-    ControlOwnersResponsePublicV2Dto:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ControlOwnerCreateRequestPublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
+        ownerId:
+          type: number
+          example: 56
+          description: Owner ID
+      required:
+      - ownerId
+    ControlOwnerModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        ownerUserIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: User IDs of the Control's owners
           type: array
           items:
-            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+            type: number
       required:
-      - data
-      - pagination
+      - ownerUserIds
   securitySchemes:
     bearer:
       scheme: bearer

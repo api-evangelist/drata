@@ -410,6 +410,261 @@ paths:
         💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
 components:
   schemas:
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    CustomConnectionResourceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: The unique identifier for the Custom Resource
+        name:
+          type: string
+          example: Employees
+          description: The name of the Custom Resource
+        description:
+          type:
+          - string
+          - 'null'
+          example: Employee records for compliance tracking
+          description: A description of the Custom Resource and its purpose
+        schema:
+          type: object
+          description: The JSON schema that defines the structure and validation rules for Custom Data records in this Custom Resource
+          additionalProperties: true
+          example:
+            id: string
+            type: object
+            properties:
+              name:
+                type: string
+            required:
+            - name
+            additionalProperties: false
+            selfRequired: true
+            $schema: http://json-schema.org/draft-07/schema#
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was last updated
+        deletedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: The date when the Custom Resource was soft-deleted
+      required:
+      - id
+      - name
+      - schema
+      - createdAt
+      - updatedAt
+    CustomConnectionUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        clientAlias:
+          type:
+          - string
+          - 'null'
+          example: My Updated Custom Connection
+          description: Alias for the Custom Connection
+        description:
+          type: string
+          example: Updated description for Custom Connection
+          description: Description for Custom Connection
+    CustomConnectionCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          example: My Custom Connection
+          description: Name for the Custom Connection
+        providerTypes:
+          type: array
+          items:
+            type: string
+            enum:
+            - CUSTOM
+            - MDM
+            - HRIS
+          example:
+          - CUSTOM
+          description: 'Provider types for the Custom Connection. Supported types: CUSTOM, MDM, HRIS. CUSTOM connections require a schema. MDM and HRIS use a fixed common model and do not accept schema fields.'
+        workspaceIds:
+          items:
+            type: number
+          example:
+          - 1
+          description: Required for `CUSTOM` connections. IDs of the Workspaces to associate with this Custom Connection. Not applicable for `MDM` or `HRIS` connections, which are global.
+          type: array
+        schema:
+          type: object
+          additionalProperties: true
+          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.The JSON Schema definition for the data records this Custom Connection will store. Provide either `schema` (a valid JSON Schema object) or `sampleData` (a representative record) — not both. When `sampleData` is provided, the schema will be inferred automatically.
+          example:
+            type: object
+            properties:
+              employeeId:
+                type: string
+              name:
+                type: string
+              department:
+                type: string
+              startDate:
+                type: string
+              isActive:
+                type: boolean
+              metadata:
+                type: object
+                properties:
+                  lastReview:
+                    type: string
+                additionalProperties: true
+            additionalProperties: true
+        sampleData:
+          type: object
+          additionalProperties: true
+          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.A sample JSON object representing a single data record. The structure will be used to infer the JSON Schema for this Custom Connection resource. Provide either `sampleData` or `schema` — not both.
+          example:
+            employeeId: EMP-001
+            name: Jane Smith
+            department: Engineering
+            startDate: '2024-01-15T00:00:00Z'
+            isActive: true
+            metadata:
+              lastReview: '2025-03-01T00:00:00Z'
+        description:
+          type:
+          - string
+          - 'null'
+          example: A connection for syncing employee records from our internal HRIS.
+          description: Optional description for the Custom Connection resource.
+        displayNameKey:
+          type: string
+          example: name
+          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.The key from the schema that identifies which field should be used as the human-readable display name for each record. For example, if your schema has `name`, `employeeId`, and `department` fields and you set `displayNameKey` to `"name"`, records will be labeled by their `name` value wherever they appear in the Drata UI. Must be a top-level key present in `schema.properties`.
+      required:
+      - name
+      - providerTypes
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
     SortTypeLimitedEnum:
       type: string
       enum:
@@ -501,187 +756,6 @@ components:
       - description
       - createdAt
       - updatedAt
-    CustomConnectionUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        clientAlias:
-          type:
-          - string
-          - 'null'
-          example: My Updated Custom Connection
-          description: Alias for the Custom Connection
-        description:
-          type: string
-          example: Updated description for Custom Connection
-          description: Description for Custom Connection
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    CustomConnectionResourceResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 123
-          description: The unique identifier for the Custom Resource
-        name:
-          type: string
-          example: Employees
-          description: The name of the Custom Resource
-        description:
-          type:
-          - string
-          - 'null'
-          example: Employee records for compliance tracking
-          description: A description of the Custom Resource and its purpose
-        schema:
-          type: object
-          description: The JSON schema that defines the structure and validation rules for Custom Data records in this Custom Resource
-          additionalProperties: true
-          example:
-            id: string
-            type: object
-            properties:
-              name:
-                type: string
-            required:
-            - name
-            additionalProperties: false
-            selfRequired: true
-            $schema: http://json-schema.org/draft-07/schema#
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The date when the Custom Resource was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The date when the Custom Resource was last updated
-        deletedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: The date when the Custom Resource was soft-deleted
-      required:
-      - id
-      - name
-      - schema
-      - createdAt
-      - updatedAt
     CustomConnectionsResponsePublicV2Dto:
       type: object
       properties:
@@ -695,80 +769,6 @@ components:
       required:
       - data
       - pagination
-    CustomConnectionCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          example: My Custom Connection
-          description: Name for the Custom Connection
-        providerTypes:
-          type: array
-          items:
-            type: string
-            enum:
-            - CUSTOM
-            - MDM
-            - HRIS
-          example:
-          - CUSTOM
-          description: 'Provider types for the Custom Connection. Supported types: CUSTOM, MDM, HRIS. CUSTOM connections require a schema. MDM and HRIS use a fixed common model and do not accept schema fields.'
-        workspaceIds:
-          items:
-            type: number
-          example:
-          - 1
-          description: Required for `CUSTOM` connections. IDs of the Workspaces to associate with this Custom Connection. Not applicable for `MDM` or `HRIS` connections, which are global.
-          type: array
-        schema:
-          type: object
-          additionalProperties: true
-          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.The JSON Schema definition for the data records this Custom Connection will store. Provide either `schema` (a valid JSON Schema object) or `sampleData` (a representative record) — not both. When `sampleData` is provided, the schema will be inferred automatically.
-          example:
-            type: object
-            properties:
-              employeeId:
-                type: string
-              name:
-                type: string
-              department:
-                type: string
-              startDate:
-                type: string
-              isActive:
-                type: boolean
-              metadata:
-                type: object
-                properties:
-                  lastReview:
-                    type: string
-                additionalProperties: true
-            additionalProperties: true
-        sampleData:
-          type: object
-          additionalProperties: true
-          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.A sample JSON object representing a single data record. The structure will be used to infer the JSON Schema for this Custom Connection resource. Provide either `sampleData` or `schema` — not both.
-          example:
-            employeeId: EMP-001
-            name: Jane Smith
-            department: Engineering
-            startDate: '2024-01-15T00:00:00Z'
-            isActive: true
-            metadata:
-              lastReview: '2025-03-01T00:00:00Z'
-        description:
-          type:
-          - string
-          - 'null'
-          example: A connection for syncing employee records from our internal HRIS.
-          description: Optional description for the Custom Connection resource.
-        displayNameKey:
-          type: string
-          example: name
-          description: Required for `CUSTOM` connections. Not applicable for `MDM` or `HRIS` connections, which use a fixed common model.The key from the schema that identifies which field should be used as the human-readable display name for each record. For example, if your schema has `name`, `employeeId`, and `department` fields and you set `displayNameKey` to `"name"`, records will be labeled by their `name` value wherever they appear in the Drata UI. Must be a top-level key present in `schema.properties`.
-      required:
-      - name
-      - providerTypes
     CustomConnectionExpandEnum:
       type: string
       enum:

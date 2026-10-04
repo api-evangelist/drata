@@ -210,85 +210,6 @@ paths:
       description: '🔒 Requires **User Policies: Acknowledge User''s Assigned Policy** permission.'
 components:
   schemas:
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    UserPoliciesExpandEnum:
-      type: string
-      enum:
-      - policy
-      - policyVersion
-    PolicyScopeEnum:
-      type: string
-      enum:
-      - ALL
-      - GROUP
-      - NONE
-    PolicyTypeEnum:
-      type: string
-      enum:
-      - BUILDER
-      - UPLOADED
-      - EXTERNAL
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    UserPolicyAcceptRequestPublicV2Dto:
-      type: object
-      properties:
-        acceptedAt:
-          type: string
-          format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: When the user accepted the Policy. Must be within the last year.
-        details:
-          type: string
-          description: Additional details on how and where the User acknowledged the Policy
-          example: Accepted in Confluence via plugin
-      required:
-      - acceptedAt
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
     UserPolicyVersionResponsePublicV2Dto:
       type: object
       properties:
@@ -352,27 +273,6 @@ components:
       - details
       - policyId
       - policyVersionId
-    PolicyStatusEnum:
-      type: string
-      enum:
-      - ACTIVE
-      - ARCHIVED
-      - REPLACED
-      - UNACCEPTABLE
-      - OUTDATED
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PolicyApprovalsSourceTypeEnum:
-      type: string
-      enum:
-      - UNKNOWN
-      - BAMBOO_HR
-      - CSV
-      - MY_DRATA
-      - PUBLIC_API
     ExceptionResponseDto:
       type: object
       properties:
@@ -398,19 +298,34 @@ components:
       - statusCode
       - message
       - code
-    UserPolicyVersionsResponsePublicV2Dto:
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Full list of User Policy Versions
-          type: array
-          items:
-            $ref: '#/components/schemas/UserPolicyVersionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - data
-      - pagination
+      - name
+      - statusCode
+      - message
+      - code
     PolicyVersionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -493,6 +408,26 @@ components:
       - changesExplanation
       - publishedAt
       - requiresAcknowledgment
+    PolicyStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    PolicyTypeEnum:
+      type: string
+      enum:
+      - BUILDER
+      - UPLOADED
+      - EXTERNAL
+    PolicyScopeEnum:
+      type: string
+      enum:
+      - ALL
+      - GROUP
+      - NONE
     PolicyCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -541,6 +476,71 @@ components:
       - updatedAt
       - policyStatus
       - renewalDate
+    UserPoliciesExpandEnum:
+      type: string
+      enum:
+      - policy
+      - policyVersion
+    PolicyApprovalsSourceTypeEnum:
+      type: string
+      enum:
+      - UNKNOWN
+      - BAMBOO_HR
+      - CSV
+      - MY_DRATA
+      - PUBLIC_API
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    UserPolicyAcceptRequestPublicV2Dto:
+      type: object
+      properties:
+        acceptedAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: When the user accepted the Policy. Must be within the last year.
+        details:
+          type: string
+          description: Additional details on how and where the User acknowledged the Policy
+          example: Accepted in Confluence via plugin
+      required:
+      - acceptedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    UserPolicyVersionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Full list of User Policy Versions
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPolicyVersionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
   securitySchemes:
     bearer:
       scheme: bearer

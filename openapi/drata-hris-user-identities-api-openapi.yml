@@ -417,24 +417,31 @@ paths:
       - CUSTOM_FRAMEWORKS
 components:
   schemas:
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    CustomUserIdentitiesResponsePublicV2Dto:
+    ExceptionResponseDto:
       type: object
       properties:
-        data:
-          description: List of HR user identity records based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - data
-      - pagination
+      - statusCode
+      - message
+      - code
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -463,6 +470,11 @@ components:
       - statusCode
       - message
       - code
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -478,58 +490,6 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    CustomUserIdentityBulkResponsePublicV2Dto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-          example: 201
-          description: 'Per-item HTTP status code: 201 = created, 200 = updated, 400 = validation error.'
-        data:
-          additionalProperties: true
-          description: The saved identity. Null when `error` is present.
-          allOf:
-          - $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
-        error:
-          type: object
-          properties:
-            message:
-              type: string
-          required:
-          - message
-      required:
-      - statusCode
-      - data
     CustomUserIdentityResponsePublicV2Dto:
       type: object
       properties:
@@ -630,6 +590,11 @@ components:
       - isContractor
       - createdAt
       - updatedAt
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     CustomUserIdentityRecordPublicV2Dto:
       type: object
       properties:
@@ -710,6 +675,41 @@ components:
           description: If `true`, this person is a `CURRENT_CONTRACTOR`; `false` means `CURRENT_EMPLOYEE`. `null` means employment type is `UNKNOWN` — the person will appear as `UNKNOWN` in Drata until an explicit value is provided.
       required:
       - identityId
+    CustomUserIdentitiesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of HR user identity records based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CustomUserIdentityBulkResponsePublicV2Dto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+          example: 201
+          description: 'Per-item HTTP status code: 201 = created, 200 = updated, 400 = validation error.'
+        data:
+          additionalProperties: true
+          description: The saved identity. Null when `error` is present.
+          allOf:
+          - $ref: '#/components/schemas/CustomUserIdentityResponsePublicV2Dto'
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+          required:
+          - message
+      required:
+      - statusCode
+      - data
   securitySchemes:
     bearer:
       scheme: bearer

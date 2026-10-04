@@ -212,6 +212,176 @@ paths:
       - CUSTOM_FIELDS_ENGINE
 components:
   schemas:
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    CustomFieldDefinitionOptionResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldOptionId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field Option. Use this value when writing OPTIONS or OPTIONS_NUMERIC values on resources.
+        value:
+          oneOf:
+          - type: string
+          - type: number
+          example: Security & IT
+          description: The display value of this option. For OPTIONS fields this is a string; for OPTIONS_NUMERIC fields this is a number.
+      required:
+      - customFieldOptionId
+      - value
+    CustomFieldTypeEnum:
+      type: string
+      enum:
+      - TEXT
+      - NUMBER
+      - CURRENCY
+      - OPTIONS
+      - FORMULA
+      - OPTIONS_NUMERIC
+      - LONG_TEXT
+      - URL
+    CustomFieldsEntityTypeEnum:
+      type: string
+      enum:
+      - RISK
+      - CONTROL
+      - ASSET
+      - PERSONNEL
+      - VENDOR
+      - FRAMEWORK_REQUIREMENTS
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    CustomFieldDefinitionFrameworkScopeResponsePublicV2Dto:
+      type: object
+      properties:
+        frameworkTags:
+          type: array
+          description: Built-in framework tags this Custom Field Definition applies to. Empty array when the field is not scoped by built-in framework tags.
+          items:
+            $ref: '#/components/schemas/FrameworkTagEnum'
+        frameworkIds:
+          description: Custom Framework IDs this Custom Field Definition applies to. Empty array when the field is not scoped by custom frameworks.
+          type: array
+          items:
+            type: number
+      required:
+      - frameworkTags
+      - frameworkIds
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    CustomFieldCurrencyCodeEnum:
+      type: string
+      enum:
+      - BWP
+      - CAD
+      - CHF
+      - CLP
+      - CNY
+      - COP
+      - CRC
+      - CZK
+      - DKK
+      - DOP
+      - EEK
+      - EUR
+      - GBP
+      - GHS
+      - GTQ
+      - HKD
+      - HRK
+      - HUF
+      - IDR
+      - ILS
+      - IMP
+      - INR
+      - ISK
+      - JPY
+      - KES
+      - KRW
+      - KYD
+      - LKR
+      - LUF
+      - LVL
+      - MTL
+      - MUR
+      - MXN
+      - MYR
+      - NGN
+      - NOK
+      - NZD
+      - PAB
+      - PEN
+      - PHP
+      - PLN
+      - RON
+      - RUB
+      - SEK
+      - SGD
+      - SOS
+      - TOP
+      - TRY
+      - UAH
+      - USD
+      - UYU
+      - ZAR
     CustomFieldDefinitionsResponsePublicV2Dto:
       type: object
       properties:
@@ -225,61 +395,6 @@ components:
       required:
       - data
       - pagination
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    FrameworkTagEnum:
-      type: string
-      enum:
-      - CUSTOM
-      - NONE
-      - SOC_2
-      - ISO27001
-      - CCPA
-      - GDPR
-      - HIPAA
-      - PCI
-      - SCF
-      - NIST80053
-      - NISTCSF
-      - CMMC
-      - NIST800171
-      - MSSSPA
-      - FFIEC
-      - ISO27701
-      - COBIT
-      - SOX_ITGC
-      - ISO270012022
-      - CCM
-      - CYBER_ESSENTIALS
-      - ISO270172015
-      - ISO270182019
-      - FEDRAMP
-      - NISTAI
-      - PCI4
-      - NISTCSF2
-      - NIS2
-      - DORA
-      - ISO420012023
-      - DRATA_ESSENTIALS
-      - NIST800171R3
-      - CIS8
-      - CYBER_ESSENTIALS_32
-      - FEDRAMP20X
-      - HITRUST
-      - MSSSPA11
-      - ESSENTIAL_EIGHT
-      - NYDFS
-      - TISAX
-      - ISO270182025
-      - CCPA2026
-      - ISO277012025
-      - CPS230
-      - CYFUN
-      - AIUC_1
-      - ALL
     CustomFieldDefinitionResponsePublicV2Dto:
       type: object
       properties:
@@ -342,181 +457,66 @@ components:
       - isHidden
       - readOnly
       - entityTypes
-    CustomFieldDefinitionFrameworkScopeResponsePublicV2Dto:
-      type: object
-      properties:
-        frameworkTags:
-          type: array
-          description: Built-in framework tags this Custom Field Definition applies to. Empty array when the field is not scoped by built-in framework tags.
-          items:
-            $ref: '#/components/schemas/FrameworkTagEnum'
-        frameworkIds:
-          description: Custom Framework IDs this Custom Field Definition applies to. Empty array when the field is not scoped by custom frameworks.
-          type: array
-          items:
-            type: number
-      required:
-      - frameworkTags
-      - frameworkIds
-    CustomFieldCurrencyCodeEnum:
-      type: string
-      enum:
-      - BWP
-      - CAD
-      - CHF
-      - CLP
-      - CNY
-      - COP
-      - CRC
-      - CZK
-      - DKK
-      - DOP
-      - EEK
-      - EUR
-      - GBP
-      - GHS
-      - GTQ
-      - HKD
-      - HRK
-      - HUF
-      - IDR
-      - ILS
-      - IMP
-      - INR
-      - ISK
-      - JPY
-      - KES
-      - KRW
-      - KYD
-      - LKR
-      - LUF
-      - LVL
-      - MTL
-      - MUR
-      - MXN
-      - MYR
-      - NGN
-      - NOK
-      - NZD
-      - PAB
-      - PEN
-      - PHP
-      - PLN
-      - RON
-      - RUB
-      - SEK
-      - SGD
-      - SOS
-      - TOP
-      - TRY
-      - UAH
-      - USD
-      - UYU
-      - ZAR
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    CustomFieldTypeEnum:
-      type: string
-      enum:
-      - TEXT
-      - NUMBER
-      - CURRENCY
-      - OPTIONS
-      - FORMULA
-      - OPTIONS_NUMERIC
-      - LONG_TEXT
-      - URL
     SortDirectionEnum:
       type: string
       enum:
       - ASC
       - DESC
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    CustomFieldsEntityTypeEnum:
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - RISK
-      - CONTROL
-      - ASSET
-      - PERSONNEL
-      - VENDOR
-      - FRAMEWORK_REQUIREMENTS
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    CustomFieldDefinitionOptionResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldOptionId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field Option. Use this value when writing OPTIONS or OPTIONS_NUMERIC values on resources.
-        value:
-          oneOf:
-          - type: string
-          - type: number
-          example: Security & IT
-          description: The display value of this option. For OPTIONS fields this is a string; for OPTIONS_NUMERIC fields this is a number.
-      required:
-      - customFieldOptionId
-      - value
+      - createdAt
+      - updatedAt
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
   securitySchemes:
     bearer:
       scheme: bearer
