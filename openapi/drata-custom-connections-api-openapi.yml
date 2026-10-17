@@ -410,59 +410,46 @@ paths:
         💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
 components:
   schemas:
-    ExceptionResponseDto:
+    UserCompactResponsePublicV2Dto:
       type: object
       properties:
-        statusCode:
+        id:
           type: number
-        message:
+          example: 1
+          description: User ID
+        email:
           type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
       required:
-      - statusCode
-      - message
-      - code
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
     CustomConnectionResourceResponsePublicV2Dto:
       type: object
       properties:
@@ -531,6 +518,19 @@ components:
           type: string
           example: Updated description for Custom Connection
           description: Description for Custom Connection
+    CustomConnectionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Connections based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     CustomConnectionCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -605,71 +605,11 @@ components:
       required:
       - name
       - providerTypes
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
+    CustomConnectionExpandEnum:
       type: string
       enum:
-      - ASC
-      - DESC
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
+      - createdByUser
+      - customResources
     CustomConnectionResponsePublicV2Dto:
       type: object
       properties:
@@ -756,24 +696,84 @@ components:
       - description
       - createdAt
       - updatedAt
-    CustomConnectionsResponsePublicV2Dto:
+    PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: List of Custom Connections based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
-      - data
-      - pagination
-    CustomConnectionExpandEnum:
+      - cursor
+    SortDirectionEnum:
       type: string
       enum:
-      - createdByUser
-      - customResources
+      - ASC
+      - DESC
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

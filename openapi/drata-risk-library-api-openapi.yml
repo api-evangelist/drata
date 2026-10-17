@@ -323,36 +323,11 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    RiskLibraryExpandEnum:
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - controls
-      - categories
+      - createdAt
+      - updatedAt
     RiskControlCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -410,6 +385,35 @@ components:
       - name
       - createdAt
       - updatedAt
+    RiskCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 100
+          description: Unique identifier of the newly created Risk in the register
+        riskId:
+          type: string
+          example: AC-04
+          description: Human-readable Risk Identifier
+        title:
+          type: string
+          example: Password Management - Password Cracking
+          description: Title of the Risk
+        description:
+          type: string
+          example: An attacker attempts to gain access to organizational information by guessing passwords.
+          description: Description of the Risk
+        registerId:
+          type: number
+          example: 5
+          description: ID of the Risk Register where the Risk was created
+      required:
+      - id
+      - riskId
+      - title
+      - description
+      - registerId
     PaginationResponsePublicV2Dto:
       type: object
       properties:
@@ -420,67 +424,6 @@ components:
           description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
       required:
       - cursor
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    RiskLibraryCopyResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of created risk objects.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
-      required:
-      - data
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    RiskLibraryResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
     RiskLibraryCopyRequestPublicV2Dto:
       type: object
       properties:
@@ -528,35 +471,26 @@ components:
       - riskIds
       - riskGroups
       - registerId
-    RiskCompactResponsePublicV2Dto:
+    RiskLibraryExpandEnum:
+      type: string
+      enum:
+      - controls
+      - categories
+    RiskLibraryCopyResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 100
-          description: Unique identifier of the newly created Risk in the register
-        riskId:
-          type: string
-          example: AC-04
-          description: Human-readable Risk Identifier
-        title:
-          type: string
-          example: Password Management - Password Cracking
-          description: Title of the Risk
-        description:
-          type: string
-          example: An attacker attempts to gain access to organizational information by guessing passwords.
-          description: Description of the Risk
-        registerId:
-          type: number
-          example: 5
-          description: ID of the Risk Register where the Risk was created
+        data:
+          description: Array of created risk objects.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCompactResponsePublicV2Dto'
       required:
-      - id
-      - riskId
-      - title
-      - description
-      - registerId
+      - data
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     RiskLibraryItemResponsePublicV2Dto:
       type: object
       properties:
@@ -591,6 +525,72 @@ components:
       - riskId
       - title
       - description
+    RiskLibraryResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskLibraryItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

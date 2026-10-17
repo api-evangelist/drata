@@ -210,122 +210,33 @@ paths:
       description: '🔒 Requires **User Policies: Acknowledge User''s Assigned Policy** permission.'
 components:
   schemas:
-    UserPolicyVersionResponsePublicV2Dto:
+    PolicyApprovalsSourceTypeEnum:
+      type: string
+      enum:
+      - UNKNOWN
+      - BAMBOO_HR
+      - CSV
+      - MY_DRATA
+      - PUBLIC_API
+    PolicyScopeEnum:
+      type: string
+      enum:
+      - ALL
+      - GROUP
+      - NONE
+    UserPolicyVersionsResponsePublicV2Dto:
       type: object
       properties:
-        id:
-          type: number
-          example: 1
-          description: User's Assigned Policy Version ID
-        acceptedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User Policy Version accepted at date timestamp. A null value indicates the user has not acknowledged the Policy yet.
-        createdAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User's Assigned Policy Version created at date timestamp
-        updatedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User's Assigned Policy Version updated at date timestamp
-        sourceType:
-          description: Indicates the source of the acknowledgement data
-          example: MY_DRATA
-          allOf:
-          - $ref: '#/components/schemas/PolicyApprovalsSourceTypeEnum'
-        details:
-          type:
-          - string
-          - 'null'
-          description: Additional details on how and where the User acknowledged the Policy
-        policyId:
-          type: number
-          example: 1
-          description: Policy  ID
-        policyVersionId:
-          type: number
-          example: 1
-          description: Policy Version ID
-        policy:
-          description: The associated Policy
-          allOf:
-          - $ref: '#/components/schemas/PolicyCompactResponsePublicV2Dto'
-        policyVersion:
-          description: The associated Policy Version
-          allOf:
-          - $ref: '#/components/schemas/PolicyVersionCompactResponsePublicV2Dto'
+        data:
+          description: Full list of User Policy Versions
+          type: array
+          items:
+            $ref: '#/components/schemas/UserPolicyVersionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - id
-      - acceptedAt
-      - createdAt
-      - updatedAt
-      - sourceType
-      - details
-      - policyId
-      - policyVersionId
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
+      - data
+      - pagination
     PolicyVersionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -408,26 +319,6 @@ components:
       - changesExplanation
       - publishedAt
       - requiresAcknowledgment
-    PolicyStatusEnum:
-      type: string
-      enum:
-      - ACTIVE
-      - ARCHIVED
-      - REPLACED
-      - UNACCEPTABLE
-      - OUTDATED
-    PolicyTypeEnum:
-      type: string
-      enum:
-      - BUILDER
-      - UPLOADED
-      - EXTERNAL
-    PolicyScopeEnum:
-      type: string
-      enum:
-      - ALL
-      - GROUP
-      - NONE
     PolicyCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -476,19 +367,34 @@ components:
       - updatedAt
       - policyStatus
       - renewalDate
-    UserPoliciesExpandEnum:
+    PolicyTypeEnum:
       type: string
       enum:
-      - policy
-      - policyVersion
-    PolicyApprovalsSourceTypeEnum:
+      - BUILDER
+      - UPLOADED
+      - EXTERNAL
+    PolicyStatusEnum:
       type: string
       enum:
-      - UNKNOWN
-      - BAMBOO_HR
-      - CSV
-      - MY_DRATA
-      - PUBLIC_API
+      - ACTIVE
+      - ARCHIVED
+      - REPLACED
+      - UNACCEPTABLE
+      - OUTDATED
+    UserPolicyAcceptRequestPublicV2Dto:
+      type: object
+      properties:
+        acceptedAt:
+          type: string
+          format: date-time
+          example: '2023-01-01T00:00:00.000Z'
+          description: When the user accepted the Policy. Must be within the last year.
+        details:
+          type: string
+          description: Additional details on how and where the User acknowledged the Policy
+          example: Accepted in Confluence via plugin
+      required:
+      - acceptedAt
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -504,20 +410,6 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    UserPolicyAcceptRequestPublicV2Dto:
-      type: object
-      properties:
-        acceptedAt:
-          type: string
-          format: date-time
-          example: '2023-01-01T00:00:00.000Z'
-          description: When the user accepted the Policy. Must be within the last year.
-        details:
-          type: string
-          description: Additional details on how and where the User acknowledged the Policy
-          example: Accepted in Confluence via plugin
-      required:
-      - acceptedAt
     SortDirectionEnum:
       type: string
       enum:
@@ -528,19 +420,127 @@ components:
       enum:
       - createdAt
       - updatedAt
-    UserPolicyVersionsResponsePublicV2Dto:
+    UserPolicyVersionResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Full list of User Policy Versions
-          type: array
-          items:
-            $ref: '#/components/schemas/UserPolicyVersionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        id:
+          type: number
+          example: 1
+          description: User's Assigned Policy Version ID
+        acceptedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User Policy Version accepted at date timestamp. A null value indicates the user has not acknowledged the Policy yet.
+        createdAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User's Assigned Policy Version created at date timestamp
+        updatedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User's Assigned Policy Version updated at date timestamp
+        sourceType:
+          description: Indicates the source of the acknowledgement data
+          example: MY_DRATA
+          allOf:
+          - $ref: '#/components/schemas/PolicyApprovalsSourceTypeEnum'
+        details:
+          type:
+          - string
+          - 'null'
+          description: Additional details on how and where the User acknowledged the Policy
+        policyId:
+          type: number
+          example: 1
+          description: Policy  ID
+        policyVersionId:
+          type: number
+          example: 1
+          description: Policy Version ID
+        policy:
+          description: The associated Policy
+          allOf:
+          - $ref: '#/components/schemas/PolicyCompactResponsePublicV2Dto'
+        policyVersion:
+          description: The associated Policy Version
+          allOf:
+          - $ref: '#/components/schemas/PolicyVersionCompactResponsePublicV2Dto'
       required:
-      - data
-      - pagination
+      - id
+      - acceptedAt
+      - createdAt
+      - updatedAt
+      - sourceType
+      - details
+      - policyId
+      - policyVersionId
+    UserPoliciesExpandEnum:
+      type: string
+      enum:
+      - policy
+      - policyVersion
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

@@ -194,150 +194,46 @@ paths:
       description: '🔒 Requires **Audits: Get Audits** permission.'
 components:
   schemas:
-    AuditorFrameworkTypeEnum:
-      type: string
-      enum:
-      - SOC_2_TYPE_1
-      - SOC_2_TYPE_2
-      - ISO_27001
-      - HIPAA
-      - PCI
-      - GDPR
-      - SCF
-      - NIST80053
-      - NISTCSF
-      - CMMC
-      - NIST800171
-      - MSSSPA
-      - FFIEC
-      - CCPA
-      - ISO_27701
-      - COBIT
-      - SOX_ITGC
-      - ISO_27001_2022
-      - CCM
-      - CYBER_ESSENTIALS
-      - ISO_27017_2015
-      - ISO_27018_2019
-      - NISTAI
-      - PCI4
-      - FEDRAMP
-      - NISTCSF2
-      - NIS2
-      - DORA
-      - ISO_42001_2023
-      - DRATA_ESSENTIALS
-      - NIST800171R3
-      - CIS8
-      - CYBER_ESSENTIALS_32
-      - FEDRAMP20X
-      - HITRUST
-      - MSSSPA11
-      - ESSENTIAL_EIGHT
-      - NYDFS
-      - TISAX
-      - ISO_27018_2025
-      - CCPA2026
-      - ISO_27701_2025
-      - CPS230
-      - CYFUN
-      - AIUC_1
-      - CUSTOM
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    AuditListExpandEnum:
-      type: string
-      enum:
-      - auditors
-      - internalAuditors
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    AuditExpandEnum:
-      type: string
-      enum:
-      - auditors
-      - internalAuditors
-      - controls
-    AuditorCompactResponsePublicV2Dto:
+    UserCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
-          type: string
-          format: uuid
-          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: Unique identifier of the Auditor
-        name:
-          type: string
-          example: Jane Smith
-          description: Full name of the Auditor
+          type: number
+          example: 1
+          description: User ID
         email:
           type: string
-          format: email
-          example: jane.smith@auditfirm.com
-          description: Email address of the Auditor
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
       required:
       - id
-      - name
       - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
     AuditGetResponsePublicV2Dto:
       type: object
       properties:
@@ -418,35 +314,141 @@ components:
       - completedAt
       - createdAt
       - updatedAt
-    AuditsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/AuditItemResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
     AuditorFrameworkOverhaulStatusEnum:
       type: string
       enum:
       - PREPARING
       - ACTIVE
       - COMPLETED
-    SortDirectionEnum:
+    AuditExpandEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - auditors
+      - internalAuditors
+      - controls
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
     AuditTypeEnum:
       type: string
       enum:
       - FULL_AUDIT
       - DOWNLOAD_ONLY_AUDIT
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    AuditorFrameworkTypeEnum:
+      type: string
+      enum:
+      - SOC_2_TYPE_1
+      - SOC_2_TYPE_2
+      - ISO_27001
+      - HIPAA
+      - PCI
+      - GDPR
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - CCPA
+      - ISO_27701
+      - COBIT
+      - SOX_ITGC
+      - ISO_27001_2022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO_27017_2015
+      - ISO_27018_2019
+      - NISTAI
+      - PCI4
+      - FEDRAMP
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO_42001_2023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO_27018_2025
+      - CCPA2026
+      - ISO_27701_2025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - CUSTOM
+    AuditControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: DCF-1001
+          description: Control code
+        name:
+          type: string
+          example: Vulnerability Management
+          description: Control name
+        controlNumber:
+          type:
+          - number
+          - 'null'
+          example: 1
+          description: Control number used for ordering
+      required:
+      - id
+      - code
+      - name
+      - controlNumber
+    AuditListExpandEnum:
+      type: string
+      enum:
+      - auditors
+      - internalAuditors
     AuditItemResponsePublicV2Dto:
       type: object
       properties:
@@ -522,77 +524,75 @@ components:
       - completedAt
       - createdAt
       - updatedAt
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    AuditControlCompactResponsePublicV2Dto:
+    AuditsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/AuditItemResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    AuditorCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
-          type: number
-          example: 1
-          description: Control ID
-        code:
           type: string
-          example: DCF-1001
-          description: Control code
+          format: uuid
+          example: aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: Unique identifier of the Auditor
         name:
           type: string
-          example: Vulnerability Management
-          description: Control name
-        controlNumber:
-          type:
-          - number
-          - 'null'
-          example: 1
-          description: Control number used for ordering
+          example: Jane Smith
+          description: Full name of the Auditor
+        email:
+          type: string
+          format: email
+          example: jane.smith@auditfirm.com
+          description: Email address of the Auditor
       required:
       - id
-      - code
       - name
-      - controlNumber
+      - email
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

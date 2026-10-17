@@ -461,6 +461,145 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    RiskRegisterUpdatePublicV2RequestDto:
+      type: object
+      properties:
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 60000
+          example: Register for all Risks
+          description: Description for the Risk Register
+        ownerIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of User ids to be assigned to the Risk Register as owners
+          type: array
+          items:
+            type: number
+            minimum: 1
+        workspaceIds:
+          example:
+          - 1
+          - 2
+          description: List of Workspace IDs to associate with the Risk Register
+          type: array
+          items:
+            type: number
+            minimum: 1
+        name:
+          type: string
+          maxLength: 191
+          example: Default Register
+          description: Unique name for the Risk Register
+    RiskRegisterCreateRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Default Register
+          description: Unique name for the Risk Register
+        description:
+          type:
+          - string
+          - 'null'
+          maxLength: 60000
+          example: Register for all Risks
+          description: Description for the Risk Register
+        ownerIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of User ids to be assigned to the Risk Register as owners
+          type: array
+          items:
+            type: number
+            minimum: 1
+        workspaceIds:
+          example:
+          - 1
+          - 2
+          description: List of Workspace IDs to associate with the Risk Register
+          type: array
+          items:
+            type: number
+            minimum: 1
+      required:
+      - name
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    RiskRegisterWorkspaceResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Workspace ID
+        name:
+          type: string
+          example: Drata
+          description: Workspace name
+      required:
+      - id
+      - name
     RiskRegisterResponsePublicV2Dto:
       type: object
       properties:
@@ -506,31 +645,34 @@ components:
       - workspaces
       - createdAt
       - updatedAt
-    ExceptionResponseDto:
+    RiskRegistersResponsePublicV2Dto:
       type: object
       properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+        data:
+          example: []
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskRegisterResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - statusCode
-      - message
-      - code
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    RiskRegisterExpandEnum:
+      type: string
+      enum:
+      - workspaces
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -559,173 +701,31 @@ components:
       - statusCode
       - message
       - code
-    RiskRegisterWorkspaceResponsePublicV2Dto:
+    ExceptionResponseDto:
       type: object
       properties:
-        id:
+        statusCode:
           type: number
-          example: 1
-          description: Workspace ID
-        name:
+        message:
           type: string
-          example: Drata
-          description: Workspace name
-      required:
-      - id
-      - name
-    RiskRegisterCreateRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: Default Register
-          description: Unique name for the Risk Register
-        description:
-          type:
-          - string
-          - 'null'
-          maxLength: 60000
-          example: Register for all Risks
-          description: Description for the Risk Register
-        ownerIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: List of User ids to be assigned to the Risk Register as owners
-          type: array
-          items:
-            type: number
-            minimum: 1
-        workspaceIds:
-          example:
-          - 1
-          - 2
-          description: List of Workspace IDs to associate with the Risk Register
-          type: array
-          items:
-            type: number
-            minimum: 1
-      required:
-      - name
-    RiskRegisterExpandEnum:
-      type: string
-      enum:
-      - workspaces
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
+        code:
           type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    RiskRegistersResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          example: []
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskRegisterResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    RiskRegisterUpdatePublicV2RequestDto:
-      type: object
-      properties:
-        description:
-          type:
-          - string
-          - 'null'
-          maxLength: 60000
-          example: Register for all Risks
-          description: Description for the Risk Register
-        ownerIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: List of User ids to be assigned to the Risk Register as owners
-          type: array
-          items:
-            type: number
-            minimum: 1
-        workspaceIds:
-          example:
-          - 1
-          - 2
-          description: List of Workspace IDs to associate with the Risk Register
-          type: array
-          items:
-            type: number
-            minimum: 1
-        name:
-          type: string
-          maxLength: 191
-          example: Default Register
-          description: Unique name for the Risk Register
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

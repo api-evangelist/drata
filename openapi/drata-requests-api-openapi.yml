@@ -200,46 +200,38 @@ paths:
       - apiKey:
         - accounts:edit
 components:
+  responses:
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '409':
+      description: Conflict - Resource already handled
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseConflict'
   schemas:
-    ApiResponseConflict:
-      type: object
-      properties:
-        ok:
-          type: boolean
-          example: false
-        errorCode:
-          type: string
-          example: request_already_handled
-        errors:
-          type: array
-          items:
-            type: string
-          example:
-          - Request has already been handled.
-    ApiResponseInvalidApiKeyOrMissingScope:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 403
-        error:
-          type: string
-          example: forbidden
-        message:
-          type: string
-          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
-    ApiResponseInvalidRequest:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 400
-        error:
-          type: string
-          example: bad_request
-        message:
-          type: string
-          example: Invalid request.
     CreateAccountPayload:
       type: object
       description: Account object that needs to be added to SafeBase
@@ -267,6 +259,30 @@ components:
       - clickwrap
       - docusign
       - override
+    ApiResponseInvalidRequest:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        error:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: Invalid request.
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
     AccountOutput:
       type: object
       properties:
@@ -289,37 +305,21 @@ components:
           type: string | null
           format: date-time
           example: '2022-01-01T12:00:00Z'
-  responses:
-    '404':
-      description: Not found or no access
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseNotFound'
-    '400':
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidRequest'
-    '403':
-      description: Invalid api key / missing scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
-    '409':
-      description: Conflict - Resource already handled
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseConflict'
-    '405':
-      description: Method not allowed
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseNotFound'
+    ApiResponseConflict:
+      type: object
+      properties:
+        ok:
+          type: boolean
+          example: false
+        errorCode:
+          type: string
+          example: request_already_handled
+        errors:
+          type: array
+          items:
+            type: string
+          example:
+          - Request has already been handled.
   securitySchemes:
     apiKey:
       type: apiKey

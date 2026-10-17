@@ -451,31 +451,49 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
-    ExceptionResponseDto:
+    RiskDocumentsUploadResponsePublicV2Dto:
       type: object
       properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+        documents:
+          description: List of uploaded Risk Documents
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
       required:
-      - statusCode
-      - message
-      - code
+      - documents
+    RiskDocumentsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     DocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -503,6 +521,11 @@ components:
       - name
       - downloadUrl
       - createdAt
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     ExceptionResponsePublicV2Dto:
       type: object
       properties:
@@ -531,54 +554,31 @@ components:
       - statusCode
       - message
       - code
-    RiskDocumentsUploadResponsePublicV2Dto:
+    ExceptionResponseDto:
       type: object
       properties:
-        documents:
-          description: List of uploaded Risk Documents
-          type: array
-          items:
-            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - documents
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    RiskDocumentsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/DocumentResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

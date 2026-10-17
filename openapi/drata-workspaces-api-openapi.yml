@@ -119,9 +119,11 @@ components:
       enum:
       - frameworks
       - personnelScope
-    ExceptionResponseDto:
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
+        name:
+          type: string
         statusCode:
           type: number
         message:
@@ -141,6 +143,7 @@ components:
           - name
           - message
       required:
+      - name
       - statusCode
       - message
       - code
@@ -214,34 +217,21 @@ components:
       - howItWorks
       - url
       - logo
-    ExceptionResponsePublicV2Dto:
+    PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
-      - name
-      - statusCode
-      - message
-      - code
+      - cursor
     FrameworkCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -281,6 +271,16 @@ components:
       - createdAt
       - updatedAt
       - enabledAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
     WorkspacesResponsePublicV2Dto:
       type: object
       properties:
@@ -294,31 +294,31 @@ components:
       required:
       - data
       - pagination
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PaginationTotalCountResponsePublicV2Dto:
+    ExceptionResponseDto:
       type: object
       properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - cursor
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

@@ -960,53 +960,6 @@ paths:
       - CUSTOM_CONNECTIONS
 components:
   schemas:
-    CustomDataSessionStatusEnum:
-      type: string
-      enum:
-      - IN_PROGRESS
-      - ACTIVE
-      - CANCELED
-      - ARCHIVED
-    SessionActionRequestPublicV2Dto:
-      type: object
-      properties:
-        action:
-          description: 'The action to perform on the session.
-
-
-            * `complete`: Mark session as complete, sets data as active and **permanently deletes all data that is not part of the session**
-
-            * `cancel`: Cancels session and discard data associated with that session'
-          example: complete
-          allOf:
-          - $ref: '#/components/schemas/SessionActionEnum'
-      required:
-      - action
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
     CreateCustomDataRequestPublicV2Dto:
       type: object
       properties:
@@ -1034,131 +987,6 @@ components:
               department: Engineering
       required:
       - data
-    CustomDataRecordsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: List of Custom Data records based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomDataResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    SessionActionResponsePublicV2Dto:
-      type: object
-      properties:
-        sessionId:
-          type: string
-          description: The Session ID that the action was performed on
-          example: upload-2024-03-13
-        status:
-          description: Current status of the Session after the action was performed
-          example: ACTIVE
-          allOf:
-          - $ref: '#/components/schemas/CustomDataSessionStatusEnum'
-        action:
-          description: The action that was performed
-          allOf:
-          - $ref: '#/components/schemas/SessionActionEnum'
-        connectionId:
-          type: number
-          description: The ID of the Custom Connection the Session was for
-          example: 123
-        resourceId:
-          type: number
-          description: The ID of the Custom Resource the Session was for
-          example: 456
-      required:
-      - sessionId
-      - status
-      - action
-      - connectionId
-      - resourceId
-    SessionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: List of Custom Data sessions based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/SessionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    UpdateCustomDataRequestPublicV2Dto:
-      type: object
-      properties:
-        data:
-          type: object
-          additionalProperties: true
-          description: The custom data to update
-          example:
-            employeeId: EMP-001
-            name: Jane Smith
-            department: Engineering
-            startDate: '2024-01-15T00:00:00Z'
-            isActive: true
-            accessLevel: 3
-            tags:
-            - engineer
-            - remote
-            metadata:
-              lastReview: '2025-03-01T00:00:00Z'
-      required:
-      - data
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
     CreateCustomDataSessionRequestPublicV2Dto:
       type: object
       properties:
@@ -1184,6 +1012,42 @@ components:
               id: employee-001
               name: John
               department: Engineering
+      required:
+      - data
+    SessionActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          description: 'The action to perform on the session.
+
+
+            * `complete`: Mark session as complete, sets data as active and **permanently deletes all data that is not part of the session**
+
+            * `cancel`: Cancels session and discard data associated with that session'
+          example: complete
+          allOf:
+          - $ref: '#/components/schemas/SessionActionEnum'
+      required:
+      - action
+    UpdateCustomDataRequestPublicV2Dto:
+      type: object
+      properties:
+        data:
+          type: object
+          additionalProperties: true
+          description: The custom data to update
+          example:
+            employeeId: EMP-001
+            name: Jane Smith
+            department: Engineering
+            startDate: '2024-01-15T00:00:00Z'
+            isActive: true
+            accessLevel: 3
+            tags:
+            - engineer
+            - remote
+            metadata:
+              lastReview: '2025-03-01T00:00:00Z'
       required:
       - data
     SessionResponsePublicV2Dto:
@@ -1234,11 +1098,152 @@ components:
       - updatedAt
       - activatedAt
       - canceledAt
+    SessionActionResponsePublicV2Dto:
+      type: object
+      properties:
+        sessionId:
+          type: string
+          description: The Session ID that the action was performed on
+          example: upload-2024-03-13
+        status:
+          description: Current status of the Session after the action was performed
+          example: ACTIVE
+          allOf:
+          - $ref: '#/components/schemas/CustomDataSessionStatusEnum'
+        action:
+          description: The action that was performed
+          allOf:
+          - $ref: '#/components/schemas/SessionActionEnum'
+        connectionId:
+          type: number
+          description: The ID of the Custom Connection the Session was for
+          example: 123
+        resourceId:
+          type: number
+          description: The ID of the Custom Resource the Session was for
+          example: 456
+      required:
+      - sessionId
+      - status
+      - action
+      - connectionId
+      - resourceId
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    CustomDataSessionStatusEnum:
+      type: string
+      enum:
+      - IN_PROGRESS
+      - ACTIVE
+      - CANCELED
+      - ARCHIVED
+    SessionActionEnum:
+      type: string
+      enum:
+      - complete
+      - cancel
+    SessionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Data sessions based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
+    CustomDataRecordsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Data records based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomDataResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
     CustomDataResponsePublicV2Dto:
       type: object
       properties:
@@ -1277,11 +1282,6 @@ components:
       - sessionId
       - createdAt
       - updatedAt
-    SessionActionEnum:
-      type: string
-      enum:
-      - complete
-      - cancel
   securitySchemes:
     bearer:
       scheme: bearer
