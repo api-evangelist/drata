@@ -127,7 +127,7 @@
     - connectors/applications/drata
     vendor_link: https://drata.com/
     builder: Fivetran
-  status: pending-generation
+  status: not-a-workflow
   arazzo: null
 - slug: drata-microsoft-teams-own
   label: Microsoft Teams (own)
