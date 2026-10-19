@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -490,6 +552,126 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
+    RiskNoteWriteRequestPublicV2Dto:
+      type: object
+      properties:
+        comment:
+          type: string
+          maxLength: 768
+          example: This is a note about the risk assessment findings.
+          description: The comment content for the note
+      required:
+      - comment
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    RiskNoteResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 123
+          description: Note ID
+        comment:
+          type: string
+          description: The Note comment
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Note updated date timestamp
+        owner:
+          description: The User that created the Note, only returned when `expand[]=owner` is passed.
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+      required:
+      - id
+      - comment
+      - createdAt
+      - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    RiskNotesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     UserCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -530,140 +712,20 @@ components:
       - lastName
       - createdAt
       - updatedAt
-    RiskNotesExpandEnum:
-      type: string
-      enum:
-      - owner
-    RiskNotesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskNoteResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    RiskNoteResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 123
-          description: Note ID
-        comment:
-          type: string
-          description: The Note comment
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Note created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Note updated date timestamp
-        owner:
-          description: The User that created the Note, only returned when `expand[]=owner` is passed.
-          allOf:
-          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-      required:
-      - id
-      - comment
-      - createdAt
-      - updatedAt
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    RiskNoteWriteRequestPublicV2Dto:
-      type: object
-      properties:
-        comment:
-          type: string
-          maxLength: 768
-          example: This is a note about the risk assessment findings.
-          description: The comment content for the note
-      required:
-      - comment
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    RiskNotesExpandEnum:
+      type: string
+      enum:
+      - owner
   securitySchemes:
     bearer:
       scheme: bearer

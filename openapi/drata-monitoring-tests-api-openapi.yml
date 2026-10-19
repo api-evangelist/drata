@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -711,126 +773,108 @@ paths:
       - MONITOR_TEST_DETAILS_UI
 components:
   schemas:
-    MonitorTestPassResponsePublicV2Dto:
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
-        id:
+        name:
           type: string
-          example: sg-0a1b2c3d4e5f67890
-          description: Unique identifier of the cloud resource that passed the compliance test. This is typically the resource ID from the cloud provider (e.g., AWS resource ID, Azure resource ID, GCP resource name).
-        providerName:
+        statusCode:
+          type: number
+        message:
           type: string
-          example: Amazon Web Services
-          description: Human-readable name of the cloud provider where the passing resource is located. Common values include "Amazon Web Services", "Microsoft Azure", "Google Cloud Platform", etc.
-        resourceName:
-          type: string
-          example: example-web-server-sg
-          description: The name or identifier of the specific cloud resource that passed the compliance test. This could be a security group name, S3 bucket name, virtual machine name, etc.
-        accountName:
-          type:
-          - string
-          - 'null'
-          example: Example Production Account
-          description: Human-readable name of the cloud account or subscription where the passing resource is located. This helps identify which environment or business unit owns the resource.
-        clientId:
-          type:
-          - string
-          - 'null'
-          example: '123456789012'
-          description: Unique identifier for the cloud account, subscription, or project where the resource resides. This is typically the AWS Account ID, Azure Subscription ID, or GCP Project ID.
-        resourceArn:
-          type:
-          - string
-          - 'null'
-          example: arn:aws:ec2:us-east-1:123456789012:security-group/sg-0a1b2c3d4e5f67890
-          description: Amazon Resource Name (ARN) or equivalent unique resource identifier from the cloud provider. This provides the full path to the resource within the cloud infrastructure hierarchy.
-        organizationalUnitId:
-          type:
-          - string
-          - 'null'
-          example: ou-root-123456789
-          description: Organizational Unit identifier, primarily used in AWS Organizations to group accounts by business unit or environment. For other providers, this may contain subscription IDs (Azure) or project hierarchy information (GCP), but is most commonly populated for AWS resources.
-        region:
-          type:
-          - string
-          - 'null'
-          example: us-east-1
-          description: Geographic region or availability zone where the passing resource is deployed. Examples include AWS regions (us-east-1), Azure regions (East US), or GCP zones (us-central1-a).
-        tags:
+        code:
+          type: number
+        debugInfo:
           type: object
-          additionalProperties: true
-          example:
-            cost-center: cc-example-001
-            system.id: example-system-id
-            environment: production
-          description: Resource tags from the cloud provider, as a flat key/value map. Keys and value types are preserved from the provider response, so values may be strings, numbers, booleans, or nested objects/arrays depending on the source. Returned only when `expand[]=tags` is requested, and only when tags are available for the resource.
-        cause:
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    MonitorTestPassesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
           type: array
           items:
-            type: object
-            additionalProperties: true
-          description: Rule-evaluation entries explaining the test outcome for this resource. Often absent for passing resources, and may be absent for some legacy tests that do not produce this data. When present, documents the rule branches the resource satisfied.
+            $ref: '#/components/schemas/MonitorTestPassResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        lastCheck:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp of the most recent autopilot run for this Monitoring Test, sourced from `control_test_instance.last_check`. Null when the test has never been run for this workspace.
       required:
-      - id
-      - providerName
-      - resourceName
-      - accountName
-    CheckStatusEnum:
-      type: string
-      enum:
-      - UNUSED
-      - NEW
-      - ENABLED
-      - DISABLED
-      - TESTING
-      x-enumDescriptions:
-        UNUSED: Test is not currently in use
-        NEW: Test has been newly added and not yet evaluated
-        ENABLED: Test is active and running
-        DISABLED: Test has been turned off
-        TESTING: Test is in a testing state
-    MonitorCompactResponsePublicV2Dto:
+      - data
+      - pagination
+      - lastCheck
+    UserCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Monitor ID
-        checkResultStatus:
-          example: PASSED
-          description: Current compliance status of the monitor (PASSED, FAILED, PENDING, etc.)
-          allOf:
-          - $ref: '#/components/schemas/CheckResultStatusEnum'
-        collectionDescription:
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
           type:
           - string
           - 'null'
-          example: Curl call to the website
-          description: Detailed description of how evidence is collected for this Monitor
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
         createdAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Timestamp when the Monitor was first created
+          description: User created at
         updatedAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Timestamp when the Monitor was last updated
-        checkTypes:
-          type: array
-          example:
-          - INFRASTRUCTURE
-          description: The check types associated with this Monitor
-          items:
-            $ref: '#/components/schemas/CheckTypeEnum'
+          description: User last updated at
       required:
       - id
-      - checkResultStatus
-      - collectionDescription
+      - email
+      - firstName
+      - lastName
       - createdAt
       - updatedAt
-      - checkTypes
+    MonitoringTestsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/MonitoringTestResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     ControlCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -873,53 +917,6 @@ components:
       - description
       - createdAt
       - updatedAt
-    MonitorTestPassExpandEnum:
-      type: string
-      enum:
-      - tags
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    MonitorExclusionExpandEnum:
-      type: string
-      enum:
-      - connection
-      - exclusionDesignator
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    CheckResultStatusEnum:
-      type: string
-      enum:
-      - READY
-      - PASSED
-      - FAILED
-      - ERROR
-      - PREAUDIT
     PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
@@ -935,141 +932,23 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    MonitorExpandEnum:
-      type: string
-      enum:
-      - controls
-      - monitorInstances
-      - disablingUser
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    MonitorTestPassesResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/MonitorTestPassResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-        lastCheck:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Timestamp of the most recent autopilot run for this Monitoring Test, sourced from `control_test_instance.last_check`. Null when the test has never been run for this workspace.
-      required:
-      - data
-      - pagination
-      - lastCheck
-    MonitorTestFailuresResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/MonitorTestFailureResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-        lastCheck:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Timestamp of the most recent autopilot run for this monitoring test, sourced from `control_test_instance.last_check`. Null when the test has never been run for this workspace.
-      required:
-      - data
-      - pagination
-      - lastCheck
-    MonitorTestFailureResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: string
-          example: sg-0a1b2c3d4e5f67890
-          description: Unique identifier of the cloud resource that failed the compliance test. This is typically the resource ID from the cloud provider (e.g., AWS resource ID, Azure resource ID, GCP resource name).
-        providerName:
-          type: string
-          example: Amazon Web Services
-          description: Human-readable name of the cloud provider where the failing resource is located. Common values include "Amazon Web Services", "Microsoft Azure", "Google Cloud Platform", etc.
-        resourceName:
-          type: string
-          example: example-web-server-sg
-          description: The name or identifier of the specific cloud resource that failed the compliance test. This could be a security group name, S3 bucket name, virtual machine name, etc.
-        accountName:
-          type:
-          - string
-          - 'null'
-          example: Example Production Account
-          description: Human-readable name of the cloud account or subscription where the failing resource is located. This helps identify which environment or business unit owns the resource.
-        clientId:
-          type:
-          - string
-          - 'null'
-          example: '123456789012'
-          description: Unique identifier for the cloud account, subscription, or project where the resource resides. This is typically the AWS Account ID, Azure Subscription ID, or GCP Project ID.
-        resourceArn:
-          type:
-          - string
-          - 'null'
-          example: arn:aws:ec2:us-east-1:123456789012:security-group/sg-0a1b2c3d4e5f67890
-          description: Amazon Resource Name (ARN) or equivalent unique resource identifier from the cloud provider. This provides the full path to the resource within the cloud infrastructure hierarchy.
-        organizationalUnitId:
-          type:
-          - string
-          - 'null'
-          example: ou-root-123456789
-          description: Organizational Unit identifier, primarily used in AWS Organizations to group accounts by business unit or environment. For other providers, this may contain subscription IDs (Azure) or project hierarchy information (GCP), but is most commonly populated for AWS resources.
-        region:
-          type:
-          - string
-          - 'null'
-          example: us-east-1
-          description: Geographic region or availability zone where the failing resource is deployed. Examples include AWS regions (us-east-1), Azure regions (East US), or GCP zones (us-central1-a).
-        tags:
-          type: object
-          additionalProperties: true
-          example:
-            cost-center: cc-example-001
-            system.id: example-system-id
-            environment: production
-          description: Resource tags from the cloud provider, as a flat key/value map. Keys and value types are preserved from the provider response, so values may be strings, numbers, booleans, or nested objects/arrays depending on the source. Returned only when `expand[]=tags` is requested, and only when tags are available for the resource.
-        cause:
-          type: array
-          items:
-            type: object
-            additionalProperties: true
-          description: Rule-evaluation entries explaining why the resource failed the test. May be absent for some legacy tests that do not produce this data. Each entry documents a rule branch (fact, path, operator, result) and may include a `factResult` array of supporting data points; size scales with rule complexity.
-      required:
-      - id
-      - providerName
-      - resourceName
-      - accountName
-    TestSourceEnum:
-      type: string
-      enum:
-      - DRATA
-      - CUSTOM
-      - EXTERNAL
-      - ACORN
-      - DRATA_LIBRARY
-      x-enumDescriptions:
-        DRATA: Built-in Drata test
-        CUSTOM: User-created test
-        EXTERNAL: External test
-        ACORN: Compliance-as-code test
-        DRATA_LIBRARY: Drata library test
     MonitorTestFailureExpandEnum:
       type: string
       enum:
       - tags
+    CheckResultStatusEnum:
+      type: string
+      enum:
+      - READY
+      - PASSED
+      - FAILED
+      - ERROR
+      - PREAUDIT
+    MonitorExclusionExpandEnum:
+      type: string
+      enum:
+      - connection
+      - exclusionDesignator
     MonitoringTestResponsePublicV2Dto:
       type: object
       properties:
@@ -1154,100 +1033,92 @@ components:
       - updatedAt
       - lastPassedAt
       - failedSince
-    CheckTypeEnum:
-      type: string
-      enum:
-      - POLICY
-      - IN_DRATA
-      - AGENT
-      - INFRASTRUCTURE
-      - VERSION_CONTROL
-      - IDENTITY
-      - TICKETING
-      - HRIS
-      - OBSERVABILITY
-      - CUSTOM
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    UserCompactResponsePublicV2Dto:
+    MonitorCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
+          description: Monitor ID
+        checkResultStatus:
+          example: PASSED
+          description: Current compliance status of the monitor (PASSED, FAILED, PENDING, etc.)
+          allOf:
+          - $ref: '#/components/schemas/CheckResultStatusEnum'
+        collectionDescription:
           type:
           - string
           - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
+          example: Curl call to the website
+          description: Detailed description of how evidence is collected for this Monitor
         createdAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: User created at
+          description: Timestamp when the Monitor was first created
         updatedAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
+          description: Timestamp when the Monitor was last updated
+        checkTypes:
+          type: array
+          example:
+          - INFRASTRUCTURE
+          description: The check types associated with this Monitor
+          items:
+            $ref: '#/components/schemas/CheckTypeEnum'
       required:
       - id
-      - email
-      - firstName
-      - lastName
+      - checkResultStatus
+      - collectionDescription
       - createdAt
       - updatedAt
-    MonitoringTestsResponsePublicV2Dto:
+      - checkTypes
+    MonitorExclusionResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/MonitoringTestResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        id:
+          type: number
+          example: 1
+          description: The ID of the Monitor Exclusion
+        targetId:
+          type: string
+          example: sg-0a1b2c3d4e5f67890
+          description: 'The unique identifier of the excluded cloud resource. Examples: AWS Security Group (sg-12345), EC2 Instance (i-1234567890abcdef0), S3 Bucket (my-bucket-name), RDS Instance (my-database-instance), Load Balancer (my-load-balancer), Azure VM (vm-12345), GCP Instance (instance-12345)'
+        targetName:
+          type: string
+          example: Production Security Group - Web Servers
+          description: 'The human-readable name or description of the excluded cloud resource. Examples: "Production Security Group", "Web Server Instance", "Customer Data Bucket", "Primary Database", "Load Balancer - API", "Development VM", "Analytics Instance"'
+        exclusionReason:
+          type: string
+          example: Legacy system scheduled for decommission in Q2 2024 - approved by security team
+          description: 'The business justification for excluding this resource from compliance monitoring. Examples: "Legacy system scheduled for decommission", "Development environment - non-production", "Approved exception by security team", "Temporary exclusion during migration", "Test environment with controlled access", "Maintenance window exclusion"'
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Exclusion created timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Exclusion updated timestamp
+        connection:
+          description: The connection associated with this exclusion
+          allOf:
+          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
+        exclusionDesignator:
+          description: The user who created this exclusion
+          allOf:
+          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
       required:
-      - data
-      - pagination
+      - id
+      - targetId
+      - targetName
+      - exclusionReason
+      - createdAt
+      - updatedAt
     ConnectionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -1622,63 +1493,124 @@ components:
       - connectedAt
       - failedAt
       - deletedAt
-    MonitorExclusionsResponsePublicV2Dto:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    MonitorTestPassResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: sg-0a1b2c3d4e5f67890
+          description: Unique identifier of the cloud resource that passed the compliance test. This is typically the resource ID from the cloud provider (e.g., AWS resource ID, Azure resource ID, GCP resource name).
+        providerName:
+          type: string
+          example: Amazon Web Services
+          description: Human-readable name of the cloud provider where the passing resource is located. Common values include "Amazon Web Services", "Microsoft Azure", "Google Cloud Platform", etc.
+        resourceName:
+          type: string
+          example: example-web-server-sg
+          description: The name or identifier of the specific cloud resource that passed the compliance test. This could be a security group name, S3 bucket name, virtual machine name, etc.
+        accountName:
+          type:
+          - string
+          - 'null'
+          example: Example Production Account
+          description: Human-readable name of the cloud account or subscription where the passing resource is located. This helps identify which environment or business unit owns the resource.
+        clientId:
+          type:
+          - string
+          - 'null'
+          example: '123456789012'
+          description: Unique identifier for the cloud account, subscription, or project where the resource resides. This is typically the AWS Account ID, Azure Subscription ID, or GCP Project ID.
+        resourceArn:
+          type:
+          - string
+          - 'null'
+          example: arn:aws:ec2:us-east-1:123456789012:security-group/sg-0a1b2c3d4e5f67890
+          description: Amazon Resource Name (ARN) or equivalent unique resource identifier from the cloud provider. This provides the full path to the resource within the cloud infrastructure hierarchy.
+        organizationalUnitId:
+          type:
+          - string
+          - 'null'
+          example: ou-root-123456789
+          description: Organizational Unit identifier, primarily used in AWS Organizations to group accounts by business unit or environment. For other providers, this may contain subscription IDs (Azure) or project hierarchy information (GCP), but is most commonly populated for AWS resources.
+        region:
+          type:
+          - string
+          - 'null'
+          example: us-east-1
+          description: Geographic region or availability zone where the passing resource is deployed. Examples include AWS regions (us-east-1), Azure regions (East US), or GCP zones (us-central1-a).
+        tags:
+          type: object
+          additionalProperties: true
+          example:
+            cost-center: cc-example-001
+            system.id: example-system-id
+            environment: production
+          description: Resource tags from the cloud provider, as a flat key/value map. Keys and value types are preserved from the provider response, so values may be strings, numbers, booleans, or nested objects/arrays depending on the source. Returned only when `expand[]=tags` is requested, and only when tags are available for the resource.
+        cause:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: Rule-evaluation entries explaining the test outcome for this resource. Often absent for passing resources, and may be absent for some legacy tests that do not produce this data. When present, documents the rule branches the resource satisfied.
+      required:
+      - id
+      - providerName
+      - resourceName
+      - accountName
+    MonitorTestFailuresResponsePublicV2Dto:
       type: object
       properties:
         data:
           description: Data set based on the pagination limits
           type: array
           items:
-            $ref: '#/components/schemas/MonitorExclusionResponsePublicV2Dto'
+            $ref: '#/components/schemas/MonitorTestFailureResponsePublicV2Dto'
         pagination:
           $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+        lastCheck:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Timestamp of the most recent autopilot run for this monitoring test, sourced from `control_test_instance.last_check`. Null when the test has never been run for this workspace.
       required:
       - data
       - pagination
-    MonitorExclusionResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: The ID of the Monitor Exclusion
-        targetId:
-          type: string
-          example: sg-0a1b2c3d4e5f67890
-          description: 'The unique identifier of the excluded cloud resource. Examples: AWS Security Group (sg-12345), EC2 Instance (i-1234567890abcdef0), S3 Bucket (my-bucket-name), RDS Instance (my-database-instance), Load Balancer (my-load-balancer), Azure VM (vm-12345), GCP Instance (instance-12345)'
-        targetName:
-          type: string
-          example: Production Security Group - Web Servers
-          description: 'The human-readable name or description of the excluded cloud resource. Examples: "Production Security Group", "Web Server Instance", "Customer Data Bucket", "Primary Database", "Load Balancer - API", "Development VM", "Analytics Instance"'
-        exclusionReason:
-          type: string
-          example: Legacy system scheduled for decommission in Q2 2024 - approved by security team
-          description: 'The business justification for excluding this resource from compliance monitoring. Examples: "Legacy system scheduled for decommission", "Development environment - non-production", "Approved exception by security team", "Temporary exclusion during migration", "Test environment with controlled access", "Maintenance window exclusion"'
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Exclusion created timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Exclusion updated timestamp
-        connection:
-          description: The connection associated with this exclusion
-          allOf:
-          - $ref: '#/components/schemas/ConnectionCompactResponsePublicV2Dto'
-        exclusionDesignator:
-          description: The user who created this exclusion
-          allOf:
-          - $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-      required:
-      - id
-      - targetId
-      - targetName
-      - exclusionReason
-      - createdAt
-      - updatedAt
+      - lastCheck
+    CheckStatusEnum:
+      type: string
+      enum:
+      - UNUSED
+      - NEW
+      - ENABLED
+      - DISABLED
+      - TESTING
+      x-enumDescriptions:
+        UNUSED: Test is not currently in use
+        NEW: Test has been newly added and not yet evaluated
+        ENABLED: Test is active and running
+        DISABLED: Test has been turned off
+        TESTING: Test is in a testing state
+    TestSourceEnum:
+      type: string
+      enum:
+      - DRATA
+      - CUSTOM
+      - EXTERNAL
+      - ACORN
+      - DRATA_LIBRARY
+      x-enumDescriptions:
+        DRATA: Built-in Drata test
+        CUSTOM: User-created test
+        EXTERNAL: External test
+        ACORN: Compliance-as-code test
+        DRATA_LIBRARY: Drata library test
     MonitoringTestUpdateRequestPublicV2Dto:
       type: object
       properties:
@@ -1697,6 +1629,136 @@ components:
           - 'null'
           maxLength: 30000
           description: Updated description for the Monitoring Test. Pass null to clear.
+    MonitorExclusionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/MonitorExclusionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    MonitorTestFailureResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: string
+          example: sg-0a1b2c3d4e5f67890
+          description: Unique identifier of the cloud resource that failed the compliance test. This is typically the resource ID from the cloud provider (e.g., AWS resource ID, Azure resource ID, GCP resource name).
+        providerName:
+          type: string
+          example: Amazon Web Services
+          description: Human-readable name of the cloud provider where the failing resource is located. Common values include "Amazon Web Services", "Microsoft Azure", "Google Cloud Platform", etc.
+        resourceName:
+          type: string
+          example: example-web-server-sg
+          description: The name or identifier of the specific cloud resource that failed the compliance test. This could be a security group name, S3 bucket name, virtual machine name, etc.
+        accountName:
+          type:
+          - string
+          - 'null'
+          example: Example Production Account
+          description: Human-readable name of the cloud account or subscription where the failing resource is located. This helps identify which environment or business unit owns the resource.
+        clientId:
+          type:
+          - string
+          - 'null'
+          example: '123456789012'
+          description: Unique identifier for the cloud account, subscription, or project where the resource resides. This is typically the AWS Account ID, Azure Subscription ID, or GCP Project ID.
+        resourceArn:
+          type:
+          - string
+          - 'null'
+          example: arn:aws:ec2:us-east-1:123456789012:security-group/sg-0a1b2c3d4e5f67890
+          description: Amazon Resource Name (ARN) or equivalent unique resource identifier from the cloud provider. This provides the full path to the resource within the cloud infrastructure hierarchy.
+        organizationalUnitId:
+          type:
+          - string
+          - 'null'
+          example: ou-root-123456789
+          description: Organizational Unit identifier, primarily used in AWS Organizations to group accounts by business unit or environment. For other providers, this may contain subscription IDs (Azure) or project hierarchy information (GCP), but is most commonly populated for AWS resources.
+        region:
+          type:
+          - string
+          - 'null'
+          example: us-east-1
+          description: Geographic region or availability zone where the failing resource is deployed. Examples include AWS regions (us-east-1), Azure regions (East US), or GCP zones (us-central1-a).
+        tags:
+          type: object
+          additionalProperties: true
+          example:
+            cost-center: cc-example-001
+            system.id: example-system-id
+            environment: production
+          description: Resource tags from the cloud provider, as a flat key/value map. Keys and value types are preserved from the provider response, so values may be strings, numbers, booleans, or nested objects/arrays depending on the source. Returned only when `expand[]=tags` is requested, and only when tags are available for the resource.
+        cause:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+          description: Rule-evaluation entries explaining why the resource failed the test. May be absent for some legacy tests that do not produce this data. Each entry documents a rule branch (fact, path, operator, result) and may include a `factResult` array of supporting data points; size scales with rule complexity.
+      required:
+      - id
+      - providerName
+      - resourceName
+      - accountName
+    CheckTypeEnum:
+      type: string
+      enum:
+      - POLICY
+      - IN_DRATA
+      - AGENT
+      - INFRASTRUCTURE
+      - VERSION_CONTROL
+      - IDENTITY
+      - TICKETING
+      - HRIS
+      - OBSERVABILITY
+      - CUSTOM
+    MonitorTestPassExpandEnum:
+      type: string
+      enum:
+      - tags
+    MonitorExpandEnum:
+      type: string
+      enum:
+      - controls
+      - monitorInstances
+      - disablingUser
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

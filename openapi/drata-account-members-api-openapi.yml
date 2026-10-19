@@ -175,41 +175,66 @@ paths:
       - apiKey:
         - accounts:edit
 components:
-  responses:
-    '403':
-      description: Invalid api key / missing scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
-    '400':
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidRequest'
-    '405':
-      description: Method not allowed
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseNotFound'
-    '404':
-      description: Not found or no access
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseNotFound'
-  parameters:
-    accountId:
-      name: id
-      in: path
-      required: true
-      schema:
-        description: The target account ID
-        type: string
-        format: uuid
   schemas:
+    ApiResponseNotFound:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 404
+        error:
+          type: string
+          example: not_found
+        message:
+          type: string
+          example: Not found
+    AccountMemberEmails:
+      type: object
+      required:
+      - members
+      properties:
+        members:
+          type: array
+          description: Array of member emails to delete
+          minItems: 1
+          uniqueItems: true
+          example:
+          - user1@safebase.io
+          - user2@safebase.io
+          items:
+            type: string
+    AccountMemberResponse:
+      type: object
+      properties:
+        accountId:
+          type: string
+          example: 88f54931-f4c6-454e-8c3d-1462df981b4d
+        firstName:
+          type: string
+          example: Safe
+        lastName:
+          type: string
+          example: Base
+        name:
+          type: string
+          example: Safe Base
+          deprecated: true
+        email:
+          type: string
+          example: user@safebase.io
+        createdAt:
+          type: string
+          format: date-time
+          example: '2017-07-21T17:32:28Z'
+        lastSeen:
+          oneOf:
+          - type: 'null'
+          - type: string
+            format: date-time
+          example: '2017-07-21T17:32:28Z'
+    AccountMemberEmail:
+      type: string
+      example: user1@safebase.io
     AccountMemberPayloadArray:
       type: object
       required:
@@ -230,18 +255,6 @@ components:
           - type: boolean
             description: Enter the 'boolean' option here
           example: This is a custom message
-    ApiResponseNotFound:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 404
-        error:
-          type: string
-          example: not_found
-        message:
-          type: string
-          example: Not found
     AccountMemberPayload:
       type: object
       required:
@@ -263,36 +276,6 @@ components:
         email:
           type: string
           example: user@safebase.io
-    ApiResponseInvalidRequest:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 400
-        error:
-          type: string
-          example: bad_request
-        message:
-          type: string
-          example: Invalid request.
-    AccountMemberEmails:
-      type: object
-      required:
-      - members
-      properties:
-        members:
-          type: array
-          description: Array of member emails to delete
-          minItems: 1
-          uniqueItems: true
-          example:
-          - user1@safebase.io
-          - user2@safebase.io
-          items:
-            type: string
-    AccountMemberEmail:
-      type: string
-      example: user1@safebase.io
     ApiResponseInvalidApiKeyOrMissingScope:
       type: object
       properties:
@@ -338,35 +321,52 @@ components:
           productId:
             description: The specific product to link to
             type: string
-    AccountMemberResponse:
+    ApiResponseInvalidRequest:
       type: object
       properties:
-        accountId:
+        statusCode:
+          type: integer
+          example: 400
+        error:
           type: string
-          example: 88f54931-f4c6-454e-8c3d-1462df981b4d
-        firstName:
+          example: bad_request
+        message:
           type: string
-          example: Safe
-        lastName:
-          type: string
-          example: Base
-        name:
-          type: string
-          example: Safe Base
-          deprecated: true
-        email:
-          type: string
-          example: user@safebase.io
-        createdAt:
-          type: string
-          format: date-time
-          example: '2017-07-21T17:32:28Z'
-        lastSeen:
-          oneOf:
-          - type: 'null'
-          - type: string
-            format: date-time
-          example: '2017-07-21T17:32:28Z'
+          example: Invalid request.
+  responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
+  parameters:
+    accountId:
+      name: id
+      in: path
+      required: true
+      schema:
+        description: The target account ID
+        type: string
+        format: uuid
   securitySchemes:
     apiKey:
       type: apiKey

@@ -1516,6 +1516,46 @@ apis:
     url: https://docs.safebase.io/reference/getaccounts
   - type: APIReference
     url: https://docs.safebase.io/reference/getaccounts
+- aid: drata:drata-auth0-proxy-api
+  name: Drata Auth0 Proxy API
+  description: The auth0-proxy API from Drata — 5 operation(s) for auth0-proxy.
+  humanURL: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  baseURL: https://mcp.drata.com/mcp/
+  tags:
+  - auth0-proxy
+  properties:
+  - type: OpenAPI
+    url: openapi/drata-auth0-proxy-api-openapi.yml
+- aid: drata:drata-health-api
+  name: Drata Health API
+  description: The Health API from Drata — 1 operation(s) for health.
+  humanURL: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  baseURL: https://mcp.drata.com/mcp/
+  tags:
+  - Health
+  properties:
+  - type: OpenAPI
+    url: openapi/drata-health-api-openapi.yml
+- aid: drata:drata-ready-api
+  name: Drata Ready API
+  description: The Ready API from Drata — 1 operation(s) for ready.
+  humanURL: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  baseURL: https://mcp.drata.com/mcp/
+  tags:
+  - Ready
+  properties:
+  - type: OpenAPI
+    url: openapi/drata-ready-api-openapi.yml
+- aid: drata:drata-well-known-api
+  name: Drata .well Known API
+  description: The .well Known API from Drata — 4 operation(s) for .well known.
+  humanURL: https://developers.drata.com/developer-portal/v2/recipes/mcp-oauth-setup/
+  baseURL: https://mcp.drata.com/mcp/
+  tags:
+  - .well Known
+  properties:
+  - type: OpenAPI
+    url: openapi/drata-well-known-api-openapi.yml
 common:
 - type: CapabilityMap
   url: capabilities/drata-capability-edges.yml

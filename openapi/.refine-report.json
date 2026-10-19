@@ -2,6 +2,7 @@
   "provider": "drata",
   "sources": [
     "_original/drata-api-v2-openapi.json",
+    "_original/drata-openapi.json",
     "_original/drata-safebase-trust-api-openapi.json"
   ],
   "outputs": [
@@ -45,6 +46,10 @@
     "drata-vendor-types-api-openapi.yml",
     "drata-vendors-api-openapi.yml",
     "drata-workspaces-api-openapi.yml",
+    "drata-well-known-api-openapi.yml",
+    "drata-health-api-openapi.yml",
+    "drata-ready-api-openapi.yml",
+    "drata-auth0-proxy-api-openapi.yml",
     "drata-account-members-api-openapi.yml",
     "drata-accounts-api-openapi.yml",
     "drata-documents-api-openapi.yml",
@@ -65,10 +70,25 @@
   "warnings": [],
   "notes": [
     "1 archived document(s) dropped as subsets of other archived documents",
-    "sourced from openapi/_original/ (2 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "sourced from openapi/_original/ (3 archived document(s)); previously refined output at the top level was skipped rather than re-split",
     "drata-api-v2-openapi.json: upgraded openapi 3.0.0 -> OpenAPI 3.2.0",
     "drata-api-v2-openapi.json: declared missing tag: Audit Requests",
     "drata-api-v2-openapi.json: declared missing tag: Procurement Connection Mappings",
+    "drata-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "drata-openapi.json: tagged paths GET /health -> Health",
+    "drata-openapi.json: tagged paths GET /ready -> Ready",
+    "drata-openapi.json: tagged paths GET /.well-known/openid-configuration -> .well Known",
+    "drata-openapi.json: tagged paths OPTIONS /.well-known/openid-configuration -> .well Known",
+    "drata-openapi.json: tagged paths GET /.well-known/oauth-authorization-server/mcp -> .well Known",
+    "drata-openapi.json: tagged paths OPTIONS /.well-known/oauth-authorization-server/mcp -> .well Known",
+    "drata-openapi.json: tagged paths GET /.well-known/oauth-authorization-server -> .well Known",
+    "drata-openapi.json: tagged paths OPTIONS /.well-known/oauth-authorization-server -> .well Known",
+    "drata-openapi.json: tagged paths GET /.well-known/oauth-protected-resource -> .well Known",
+    "drata-openapi.json: tagged paths OPTIONS /.well-known/oauth-protected-resource -> .well Known",
+    "drata-openapi.json: declared missing tag: .well Known",
+    "drata-openapi.json: declared missing tag: Health",
+    "drata-openapi.json: declared missing tag: Ready",
+    "drata-openapi.json: declared missing tag: auth0-proxy",
     "drata-safebase-trust-api-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
     "drata-safebase-trust-api-openapi.json: declared missing tag: Account Members",
     "drata-safebase-trust-api-openapi.json: declared missing tag: Accounts",
@@ -81,7 +101,7 @@
     "drata-safebase-trust-api-openapi.json: declared missing tag: Requests",
     "drata-safebase-trust-api-openapi.json: declared missing tag: Tags",
     "drata-safebase-trust-api-openapi.json: declared missing tag: Trust Center Updates",
-    "apis.yml register: already-registered"
+    "apis.yml register: written (+4 apis, 56 total)"
   ],
   "skipped": [
     "_original/drata-api-v2-openapi.yml: archived document superseded by a larger archived document",

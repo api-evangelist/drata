@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -410,46 +472,34 @@ paths:
         💎 Requires your account have the **Custom Connections and Tests** feature. Contact your CSM for help upgrading.'
 components:
   schemas:
-    UserCompactResponsePublicV2Dto:
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
-        id:
+        name:
+          type: string
+        statusCode:
           type: number
-          example: 1
-          description: User ID
-        email:
+        message:
           type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
+      - name
+      - statusCode
+      - message
+      - code
     CustomConnectionResourceResponsePublicV2Dto:
       type: object
       properties:
@@ -505,32 +555,26 @@ components:
       - schema
       - createdAt
       - updatedAt
-    CustomConnectionUpdateRequestPublicV2Dto:
+    PaginationTotalCountResponsePublicV2Dto:
       type: object
       properties:
-        clientAlias:
+        cursor:
           type:
           - string
           - 'null'
-          example: My Updated Custom Connection
-          description: Alias for the Custom Connection
-        description:
-          type: string
-          example: Updated description for Custom Connection
-          description: Description for Custom Connection
-    CustomConnectionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: List of Custom Connections based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
-      - data
-      - pagination
+      - cursor
+    CustomConnectionExpandEnum:
+      type: string
+      enum:
+      - createdByUser
+      - customResources
     CustomConnectionCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -605,11 +649,59 @@ components:
       required:
       - name
       - providerTypes
-    CustomConnectionExpandEnum:
-      type: string
-      enum:
-      - createdByUser
-      - customResources
+    CustomConnectionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: List of Custom Connections based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomConnectionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
     CustomConnectionResponsePublicV2Dto:
       type: object
       properties:
@@ -696,59 +788,29 @@ components:
       - description
       - createdAt
       - updatedAt
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    ExceptionResponsePublicV2Dto:
+    CustomConnectionUpdateRequestPublicV2Dto:
       type: object
       properties:
-        name:
+        clientAlias:
+          type:
+          - string
+          - 'null'
+          example: My Updated Custom Connection
+          description: Alias for the Custom Connection
+        description:
           type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
+          example: Updated description for Custom Connection
+          description: Description for Custom Connection
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
     ExceptionResponseDto:
       type: object
       properties:

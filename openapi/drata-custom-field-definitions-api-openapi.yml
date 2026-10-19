@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -212,6 +274,143 @@ paths:
       - CUSTOM_FIELDS_ENGINE
 components:
   schemas:
+    PaginationResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+      required:
+      - cursor
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    CustomFieldDefinitionsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldDefinitionResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    CustomFieldTypeEnum:
+      type: string
+      enum:
+      - TEXT
+      - NUMBER
+      - CURRENCY
+      - OPTIONS
+      - FORMULA
+      - OPTIONS_NUMERIC
+      - LONG_TEXT
+      - URL
     CustomFieldDefinitionFrameworkScopeResponsePublicV2Dto:
       type: object
       properties:
@@ -228,38 +427,6 @@ components:
       required:
       - frameworkTags
       - frameworkIds
-    CustomFieldDefinitionsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldDefinitionResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    PaginationResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-      required:
-      - cursor
-    CustomFieldsEntityTypeEnum:
-      type: string
-      enum:
-      - RISK
-      - CONTROL
-      - ASSET
-      - PERSONNEL
-      - VENDOR
-      - FRAMEWORK_REQUIREMENTS
     CustomFieldCurrencyCodeEnum:
       type: string
       enum:
@@ -315,88 +482,6 @@ components:
       - USD
       - UYU
       - ZAR
-    CustomFieldTypeEnum:
-      type: string
-      enum:
-      - TEXT
-      - NUMBER
-      - CURRENCY
-      - OPTIONS
-      - FORMULA
-      - OPTIONS_NUMERIC
-      - LONG_TEXT
-      - URL
-    FrameworkTagEnum:
-      type: string
-      enum:
-      - CUSTOM
-      - NONE
-      - SOC_2
-      - ISO27001
-      - CCPA
-      - GDPR
-      - HIPAA
-      - PCI
-      - SCF
-      - NIST80053
-      - NISTCSF
-      - CMMC
-      - NIST800171
-      - MSSSPA
-      - FFIEC
-      - ISO27701
-      - COBIT
-      - SOX_ITGC
-      - ISO270012022
-      - CCM
-      - CYBER_ESSENTIALS
-      - ISO270172015
-      - ISO270182019
-      - FEDRAMP
-      - NISTAI
-      - PCI4
-      - NISTCSF2
-      - NIS2
-      - DORA
-      - ISO420012023
-      - DRATA_ESSENTIALS
-      - NIST800171R3
-      - CIS8
-      - CYBER_ESSENTIALS_32
-      - FEDRAMP20X
-      - HITRUST
-      - MSSSPA11
-      - ESSENTIAL_EIGHT
-      - NYDFS
-      - TISAX
-      - ISO270182025
-      - CCPA2026
-      - ISO277012025
-      - CPS230
-      - CYFUN
-      - AIUC_1
-      - ALL
-    CustomFieldDefinitionOptionResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldOptionId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field Option. Use this value when writing OPTIONS or OPTIONS_NUMERIC values on resources.
-        value:
-          oneOf:
-          - type: string
-          - type: number
-          example: Security & IT
-          description: The display value of this option. For OPTIONS fields this is a string; for OPTIONS_NUMERIC fields this is a number.
-      required:
-      - customFieldOptionId
-      - value
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
     CustomFieldDefinitionResponsePublicV2Dto:
       type: object
       properties:
@@ -459,64 +544,41 @@ components:
       - isHidden
       - readOnly
       - entityTypes
+    CustomFieldsEntityTypeEnum:
+      type: string
+      enum:
+      - RISK
+      - CONTROL
+      - ASSET
+      - PERSONNEL
+      - VENDOR
+      - FRAMEWORK_REQUIREMENTS
     SortTypeLimitedEnum:
       type: string
       enum:
       - createdAt
       - updatedAt
-    ExceptionResponsePublicV2Dto:
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    CustomFieldDefinitionOptionResponsePublicV2Dto:
       type: object
       properties:
-        name:
-          type: string
-        statusCode:
+        customFieldOptionId:
           type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+          example: 1
+          description: The ID of the Custom Field Option. Use this value when writing OPTIONS or OPTIONS_NUMERIC values on resources.
+        value:
+          oneOf:
+          - type: string
+          - type: number
+          example: Security & IT
+          description: The display value of this option. For OPTIONS fields this is a string; for OPTIONS_NUMERIC fields this is a number.
       required:
-      - name
-      - statusCode
-      - message
-      - code
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
+      - customFieldOptionId
+      - value
   securitySchemes:
     bearer:
       scheme: bearer

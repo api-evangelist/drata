@@ -1,0 +1,141 @@
+openapi: 3.2.0
+info:
+  title: Fast .well Known API
+  version: 0.1.0
+tags:
+- name: .well Known
+paths:
+  /.well-known/openid-configuration:
+    get:
+      summary: Oauth Authorization Server
+      description: 'Root-level OAuth authorization server metadata.
+
+
+        Some MCP clients look for OIDC configuration at the root level.
+
+        This proxies Auth0''s configuration with our modified authorization_endpoint.
+
+
+        Matches TypeScript implementation in mcp.controller.ts.'
+      operationId: oauth_authorization_server__well_known_openid_configuration_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+    options:
+      summary: Options Handler
+      description: Handle OPTIONS requests for CORS preflight.
+      operationId: options_handler__well_known_openid_configuration_options
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+  /.well-known/oauth-authorization-server/mcp:
+    get:
+      summary: Oauth Authorization Server
+      description: 'Root-level OAuth authorization server metadata.
+
+
+        Some MCP clients look for OIDC configuration at the root level.
+
+        This proxies Auth0''s configuration with our modified authorization_endpoint.
+
+
+        Matches TypeScript implementation in mcp.controller.ts.'
+      operationId: oauth_authorization_server__well_known_oauth_authorization_server_mcp_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+    options:
+      summary: Options Handler
+      description: Handle OPTIONS requests for CORS preflight.
+      operationId: options_handler__well_known_oauth_authorization_server_mcp_options
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+  /.well-known/oauth-authorization-server:
+    get:
+      summary: Oauth Authorization Server
+      description: 'Root-level OAuth authorization server metadata.
+
+
+        Some MCP clients look for OIDC configuration at the root level.
+
+        This proxies Auth0''s configuration with our modified authorization_endpoint.
+
+
+        Matches TypeScript implementation in mcp.controller.ts.'
+      operationId: oauth_authorization_server__well_known_oauth_authorization_server_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+    options:
+      summary: Options Handler
+      description: Handle OPTIONS requests for CORS preflight.
+      operationId: options_handler__well_known_oauth_authorization_server_options
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+  /.well-known/oauth-protected-resource:
+    get:
+      summary: Oauth Protected Resource
+      description: 'OAuth Protected Resource metadata endpoint.
+
+
+        This is the primary discovery endpoint that MCP clients (like mcp-remote) use
+
+        to discover OAuth requirements. It points clients to our Auth0 proxy as the
+
+        authorization server.
+
+
+        See: RFC 9728 (OAuth 2.0 Protected Resource Metadata)'
+      operationId: oauth_protected_resource__well_known_oauth_protected_resource_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known
+    options:
+      summary: Options Handler
+      description: Handle OPTIONS requests for CORS preflight.
+      operationId: options_handler__well_known_oauth_protected_resource_options
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      tags:
+      - .well Known

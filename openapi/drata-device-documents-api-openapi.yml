@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -324,31 +386,80 @@ paths:
       - MDM
 components:
   schemas:
-    DeviceDocumentCreateRequestPublicV2Dto:
+    DeviceDocumentTypeEnum:
+      type: string
+      enum:
+      - PASSWORD_MANAGER_EVIDENCE
+      - AUTO_UPDATES_EVIDENCE
+      - HARD_DRIVE_ENCRYPTION_EVIDENCE
+      - ANTIVIRUS_EVIDENCE
+      - LOCK_SCREEN_EVIDENCE
+    ExceptionResponsePublicV2Dto:
       type: object
       properties:
-        type:
-          enum:
-          - PASSWORD_MANAGER_EVIDENCE
-          - AUTO_UPDATES_EVIDENCE
-          - HARD_DRIVE_ENCRYPTION_EVIDENCE
-          - ANTIVIRUS_EVIDENCE
-          - LOCK_SCREEN_EVIDENCE
+        name:
           type: string
-          example: PASSWORD_MANAGER_EVIDENCE
-          description: The device document type
-        file:
+        statusCode:
+          type: number
+        message:
           type: string
-          format: binary
-          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png'
-        base64File:
-          type: string
-          example:
-            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
-            filename: excellent-filename
-          description: JSON string with external evidence in Base64 format.
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
       required:
-      - type
+      - name
+      - statusCode
+      - message
+      - code
+    DeviceDocumentsResponsePublicV2Dto:
+      type: object
+      properties:
+        documents:
+          description: Full list of device documents
+          type: array
+          items:
+            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
+      required:
+      - documents
+    DeviceDocumentExpandEnum:
+      type: string
+      enum:
+      - downloadUrl
+    SignedUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        signedUrl:
+          type: string
+          example: https://somedomain.com/filename.pdf?Signature=ABC123
+          description: The short lived signed URL to link directly to the private file
+        fileBuffer:
+          type:
+          - object
+          - 'null'
+          description: The file on buffer format. This only applies for txt files.
+          example:
+            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
+        fileName:
+          type:
+          - string
+          - 'null'
+          example: Artifact 3.png
+          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+      required:
+      - signedUrl
+      - fileBuffer
+      - fileName
     DeviceDocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -391,80 +502,31 @@ components:
       - fileUrl
       - createdAt
       - updatedAt
-    DeviceDocumentsResponsePublicV2Dto:
+    DeviceDocumentCreateRequestPublicV2Dto:
       type: object
       properties:
-        documents:
-          description: Full list of device documents
-          type: array
-          items:
-            $ref: '#/components/schemas/DeviceDocumentResponsePublicV2Dto'
-      required:
-      - documents
-    SignedUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        signedUrl:
+        type:
+          enum:
+          - PASSWORD_MANAGER_EVIDENCE
+          - AUTO_UPDATES_EVIDENCE
+          - HARD_DRIVE_ENCRYPTION_EVIDENCE
+          - ANTIVIRUS_EVIDENCE
+          - LOCK_SCREEN_EVIDENCE
           type: string
-          example: https://somedomain.com/filename.pdf?Signature=ABC123
-          description: The short lived signed URL to link directly to the private file
-        fileBuffer:
-          type:
-          - object
-          - 'null'
-          description: The file on buffer format. This only applies for txt files.
+          example: PASSWORD_MANAGER_EVIDENCE
+          description: The device document type
+        file:
+          type: string
+          format: binary
+          description: 'Accepted file extensions: .pdf, .docx, .odt, .doc, .xlsx, .ods, .pptx, .odp, .gif, .jpg, .jpeg, .png'
+        base64File:
+          type: string
           example:
-            buffer: RXhhbXBsZSB0ZXh0IGNvbnRlbnQ=
-        fileName:
-          type:
-          - string
-          - 'null'
-          example: Artifact 3.png
-          description: Resolved download filename, extension-repaired server-side. Null when the endpoint does not provide one.
+            base64String: data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABg
+            filename: excellent-filename
+          description: JSON string with external evidence in Base64 format.
       required:
-      - signedUrl
-      - fileBuffer
-      - fileName
-    DeviceDocumentTypeEnum:
-      type: string
-      enum:
-      - PASSWORD_MANAGER_EVIDENCE
-      - AUTO_UPDATES_EVIDENCE
-      - HARD_DRIVE_ENCRYPTION_EVIDENCE
-      - ANTIVIRUS_EVIDENCE
-      - LOCK_SCREEN_EVIDENCE
-    DeviceDocumentExpandEnum:
-      type: string
-      enum:
-      - downloadUrl
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
+      - type
     ExceptionResponseDto:
       type: object
       properties:

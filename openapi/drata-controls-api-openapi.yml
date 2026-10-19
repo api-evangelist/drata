@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -878,6 +940,178 @@ paths:
       - REQUIREMENTS_FRAMEWORKS
 components:
   schemas:
+    ControlActionRequestPublicV2Dto:
+      type: object
+      properties:
+        action:
+          example: markOutOfScope
+          description: 'Action to perform: `markOutOfScope` archives the control, `markInScope` restores it'
+          allOf:
+          - $ref: '#/components/schemas/ControlActionEnum'
+        rationale:
+          type: string
+          maxLength: 191
+          description: Required when action is `markOutOfScope`. Business rationale for archiving the control.
+      required:
+      - action
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    ControlsResetMappingsResponsePublicV2Dto:
+      type: object
+      properties:
+        results:
+          description: Results for each control reset operation
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlResetResultPublicV2Dto'
+      required:
+      - results
+    ControlActionEnum:
+      type: string
+      enum:
+      - markInScope
+      - markOutOfScope
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+      required:
+      - id
+      - email
+      - firstName
+      - lastName
+      - createdAt
+      - updatedAt
+    OwnersSubcollectionResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of owners. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 15
+          description: Total count of all owners for this control.
+      required:
+      - data
+      - totalCount
+    ControlsRequirementComparisonResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of control requirement comparisons
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlRequirementComparisonResponsePublicV2Dto'
+      required:
+      - data
+    FrameworkTagEnum:
+      type: string
+      enum:
+      - CUSTOM
+      - NONE
+      - SOC_2
+      - ISO27001
+      - CCPA
+      - GDPR
+      - HIPAA
+      - PCI
+      - SCF
+      - NIST80053
+      - NISTCSF
+      - CMMC
+      - NIST800171
+      - MSSSPA
+      - FFIEC
+      - ISO27701
+      - COBIT
+      - SOX_ITGC
+      - ISO270012022
+      - CCM
+      - CYBER_ESSENTIALS
+      - ISO270172015
+      - ISO270182019
+      - FEDRAMP
+      - NISTAI
+      - PCI4
+      - NISTCSF2
+      - NIS2
+      - DORA
+      - ISO420012023
+      - DRATA_ESSENTIALS
+      - NIST800171R3
+      - CIS8
+      - CYBER_ESSENTIALS_32
+      - FEDRAMP20X
+      - HITRUST
+      - MSSSPA11
+      - ESSENTIAL_EIGHT
+      - NYDFS
+      - TISAX
+      - ISO270182025
+      - CCPA2026
+      - ISO277012025
+      - CPS230
+      - CYFUN
+      - AIUC_1
+      - ALL
     ControlCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -985,301 +1219,6 @@ components:
       - name
       - description
       - code
-    ControlRequirementResponsePublicV2Dto:
-      type: object
-      properties:
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the requirement was created
-        description:
-          type: string
-          example: The entity demonstrates a commitment to integrity and ethical values.
-          description: Requirement description
-        frameworkName:
-          type: string
-          example: SOC 2
-          description: The framework name this requirement is associated with
-        frameworkPill:
-          type: string
-          example: SOC 2
-          description: A pill representing the framework
-        frameworkSlug:
-          type: string
-          example: SOC 2
-          description: The framework slug this requirement is associated with
-        frameworkTag:
-          type: string
-          example: SOC_2
-          description: The framework tag this requirement is associated with
-        id:
-          type: number
-          example: '58'
-          description: Requirement ID
-        name:
-          type: string
-          example: PI1.2
-          description: Requirement name
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the requirement was updated
-        additionalInfo:
-          type:
-          - string
-          - 'null'
-          example: The entity demonstrates a commitment to integrity.
-          description: Additional information surrounding requirement
-        additionalInfo2:
-          type:
-          - string
-          - 'null'
-          example: The entity demonstrates a commitment to ethical values.
-          description: Second additional information surrounding requirement
-        additionalInfo3:
-          type:
-          - string
-          - 'null'
-          example: The entity demonstrates a commitment to enforcing policies.
-          description: Third additional information surrounding requirement
-        archivedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the requirement was marked out of scope
-        externalId:
-          type:
-          - string
-          - 'null'
-          example: SOC 2
-          description: An external ID associated with this requirement
-        longDescription:
-          type:
-          - string
-          - 'null'
-          example: The entity demonstrates a commitment to integrity and ethical values.
-          description: 'A long description of the requirement '
-        rationale:
-          type:
-          - string
-          - 'null'
-          example: This requirement is not needed.
-          description: Requirement rationale for out of scope.
-      required:
-      - createdAt
-      - description
-      - frameworkName
-      - frameworkPill
-      - frameworkSlug
-      - frameworkTag
-      - id
-      - name
-      - updatedAt
-      - additionalInfo
-      - additionalInfo2
-      - additionalInfo3
-      - archivedAt
-      - externalId
-      - longDescription
-      - rationale
-    OwnersSubcollectionResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of owners. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 15
-          description: Total count of all owners for this control.
-      required:
-      - data
-      - totalCount
-    ControlsExpandEnum:
-      type: string
-      enum:
-      - customFields
-      - evidenceIds
-      - flags
-      - frameworkTags
-      - owners
-      - requirements
-      - testIds
-      - topics
-    ControlFlagsResponsePublicV2Dto:
-      type: object
-      properties:
-        hasEvidence:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Indicates if the Control has any linked Polices, Reports, External Evidence, or Control Tests
-        hasPolicy:
-          type:
-          - boolean
-          - 'null'
-          example: true
-          description: Indicates if the Control has any linked Polices
-        isReady:
-          type:
-          - boolean
-          - 'null'
-          example: 'true'
-          description: Indicates if the Control is ready
-        hasTicket:
-          type:
-          - boolean
-          - 'null'
-          example: 'true'
-          description: Indicates if the Control is associated with a Task Management Ticket
-        hasOwner:
-          type: boolean
-          example: false
-          description: Indicates if the Control has any Owners
-        isMonitored:
-          type: boolean
-          example: false
-          description: Indicates if the Control has a Test
-      required:
-      - hasEvidence
-      - hasPolicy
-      - isReady
-      - hasTicket
-      - hasOwner
-      - isMonitored
-    ControlsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ControlRequirementsResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlRequirementResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    TrustServiceCriteriaEnum:
-      type: string
-      enum:
-      - AVAILABILITY
-      - CONFIDENTIALITY
-      - SECURITY
-      - PRIVACY
-      - PROCESS_INTEGRITY
-      - GENERAL_RULES
-      - ADMINISTRATIVE_SAFEGUARDS
-      - PHYSICAL_SAFEGUARDS
-      - TECHNICAL_SAFEGUARDS
-      - REQUIREMENTS_ORGANIZATION
-      - REQUIREMENTS_POLICIES_PROCEDURES
-      - BASIC
-      - DERIVED
-      - NIST80053_PRIVACY
-    CustomFieldResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field
-        name:
-          type: string
-          example: Stakeholders
-          description: The name of the Custom Field
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field
-      required:
-      - customFieldId
-      - name
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    ControlTestIdsResponsePublicV2Dto:
-      type: object
-      properties:
-        passing:
-          example:
-          - 1
-          - 2
-          - 3
-          description: IDs of passing control tests
-          type: array
-          items:
-            type: number
-        failing:
-          example:
-          - 4
-          description: IDs of failing control tests
-          type: array
-          items:
-            type: number
-        monitored:
-          example:
-          - 1
-          - 2
-          - 3
-          - 5
-          description: IDs of monitored control tests
-          type: array
-          items:
-            type: number
-      required:
-      - passing
-      - failing
-      - monitored
     ShortRequirementResponsePublicV2Dto:
       type: object
       properties:
@@ -1324,11 +1263,115 @@ components:
           description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
       required:
       - cursor
-    SortDirectionEnum:
+    ControlsExpandEnum:
       type: string
       enum:
-      - ASC
-      - DESC
+      - customFields
+      - evidenceIds
+      - flags
+      - frameworkTags
+      - owners
+      - requirements
+      - testIds
+      - topics
+    ControlModifyRequestPublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Quarterly User Access Reviews
+          description: The name of the Control
+        description:
+          type: string
+          maxLength: 30000
+          example: Access to critical systems is reviewed on a quarterly basis to ensure that only authorized users retain access.
+          description: The description of the Control
+        question:
+          type: string
+          maxLength: 768
+          example: A very good question
+          description: The question of the Control
+        code:
+          type: string
+          maxLength: 20
+          example: DRA-69
+          description: The Control code
+        activity:
+          type: string
+          maxLength: 768
+          example: On a quarterly schedule, generate access reports from identity providers.
+          description: The activity of the Control
+        reportIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Report IDs
+          type: array
+          items:
+            type: number
+        policyIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Policy IDs
+          type: array
+          items:
+            type: number
+        requirementIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Requirement IDs
+          type: array
+          items:
+            type: number
+        ownersIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of User IDs to make owners of the Control
+          type: array
+          items:
+            type: number
+        testIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: Array of Control Test IDs
+          type: array
+          items:
+            type: number
+        customFields:
+          description: "Custom Fields for the Control. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+    ControlResetResultPublicV2Dto:
+      type: object
+      properties:
+        controlId:
+          type: number
+          description: Control ID
+          example: 123
+        success:
+          type: boolean
+          description: Whether the reset was successful
+          example: true
+        error:
+          type:
+          - string
+          - 'null'
+          description: Error message if reset failed
+          example: Cannot reset requirement mappings for Custom Control
+      required:
+      - controlId
+      - success
     ControlResponsePublicV2Dto:
       type: object
       properties:
@@ -1450,35 +1493,33 @@ components:
       - createdAt
       - updatedAt
       - controlTemplateId
-    ControlActionRequestPublicV2Dto:
+    ControlRequirementComparisonResponsePublicV2Dto:
       type: object
       properties:
-        action:
-          example: markOutOfScope
-          description: 'Action to perform: `markOutOfScope` archives the control, `markInScope` restores it'
-          allOf:
-          - $ref: '#/components/schemas/ControlActionEnum'
-        rationale:
-          type: string
-          maxLength: 191
-          description: Required when action is `markOutOfScope`. Business rationale for archiving the control.
-      required:
-      - action
-    ControlsResetMappingsRequestPublicV2Dto:
-      type: object
-      properties:
-        controlIds:
-          maxItems: 100
-          example:
-          - 123
-          - 456
-          - 789
-          description: Array of control IDs to reset requirement mappings for (max 100)
+        controlId:
+          type: number
+          example: 123
+          description: Control ID
+        alignedRequirements:
+          description: Requirements found in both tenant and global mappings
           type: array
           items:
-            type: number
+            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
+        userMappedRequirements:
+          description: Requirements found only in tenant mappings
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
+        templateMappedRequirements:
+          description: Requirements found only in global template mappings
+          type: array
+          items:
+            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
       required:
-      - controlIds
+      - controlId
+      - alignedRequirements
+      - userMappedRequirements
+      - templateMappedRequirements
     ControlEvidenceIdsResponsePublicV2Dto:
       type: object
       properties:
@@ -1517,275 +1558,53 @@ components:
       - invalidExternalEvidenceIds
       - validReportIds
       - invalidReportIds
-    ControlExpandEnum:
+    SortTypeLimitedEnum:
       type: string
       enum:
-      - customFields
-      - evidenceIds
-      - flags
-      - frameworkTags
-      - owners
-      - requirements
-      - testIds
-      - topics
-    ExceptionResponsePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - name
-      - statusCode
-      - message
-      - code
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
       - createdAt
       - updatedAt
-    ControlsRequirementComparisonResponsePublicV2Dto:
+    ControlFlagsResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Array of control requirement comparisons
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlRequirementComparisonResponsePublicV2Dto'
-      required:
-      - data
-    ControlResetResultPublicV2Dto:
-      type: object
-      properties:
-        controlId:
-          type: number
-          description: Control ID
-          example: 123
-        success:
-          type: boolean
-          description: Whether the reset was successful
-          example: true
-        error:
+        hasEvidence:
           type:
-          - string
+          - boolean
           - 'null'
-          description: Error message if reset failed
-          example: Cannot reset requirement mappings for Custom Control
+          example: true
+          description: Indicates if the Control has any linked Polices, Reports, External Evidence, or Control Tests
+        hasPolicy:
+          type:
+          - boolean
+          - 'null'
+          example: true
+          description: Indicates if the Control has any linked Polices
+        isReady:
+          type:
+          - boolean
+          - 'null'
+          example: 'true'
+          description: Indicates if the Control is ready
+        hasTicket:
+          type:
+          - boolean
+          - 'null'
+          example: 'true'
+          description: Indicates if the Control is associated with a Task Management Ticket
+        hasOwner:
+          type: boolean
+          example: false
+          description: Indicates if the Control has any Owners
+        isMonitored:
+          type: boolean
+          example: false
+          description: Indicates if the Control has a Test
       required:
-      - controlId
-      - success
-    ControlRequirementComparisonResponsePublicV2Dto:
-      type: object
-      properties:
-        controlId:
-          type: number
-          example: 123
-          description: Control ID
-        alignedRequirements:
-          description: Requirements found in both tenant and global mappings
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
-        userMappedRequirements:
-          description: Requirements found only in tenant mappings
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
-        templateMappedRequirements:
-          description: Requirements found only in global template mappings
-          type: array
-          items:
-            $ref: '#/components/schemas/ShortRequirementResponsePublicV2Dto'
-      required:
-      - controlId
-      - alignedRequirements
-      - userMappedRequirements
-      - templateMappedRequirements
-    ControlModifyRequestPublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: Quarterly User Access Reviews
-          description: The name of the Control
-        description:
-          type: string
-          maxLength: 30000
-          example: Access to critical systems is reviewed on a quarterly basis to ensure that only authorized users retain access.
-          description: The description of the Control
-        question:
-          type: string
-          maxLength: 768
-          example: A very good question
-          description: The question of the Control
-        code:
-          type: string
-          maxLength: 20
-          example: DRA-69
-          description: The Control code
-        activity:
-          type: string
-          maxLength: 768
-          example: On a quarterly schedule, generate access reports from identity providers.
-          description: The activity of the Control
-        reportIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: Array of Report IDs
-          type: array
-          items:
-            type: number
-        policyIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: Array of Policy IDs
-          type: array
-          items:
-            type: number
-        requirementIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: Array of Requirement IDs
-          type: array
-          items:
-            type: number
-        ownersIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: Array of User IDs to make owners of the Control
-          type: array
-          items:
-            type: number
-        testIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: Array of Control Test IDs
-          type: array
-          items:
-            type: number
-        customFields:
-          description: "Custom Fields for the Control. \n\n\U0001F48E Requires your account have the Custom Fields and Formulas feature. Contact your CSM for help upgrading."
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-    FrameworkTagEnum:
-      type: string
-      enum:
-      - CUSTOM
-      - NONE
-      - SOC_2
-      - ISO27001
-      - CCPA
-      - GDPR
-      - HIPAA
-      - PCI
-      - SCF
-      - NIST80053
-      - NISTCSF
-      - CMMC
-      - NIST800171
-      - MSSSPA
-      - FFIEC
-      - ISO27701
-      - COBIT
-      - SOX_ITGC
-      - ISO270012022
-      - CCM
-      - CYBER_ESSENTIALS
-      - ISO270172015
-      - ISO270182019
-      - FEDRAMP
-      - NISTAI
-      - PCI4
-      - NISTCSF2
-      - NIS2
-      - DORA
-      - ISO420012023
-      - DRATA_ESSENTIALS
-      - NIST800171R3
-      - CIS8
-      - CYBER_ESSENTIALS_32
-      - FEDRAMP20X
-      - HITRUST
-      - MSSSPA11
-      - ESSENTIAL_EIGHT
-      - NYDFS
-      - TISAX
-      - ISO270182025
-      - CCPA2026
-      - ISO277012025
-      - CPS230
-      - CYFUN
-      - AIUC_1
-      - ALL
-    ControlActionEnum:
-      type: string
-      enum:
-      - markInScope
-      - markOutOfScope
+      - hasEvidence
+      - hasPolicy
+      - isReady
+      - hasTicket
+      - hasOwner
+      - isMonitored
     CustomFieldSubmitRequestPublicV2Dto:
       type: object
       properties:
@@ -1805,16 +1624,259 @@ components:
           description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
       required:
       - value
-    ControlsResetMappingsResponsePublicV2Dto:
+    ControlRequirementResponsePublicV2Dto:
       type: object
       properties:
-        results:
-          description: Results for each control reset operation
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the requirement was created
+        description:
+          type: string
+          example: The entity demonstrates a commitment to integrity and ethical values.
+          description: Requirement description
+        frameworkName:
+          type: string
+          example: SOC 2
+          description: The framework name this requirement is associated with
+        frameworkPill:
+          type: string
+          example: SOC 2
+          description: A pill representing the framework
+        frameworkSlug:
+          type: string
+          example: SOC 2
+          description: The framework slug this requirement is associated with
+        frameworkTag:
+          type: string
+          example: SOC_2
+          description: The framework tag this requirement is associated with
+        id:
+          type: number
+          example: '58'
+          description: Requirement ID
+        name:
+          type: string
+          example: PI1.2
+          description: Requirement name
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the requirement was updated
+        additionalInfo:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to integrity.
+          description: Additional information surrounding requirement
+        additionalInfo2:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to ethical values.
+          description: Second additional information surrounding requirement
+        additionalInfo3:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to enforcing policies.
+          description: Third additional information surrounding requirement
+        archivedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the requirement was marked out of scope
+        externalId:
+          type:
+          - string
+          - 'null'
+          example: SOC 2
+          description: An external ID associated with this requirement
+        longDescription:
+          type:
+          - string
+          - 'null'
+          example: The entity demonstrates a commitment to integrity and ethical values.
+          description: 'A long description of the requirement '
+        rationale:
+          type:
+          - string
+          - 'null'
+          example: This requirement is not needed.
+          description: Requirement rationale for out of scope.
+      required:
+      - createdAt
+      - description
+      - frameworkName
+      - frameworkPill
+      - frameworkSlug
+      - frameworkTag
+      - id
+      - name
+      - updatedAt
+      - additionalInfo
+      - additionalInfo2
+      - additionalInfo3
+      - archivedAt
+      - externalId
+      - longDescription
+      - rationale
+    ControlTestIdsResponsePublicV2Dto:
+      type: object
+      properties:
+        passing:
+          example:
+          - 1
+          - 2
+          - 3
+          description: IDs of passing control tests
           type: array
           items:
-            $ref: '#/components/schemas/ControlResetResultPublicV2Dto'
+            type: number
+        failing:
+          example:
+          - 4
+          description: IDs of failing control tests
+          type: array
+          items:
+            type: number
+        monitored:
+          example:
+          - 1
+          - 2
+          - 3
+          - 5
+          description: IDs of monitored control tests
+          type: array
+          items:
+            type: number
       required:
-      - results
+      - passing
+      - failing
+      - monitored
+    ControlsResetMappingsRequestPublicV2Dto:
+      type: object
+      properties:
+        controlIds:
+          maxItems: 100
+          example:
+          - 123
+          - 456
+          - 789
+          description: Array of control IDs to reset requirement mappings for (max 100)
+          type: array
+          items:
+            type: number
+      required:
+      - controlIds
+    ControlsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    ControlExpandEnum:
+      type: string
+      enum:
+      - customFields
+      - evidenceIds
+      - flags
+      - frameworkTags
+      - owners
+      - requirements
+      - testIds
+      - topics
+    CustomFieldResponsePublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
+      required:
+      - customFieldId
+      - name
+    ControlRequirementsResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlRequirementResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    TrustServiceCriteriaEnum:
+      type: string
+      enum:
+      - AVAILABILITY
+      - CONFIDENTIALITY
+      - SECURITY
+      - PRIVACY
+      - PROCESS_INTEGRITY
+      - GENERAL_RULES
+      - ADMINISTRATIVE_SAFEGUARDS
+      - PHYSICAL_SAFEGUARDS
+      - TECHNICAL_SAFEGUARDS
+      - REQUIREMENTS_ORGANIZATION
+      - REQUIREMENTS_POLICIES_PROCEDURES
+      - BASIC
+      - DERIVED
+      - NIST80053_PRIVACY
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

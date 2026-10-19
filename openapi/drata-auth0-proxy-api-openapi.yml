@@ -1,0 +1,100 @@
+openapi: 3.2.0
+info:
+  title: Fast Auth0 Proxy API
+  version: 0.1.0
+tags:
+- name: auth0-proxy
+paths:
+  /auth0-proxy/.well-known/openid_configuration:
+    get:
+      tags:
+      - auth0-proxy
+      summary: Get Openid Configuration
+      description: 'Fetch Auth0''s OpenID configuration and modify authorization_endpoint.
+
+
+        This matches the TypeScript implementation in mcp.service.ts:handleAuth0ProxyDiscovery'
+      operationId: get_openid_configuration_auth0_proxy__well_known_openid_configuration_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /auth0-proxy/.well-known/openid-configuration:
+    get:
+      tags:
+      - auth0-proxy
+      summary: Get Openid Configuration
+      description: 'Fetch Auth0''s OpenID configuration and modify authorization_endpoint.
+
+
+        This matches the TypeScript implementation in mcp.service.ts:handleAuth0ProxyDiscovery'
+      operationId: getAuth0ProxyWellKnownOpenidConfiguration
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      x-operation-id-source: normalized
+      x-operation-id-original: get_openid_configuration_auth0_proxy__well_known_openid_configuration_get
+  /auth0-proxy/.well-known/oauth_authorization_server:
+    get:
+      tags:
+      - auth0-proxy
+      summary: Get Oauth Authorization Server
+      description: 'Alias for OpenID configuration (same handler).
+
+
+        Some OAuth clients look for oauth-authorization-server instead of openid-configuration.'
+      operationId: get_oauth_authorization_server_auth0_proxy__well_known_oauth_authorization_server_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+  /auth0-proxy/.well-known/oauth-authorization-server:
+    get:
+      tags:
+      - auth0-proxy
+      summary: Get Oauth Authorization Server
+      description: 'Alias for OpenID configuration (same handler).
+
+
+        Some OAuth clients look for oauth-authorization-server instead of openid-configuration.'
+      operationId: getAuth0ProxyWellKnownOauthAuthorizationServer
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+      x-operation-id-source: normalized
+      x-operation-id-original: get_oauth_authorization_server_auth0_proxy__well_known_oauth_authorization_server_get
+  /auth0-proxy/authorize:
+    get:
+      tags:
+      - auth0-proxy
+      summary: Authorize
+      description: 'Handle authorization requests by adding connection parameter and redirecting to Auth0.
+
+
+        This matches the TypeScript implementation in mcp.service.ts:handleAuth0ProxyAuthorize
+
+
+        Flow:
+
+        1. Receive OAuth parameters from MCP Inspector
+
+        2. Add connection= parameter
+
+        3. Redirect to Auth0''s real authorization endpoint'
+      operationId: authorize_auth0_proxy_authorize_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}

@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -505,485 +567,6 @@ paths:
       - TBD
 components:
   schemas:
-    BackgroundCheckResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          description: The Background Check Id
-        userId:
-          type:
-          - number
-          - 'null'
-          description: The user ID
-        status:
-          type: string
-          enum:
-          - PENDING
-          - OK
-          - ISSUE
-          - CANCELED
-          - EXPIRED
-          - OUT_OF_SCOPE
-          example: OK
-          description: The status of the background check
-        caseId:
-          type:
-          - string
-          - 'null'
-          example: abc123
-          description: The case ID of the KarmaCheck background check
-        caseInvitationId:
-          type: string
-          example: abc123
-          description: The case invitation ID of the KarmaCheck background check
-        url:
-          type: string
-          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
-          description: The URL of the background check
-        manualCheckDate:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2020-07-06'
-          description: The date this background check was manually uploaded
-        manuallyCheckUrl:
-          type:
-          - string
-          - 'null'
-          example: url.com
-          description: The url of manual background check
-        type:
-          type: string
-          enum:
-          - KARMACHECK
-          - MANUAL
-          - CERTN
-          - CHECKR
-          - HRIS_RIPPLING
-          - STERLING
-          - HIRERIGHT
-          - VETTY
-          example: CERTN
-          description: The background check type
-        source:
-          type:
-          - string
-          - 'null'
-          enum:
-          - DRATA
-          - CHECKR
-          - KARMACHECK
-          - RIPPLING_CHECKR
-          - CERTN
-          - STERLING
-          - HIRERIGHT
-          - VETTY
-          example: DRATA
-          description: The background check source
-        reportData:
-          type: string
-          description: The background check report data
-        outOfScopeReason:
-          type:
-          - string
-          - 'null'
-          example: abc123
-          description: the reason it was marked out of scope
-        outOfScopeAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When it was marked out of scope
-        invitationEmail:
-          type:
-          - string
-          - 'null'
-          example: email@email.com
-          description: Invitation email
-        linkedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: When the report was linked to a user
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Report created date timestamp
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Report updated date timestamp
-      required:
-      - id
-      - userId
-      - status
-      - caseId
-      - caseInvitationId
-      - url
-      - manualCheckDate
-      - manuallyCheckUrl
-      - type
-      - source
-      - reportData
-      - outOfScopeReason
-      - outOfScopeAt
-      - invitationEmail
-      - linkedAt
-      - createdAt
-      - updatedAt
-    SubjectEnum:
-      type: string
-      enum:
-      - AdminOnboarding
-      - Asset
-      - AuditHub
-      - Company
-      - CompanyDocument
-      - Connection
-      - Control
-      - ControlTestInstance
-      - CustomerRequest
-      - CustomTask
-      - Event
-      - Framework
-      - Personnel
-      - Policy
-      - PublicApiKey
-      - QuestionnairesVendors
-      - Report
-      - Risk
-      - RiskAssessment
-      - ServiceUser
-      - Ticket
-      - TrustCenter
-      - ListAllUsers
-      - UserIdentity
-      - UserIdentityInfrastructure
-      - UserIdentityVersionControl
-      - UsersRoles
-      - Vendor
-      - Vulnerability
-      - Note
-      - UserFeature
-      - Monitors
-      - Dashboard
-      - UserDocument
-      - Autopilot
-      - MonitorInstanceExclusion
-      - Workspace
-      - InternalSecurity
-      - ComplianceCheckExclusion
-      - UserLanguage
-      - SecurityReport
-      - Resync
-      - UserIdentityObservability
-      - SignIn
-      - FeatureAnnouncement
-      - Wysiwyg
-      - RemoteAccess
-      - EmployeeOnboarding
-      - UserIdentitiesAccess
-      - TicketManagement
-      - HumanResources
-      - UserControls
-      - TasksDetails
-      - ControlList
-      - ControlTicket
-      - RiskManagementTicket
-      - MonitorTicket
-      - CreateTicket
-      - DeleteTask
-      - UpdateTask
-      - CreateTask
-      - AssociateRequirements
-      - GetGroups
-      - WorkspaceConnections
-      - TrustCenterInfo
-      - GlobalConnection
-      - RiskTask
-      - GeneralTask
-      - ControlTask
-      - EvidenceTask
-      - PolicyTask
-      - VendorTask
-      - AccessReview
-      - RiskSettings
-      - Scan
-      - RiskDocument
-      - ViewAllControls
-      - ViewAllRisks
-      - ControlTemplate
-      - FrameworkMappingReset
-      - ActivateFramework
-      - CustomFields
-      - CaCConfiguration
-      - CaCMonitoring
-      - AccessReviewTicket
-      - SecurityQuestionnaire
-      - Findings
-      - ExceptionManagement
-      - CustomWorkflows
-      - VulnerabilityReport
-      - CustomConnections
-      - UserSettings
-      - KnowledgeBase
-      - TrustCenterRequest
-      - BulkImportRisk
-      - TestLibrary
-      - RiskRegisters
-      - BulkImportControl
-      - BulkImportTraining
-      - BulkImportBackgroundCheck
-      - BulkImportVendor
-      - RiskCategory
-      - Audit
-      - GroupRoleManagement
-      - BulkImportCustomTask
-      - UserIdentityHris
-      - Requirements
-      - BulkImportPolicyAcknowledgment
-      - BulkImportAsset
-      - Groups
-      - Task
-      - ExecutiveDashboard
-      - PolicyLanguage
-      - BulkImportEvidence
-      - Webhooks
-      - ALL
-      - DenyControl
-    UserResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-        jobTitle:
-          type:
-          - string
-          - 'null'
-          example: CEO
-          description: User job title
-        avatarUrl:
-          type:
-          - string
-          - 'null'
-          example: https://cdn-prod.imgpilot.com/avatar.png
-          description: User avatar URL
-        drataTermsAgreedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User agreed to the Drata terms date timestamp
-        roles:
-          example:
-          - ROLE
-          - ANOTHER_ROLE
-          description: User roles, only returned when `expand[]=roles` is passed.
-          type: array
-          items:
-            type: string
-        backgroundChecks:
-          description: The Background Checks array DTO, only returned when `expand[]=backgroundChecks` is passed.
-          type:
-          - array
-          - 'null'
-          items:
-            $ref: '#/components/schemas/BackgroundCheckResponsePublicV2Dto'
-        documents:
-          description: Full list of user documents, only returned when `expand[]=documents` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
-        identities:
-          description: User identities, only returned when `expand[]=identities` is passed.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserIdentityResponsePublicV2Dto'
-      required:
-      - id
-      - email
-      - createdAt
-      - updatedAt
-    UsersResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/UserResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    RoleEnum:
-      type: string
-      enum:
-      - EMPLOYEE
-      - TECHGOV
-      - AUDITOR
-      - ADMIN
-      - ACT_AS_READ_ONLY
-      - APP
-      - RISK_MANAGER
-      - WORKSPACE_ADMINISTRATOR
-      - SERVICE_USER
-      - REVIEWER
-      - CONTROL_MANAGER
-      - PEOPLE_OPS
-      - POLICY_MANAGER
-      - DEVOPS_ENGINEER
-      - KNOWLEDGE_BASE
-      - TRUST_CENTER_MANAGER
-      - TRUST_CENTER_REVIEWER
-      - RISK_REGISTER_OWNER
-      - INTERNAL_AUDITOR
-      - RESTRICTED_CONTROL_MANAGER
-      - RESTRICTED_RISK_MANAGER
-      - READONLY_ADMIN
-      - READONLY_TECHGOV
-      - READONLY_RISK_MANAGER
-      - READONLY_CONTROL_MANAGER
-      - READONLY_POLICY_MANAGER
-      - READONLY_PEOPLE_OPS
-      - READONLY_WORKSPACE_ADMINISTRATOR
-      - READONLY_RESTRICTED_CONTROL_MANAGER
-      - READONLY_RESTRICTED_RISK_MANAGER
-      - READONLY_RISK_REGISTER_OWNER
-      - READONLY_REVIEWER
-      - READONLY_DEVOPS_ENGINEER
-      - READONLY_TRUST_CENTER_MANAGER
-      - TRUST_USER
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    ActionEnum:
-      type: string
-      enum:
-      - READ
-      - MANAGE
-      - CREATE
-      - UPDATE
-      - DELETE
-    RoleExpandEnum:
-      type: string
-      enum:
-      - permissions
-    PermissionResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type:
-          - number
-          - 'null'
-          deprecated: true
-          example: null
-          description: 'Deprecated: no longer provided. Always returns `null`.'
-        action:
-          example: READ
-          description: Permission action
-          allOf:
-          - $ref: '#/components/schemas/ActionEnum'
-        subject:
-          example: Asset
-          description: Permission subject
-          allOf:
-          - $ref: '#/components/schemas/SubjectEnum'
-        createdAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          deprecated: true
-          description: 'Deprecated: no longer provided. Always returns `null`.'
-      required:
-      - action
-      - subject
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
     UserDocumentResponsePublicV2Dto:
       type: object
       properties:
@@ -1079,6 +662,34 @@ components:
       - role
       - createdAt
       - updatedAt
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
     UserExpandEnum:
       type: string
       enum:
@@ -1233,34 +844,102 @@ components:
       - managerName
       - createdAt
       - updatedAt
-    ExceptionResponsePublicV2Dto:
+    UsersResponsePublicV2Dto:
       type: object
       properties:
-        name:
-          type: string
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/UserResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
       required:
-      - name
-      - statusCode
-      - message
-      - code
+      - data
+      - pagination
+    PermissionResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type:
+          - number
+          - 'null'
+          deprecated: true
+          example: null
+          description: 'Deprecated: no longer provided. Always returns `null`.'
+        action:
+          example: READ
+          description: Permission action
+          allOf:
+          - $ref: '#/components/schemas/ActionEnum'
+        subject:
+          example: Asset
+          description: Permission subject
+          allOf:
+          - $ref: '#/components/schemas/SubjectEnum'
+        createdAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          deprecated: true
+          description: 'Deprecated: no longer provided. Always returns `null`.'
+      required:
+      - action
+      - subject
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    RoleEnum:
+      type: string
+      enum:
+      - EMPLOYEE
+      - TECHGOV
+      - AUDITOR
+      - ADMIN
+      - ACT_AS_READ_ONLY
+      - APP
+      - RISK_MANAGER
+      - WORKSPACE_ADMINISTRATOR
+      - SERVICE_USER
+      - REVIEWER
+      - CONTROL_MANAGER
+      - PEOPLE_OPS
+      - POLICY_MANAGER
+      - DEVOPS_ENGINEER
+      - KNOWLEDGE_BASE
+      - TRUST_CENTER_MANAGER
+      - TRUST_CENTER_REVIEWER
+      - RISK_REGISTER_OWNER
+      - INTERNAL_AUDITOR
+      - RESTRICTED_CONTROL_MANAGER
+      - RESTRICTED_RISK_MANAGER
+      - READONLY_ADMIN
+      - READONLY_TECHGOV
+      - READONLY_RISK_MANAGER
+      - READONLY_CONTROL_MANAGER
+      - READONLY_POLICY_MANAGER
+      - READONLY_PEOPLE_OPS
+      - READONLY_WORKSPACE_ADMINISTRATOR
+      - READONLY_RESTRICTED_CONTROL_MANAGER
+      - READONLY_RESTRICTED_RISK_MANAGER
+      - READONLY_RISK_REGISTER_OWNER
+      - READONLY_REVIEWER
+      - READONLY_DEVOPS_ENGINEER
+      - READONLY_TRUST_CENTER_MANAGER
+      - TRUST_USER
     ConnectionCompactResponsePublicV2Dto:
       type: object
       properties:
@@ -1635,6 +1314,19 @@ components:
       - connectedAt
       - failedAt
       - deletedAt
+    RolesResponsePublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Data set based on the pagination limits
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
     SignedUrlResponsePublicV2Dto:
       type: object
       properties:
@@ -1659,19 +1351,389 @@ components:
       - signedUrl
       - fileBuffer
       - fileName
-    RolesResponsePublicV2Dto:
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    ActionEnum:
+      type: string
+      enum:
+      - READ
+      - MANAGE
+      - CREATE
+      - UPDATE
+      - DELETE
+    BackgroundCheckResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Data set based on the pagination limits
+        id:
+          type: number
+          description: The Background Check Id
+        userId:
+          type:
+          - number
+          - 'null'
+          description: The user ID
+        status:
+          type: string
+          enum:
+          - PENDING
+          - OK
+          - ISSUE
+          - CANCELED
+          - EXPIRED
+          - OUT_OF_SCOPE
+          example: OK
+          description: The status of the background check
+        caseId:
+          type:
+          - string
+          - 'null'
+          example: abc123
+          description: The case ID of the KarmaCheck background check
+        caseInvitationId:
+          type: string
+          example: abc123
+          description: The case invitation ID of the KarmaCheck background check
+        url:
+          type: string
+          example: https://app-stage.karmacheck.com/background_check/aaaaaaaa-bbbb-0000-cccc-dddddddddddd
+          description: The URL of the background check
+        manualCheckDate:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2020-07-06'
+          description: The date this background check was manually uploaded
+        manuallyCheckUrl:
+          type:
+          - string
+          - 'null'
+          example: url.com
+          description: The url of manual background check
+        type:
+          type: string
+          enum:
+          - KARMACHECK
+          - MANUAL
+          - CERTN
+          - CHECKR
+          - HRIS_RIPPLING
+          - STERLING
+          - HIRERIGHT
+          - VETTY
+          example: CERTN
+          description: The background check type
+        source:
+          type:
+          - string
+          - 'null'
+          enum:
+          - DRATA
+          - CHECKR
+          - KARMACHECK
+          - RIPPLING_CHECKR
+          - CERTN
+          - STERLING
+          - HIRERIGHT
+          - VETTY
+          example: DRATA
+          description: The background check source
+        reportData:
+          type: string
+          description: The background check report data
+        outOfScopeReason:
+          type:
+          - string
+          - 'null'
+          example: abc123
+          description: the reason it was marked out of scope
+        outOfScopeAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When it was marked out of scope
+        invitationEmail:
+          type:
+          - string
+          - 'null'
+          example: email@email.com
+          description: Invitation email
+        linkedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: When the report was linked to a user
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Report created date timestamp
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Report updated date timestamp
+      required:
+      - id
+      - userId
+      - status
+      - caseId
+      - caseInvitationId
+      - url
+      - manualCheckDate
+      - manuallyCheckUrl
+      - type
+      - source
+      - reportData
+      - outOfScopeReason
+      - outOfScopeAt
+      - invitationEmail
+      - linkedAt
+      - createdAt
+      - updatedAt
+    SubjectEnum:
+      type: string
+      enum:
+      - AdminOnboarding
+      - Asset
+      - AuditHub
+      - Company
+      - CompanyDocument
+      - Connection
+      - Control
+      - ControlTestInstance
+      - CustomerRequest
+      - CustomTask
+      - Event
+      - Framework
+      - Personnel
+      - Policy
+      - PublicApiKey
+      - QuestionnairesVendors
+      - Report
+      - Risk
+      - RiskAssessment
+      - ServiceUser
+      - Ticket
+      - TrustCenter
+      - ListAllUsers
+      - UserIdentity
+      - UserIdentityInfrastructure
+      - UserIdentityVersionControl
+      - UsersRoles
+      - Vendor
+      - Vulnerability
+      - Note
+      - UserFeature
+      - Monitors
+      - Dashboard
+      - UserDocument
+      - Autopilot
+      - MonitorInstanceExclusion
+      - Workspace
+      - InternalSecurity
+      - ComplianceCheckExclusion
+      - UserLanguage
+      - SecurityReport
+      - Resync
+      - UserIdentityObservability
+      - SignIn
+      - FeatureAnnouncement
+      - Wysiwyg
+      - RemoteAccess
+      - EmployeeOnboarding
+      - UserIdentitiesAccess
+      - TicketManagement
+      - HumanResources
+      - UserControls
+      - TasksDetails
+      - ControlList
+      - ControlTicket
+      - RiskManagementTicket
+      - MonitorTicket
+      - CreateTicket
+      - DeleteTask
+      - UpdateTask
+      - CreateTask
+      - AssociateRequirements
+      - GetGroups
+      - WorkspaceConnections
+      - TrustCenterInfo
+      - GlobalConnection
+      - RiskTask
+      - GeneralTask
+      - ControlTask
+      - EvidenceTask
+      - PolicyTask
+      - VendorTask
+      - AccessReview
+      - RiskSettings
+      - Scan
+      - RiskDocument
+      - ViewAllControls
+      - ViewAllRisks
+      - ControlTemplate
+      - FrameworkMappingReset
+      - ActivateFramework
+      - CustomFields
+      - CaCConfiguration
+      - CaCMonitoring
+      - AccessReviewTicket
+      - SecurityQuestionnaire
+      - Findings
+      - ExceptionManagement
+      - CustomWorkflows
+      - VulnerabilityReport
+      - CustomConnections
+      - UserSettings
+      - KnowledgeBase
+      - TrustCenterRequest
+      - BulkImportRisk
+      - TestLibrary
+      - RiskRegisters
+      - BulkImportControl
+      - BulkImportTraining
+      - BulkImportBackgroundCheck
+      - BulkImportVendor
+      - RiskCategory
+      - Audit
+      - GroupRoleManagement
+      - BulkImportCustomTask
+      - UserIdentityHris
+      - Requirements
+      - BulkImportPolicyAcknowledgment
+      - BulkImportAsset
+      - Groups
+      - Task
+      - ExecutiveDashboard
+      - PolicyLanguage
+      - BulkImportEvidence
+      - Webhooks
+      - ALL
+      - DenyControl
+    RoleExpandEnum:
+      type: string
+      enum:
+      - permissions
+    UserResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User created at
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User last updated at
+        jobTitle:
+          type:
+          - string
+          - 'null'
+          example: CEO
+          description: User job title
+        avatarUrl:
+          type:
+          - string
+          - 'null'
+          example: https://cdn-prod.imgpilot.com/avatar.png
+          description: User avatar URL
+        drataTermsAgreedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: User agreed to the Drata terms date timestamp
+        roles:
+          example:
+          - ROLE
+          - ANOTHER_ROLE
+          description: User roles, only returned when `expand[]=roles` is passed.
           type: array
           items:
-            $ref: '#/components/schemas/RoleResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+            type: string
+        backgroundChecks:
+          description: The Background Checks array DTO, only returned when `expand[]=backgroundChecks` is passed.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/BackgroundCheckResponsePublicV2Dto'
+        documents:
+          description: Full list of user documents, only returned when `expand[]=documents` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserDocumentResponsePublicV2Dto'
+        identities:
+          description: User identities, only returned when `expand[]=identities` is passed.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserIdentityResponsePublicV2Dto'
       required:
-      - data
-      - pagination
+      - id
+      - email
+      - createdAt
+      - updatedAt
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - statusCode
+      - message
+      - code
   securitySchemes:
     bearer:
       scheme: bearer

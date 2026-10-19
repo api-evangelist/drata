@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -80,89 +142,6 @@ paths:
       - EVIDENCE_LIBRARY
 components:
   schemas:
-    MultiArtifactCreateEvidencePublicV2Dto:
-      type: object
-      properties:
-        name:
-          type: string
-          maxLength: 191
-          example: Q4 Penetration Test Report
-          description: Evidence Library Item name.
-        description:
-          type: string
-          maxLength: 30000
-          example: Third-party pen-test findings, remediations, and evidence
-          description: Evidence Library Item description.
-        ownerId:
-          type: number
-          example: 1
-          description: 'User ID of the Evidence Library Item owner. Required: the multi-artifact CREATE flow always attaches artifacts at commit time, and the sibling single-artifact create endpoint requires owner + renewal schedule whenever any artifact source is provided. Enforcing the same rule at mint fails-fast rather than 500-ing at commit when the downstream service builds an artifact chain with no owner.'
-        renewalScheduleType:
-          example: ONE_YEAR
-          description: 'Artifact renewal schedule type. Required: see `ownerId` for the same rationale. Use CUSTOM to set a specific renewal date via `renewalDate`.'
-          allOf:
-          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
-        renewalDate:
-          type: string
-          format: date
-          example: '2020-07-06'
-          description: Artifact renewal date. Required only when `renewalScheduleType` is CUSTOM. For other schedule types the renewal date is calculated from each artifact's `filedAt`, and supplying `renewalDate` alongside a non-CUSTOM schedule is rejected.
-        implementationGuidance:
-          type: string
-          maxLength: 30000
-          example: Follow the internal pen-test playbook and attach every artifact per section.
-          description: Implementation guidance for this Evidence Library Item.
-        controlIds:
-          example:
-          - 1
-          - 2
-          - 3
-          description: List of control IDs to associate with this Evidence Library Item.
-          type: array
-          items:
-            type: number
-      required:
-      - name
-      - ownerId
-      - renewalScheduleType
-    RenewalScheduleTypeEnum:
-      type: string
-      enum:
-      - ONE_MONTH
-      - TWO_MONTHS
-      - THREE_MONTHS
-      - SIX_MONTHS
-      - ONE_YEAR
-      - CUSTOM
-      - NONE
-    UploadPurposeEnum:
-      type: string
-      enum:
-      - evidence
-      - background_check
-    UploadUrlResponsePublicV2Dto:
-      type: object
-      properties:
-        presignedUrl:
-          type: string
-          example: https://s3.amazonaws.com/drata-bucket/account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf?X-Amz-Algorithm=...
-          description: Full pre-signed AWS S3 URL to perform the HTTP PUT operation against to upload the file.
-        objectKey:
-          type: string
-          example: account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf
-          description: The S3 object key the uploaded file will be stored under. Reference this value per the semantics of the request `purpose` (e.g. as the `fileKey` when creating the Evidence item).
-        expiresAt:
-          type: string
-          example: '2026-07-08T15:04:05.000Z'
-          description: ISO-8601 timestamp indicating when the pre-signed URL expires.
-        webUploadUrl:
-          type: string
-          example: https://api.drata.com/upload/abc123XYZ_-
-          description: 'Browser-facing upload URL. Present only when the request included `includeWebUploadUrl: true`. Point a user at this URL to upload the file via a drag-and-drop page; the URL expires alongside `presignedUrl`.'
-      required:
-      - presignedUrl
-      - objectKey
-      - expiresAt
     UploadUrlRequestPublicV2Dto:
       type: object
       properties:
@@ -234,6 +213,89 @@ components:
       - statusCode
       - message
       - code
+    UploadUrlResponsePublicV2Dto:
+      type: object
+      properties:
+        presignedUrl:
+          type: string
+          example: https://s3.amazonaws.com/drata-bucket/account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf?X-Amz-Algorithm=...
+          description: Full pre-signed AWS S3 URL to perform the HTTP PUT operation against to upload the file.
+        objectKey:
+          type: string
+          example: account-id/evidence-library/11/62545abd-5469-4a19-abc2-55df8809b225/file.pdf
+          description: The S3 object key the uploaded file will be stored under. Reference this value per the semantics of the request `purpose` (e.g. as the `fileKey` when creating the Evidence item).
+        expiresAt:
+          type: string
+          example: '2026-07-08T15:04:05.000Z'
+          description: ISO-8601 timestamp indicating when the pre-signed URL expires.
+        webUploadUrl:
+          type: string
+          example: https://api.drata.com/upload/abc123XYZ_-
+          description: 'Browser-facing upload URL. Present only when the request included `includeWebUploadUrl: true`. Point a user at this URL to upload the file via a drag-and-drop page; the URL expires alongside `presignedUrl`.'
+      required:
+      - presignedUrl
+      - objectKey
+      - expiresAt
+    UploadPurposeEnum:
+      type: string
+      enum:
+      - evidence
+      - background_check
+    RenewalScheduleTypeEnum:
+      type: string
+      enum:
+      - ONE_MONTH
+      - TWO_MONTHS
+      - THREE_MONTHS
+      - SIX_MONTHS
+      - ONE_YEAR
+      - CUSTOM
+      - NONE
+    MultiArtifactCreateEvidencePublicV2Dto:
+      type: object
+      properties:
+        name:
+          type: string
+          maxLength: 191
+          example: Q4 Penetration Test Report
+          description: Evidence Library Item name.
+        description:
+          type: string
+          maxLength: 30000
+          example: Third-party pen-test findings, remediations, and evidence
+          description: Evidence Library Item description.
+        ownerId:
+          type: number
+          example: 1
+          description: 'User ID of the Evidence Library Item owner. Required: the multi-artifact CREATE flow always attaches artifacts at commit time, and the sibling single-artifact create endpoint requires owner + renewal schedule whenever any artifact source is provided. Enforcing the same rule at mint fails-fast rather than 500-ing at commit when the downstream service builds an artifact chain with no owner.'
+        renewalScheduleType:
+          example: ONE_YEAR
+          description: 'Artifact renewal schedule type. Required: see `ownerId` for the same rationale. Use CUSTOM to set a specific renewal date via `renewalDate`.'
+          allOf:
+          - $ref: '#/components/schemas/RenewalScheduleTypeEnum'
+        renewalDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Artifact renewal date. Required only when `renewalScheduleType` is CUSTOM. For other schedule types the renewal date is calculated from each artifact's `filedAt`, and supplying `renewalDate` alongside a non-CUSTOM schedule is rejected.
+        implementationGuidance:
+          type: string
+          maxLength: 30000
+          example: Follow the internal pen-test playbook and attach every artifact per section.
+          description: Implementation guidance for this Evidence Library Item.
+        controlIds:
+          example:
+          - 1
+          - 2
+          - 3
+          description: List of control IDs to associate with this Evidence Library Item.
+          type: array
+          items:
+            type: number
+      required:
+      - name
+      - ownerId
+      - renewalScheduleType
     ExceptionResponseDto:
       type: object
       properties:

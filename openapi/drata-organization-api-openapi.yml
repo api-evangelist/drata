@@ -235,31 +235,6 @@ paths:
       - apiKey:
         - organization:view
 components:
-  responses:
-    '403':
-      description: Invalid api key / missing scope
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
-    '400':
-      description: Invalid request
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseInvalidRequest'
-    '405':
-      description: Method not allowed
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseNotFound'
-    '404':
-      description: Not found or no access
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/ApiResponseNotFound'
   schemas:
     ApiResponseNotFound:
       type: object
@@ -273,6 +248,18 @@ components:
         message:
           type: string
           example: Not found
+    ApiResponseInvalidApiKeyOrMissingScope:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 403
+        error:
+          type: string
+          example: forbidden
+        message:
+          type: string
+          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
     NdaProvider:
       type: string
       description: One of the available NDA options. If the ndaProvider field is not set, NDA provider will be set to the organization's default NDA provider.
@@ -293,18 +280,31 @@ components:
         message:
           type: string
           example: Invalid request.
-    ApiResponseInvalidApiKeyOrMissingScope:
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 403
-        error:
-          type: string
-          example: forbidden
-        message:
-          type: string
-          example: 'Invalid API key / Missing required scope(s): (missing scopes here)'
+  responses:
+    '400':
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidRequest'
+    '404':
+      description: Not found or no access
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '405':
+      description: Method not allowed
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseNotFound'
+    '403':
+      description: Invalid api key / missing scope
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiResponseInvalidApiKeyOrMissingScope'
   securitySchemes:
     apiKey:
       type: apiKey

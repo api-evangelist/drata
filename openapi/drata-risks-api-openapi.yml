@@ -7,7 +7,69 @@ info:
 
     - Get and acknowledge user''s assigned policies
 
-    - Payloads are streamlined to include only the essential information.'
+    - Payloads are streamlined to include only the essential information. You can expand related objects and collections using the `expand` query parameter.
+
+    - Cursor-based pagination for greater efficiency and stability with large datasets
+
+
+    ### Getting Started
+
+    Please visit our help article to learn how to create an API key.
+
+
+    ### Upgrading From Version 1
+
+    API V2 is designed to provide a faster an more flexible way of accessing Drata. There are several differences from V1:
+
+    - The listing endpoints now use **cursor-based pagination**. This provides faster responses and ensures that all records can be retrieved even, if they are changed during the process.
+
+
+    ```javascript
+
+    async function fetchAll() {
+
+    // The first request doesn''t send a value for the cursor.
+
+    let cursor = undefined;
+
+    do {
+
+    const query = new URLSearchParams({ cursor });
+
+    const resp = await fetch(
+
+    `https://public-api.drata.com/public/v2/users?${query}`,
+
+    {
+
+    method: ''GET'',
+
+    headers: { Authorization: ''Bearer '' }
+
+    }
+
+    );
+
+    const data = await resp.json();
+
+    console.log(data);
+
+
+    // If there''s a cursor value returned, then there are more results.
+
+    // Pass that back as a query parameter to get the next page of data.
+
+    cursor = data?.pagination?.cursor;
+
+    } while (cursor)
+
+    }
+
+    fetchAll();
+
+    ```
+
+    - You''ll notice smaller responses. Most endpoints accept an `expand` query parameter that let''s you specify which related objects and collections you want to expand.'
   version: V2
   contact: {}
 servers:
@@ -1107,687 +1169,6 @@ paths:
       - RISK_MANAGEMENT
 components:
   schemas:
-    RiskSearchInRegisterFacetEnum:
-      type: string
-      enum:
-      - status
-      - treatmentPlan
-      - type
-      - categories
-      - controls
-      - ownerEmails
-      - reviewerEmails
-      - vendorNames
-    RiskDashboardResponsePublicV2Dto:
-      type: object
-      properties:
-        riskPosture:
-          description: Distribution of Risks by severity level. Shows the count of Risks in each severity category based on their calculated Risk scores.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskThresholdCountResponsePublicV2Dto'
-        treatmentOverview:
-          description: 'Distribution of Risks by treatment strategy. Shows how many Risks are assigned to each treatment plan: ACCEPT (acknowledge and monitor), AVOID (eliminate Risk source), MITIGATE (reduce impact/likelihood), TRANSFER (shift to third party), UNTREATED (no action taken).'
-          allOf:
-          - $ref: '#/components/schemas/TreatmentOverviewResponsePublicV2Dto'
-        riskHeatmap:
-          description: Risk heatmap data showing the distribution of Risks across impact and likelihood dimensions. Each entry represents the count of Risks at a specific impact/likelihood intersection, useful for visualizing Risk concentration in a matrix format.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskHeatmapResponsePublicV2Dto'
-        categoryBreakdown:
-          description: Breakdown of Risks by category and severity. For each Risk category, shows the distribution of Risks across severity levels, enabling analysis of which Risk categories have the most critical issues.
-          type: array
-          items:
-            $ref: '#/components/schemas/CategorySeverityResponsePublicV2Dto'
-        scored:
-          type: number
-          example: 63
-          description: Count of Risks that have been scored (have both impact and likelihood values assigned). Scored Risks contribute to the Risk posture and heatmap analytics.
-        remaining:
-          type: number
-          example: 8
-          description: Count of Risks that have not yet been scored (missing impact or likelihood values). These Risks require assessment to be included in comprehensive Risk analytics.
-        riskOverTime:
-          description: Historical trend data showing Risk severity distribution over time. Each entry represents a month with counts of Risks at each severity level, enabling time-series analysis and trend visualization. Sorted by most recent first.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskOverTimeResponsePublicV2Dto'
-      required:
-      - riskPosture
-      - treatmentOverview
-      - riskHeatmap
-      - categoryBreakdown
-      - scored
-      - remaining
-      - riskOverTime
-    RiskSearchFacetsResponsePublicV2Dto:
-      type: object
-      properties:
-        status:
-          description: Bucket counts for the Risk workflow `status` facet.
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        treatmentPlan:
-          description: Bucket counts for the Risk `treatmentPlan` facet (ACCEPT / AVOID / MITIGATE / TRANSFER / UNTREATED).
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        type:
-          description: Bucket counts for the Risk version `type` facet.
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        categories:
-          description: Top category names by Risk count in the result set.
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        controls:
-          description: Top control codes by Risk count in the result set.
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        ownerEmails:
-          description: Top owner emails by Risk count in the result set.
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        reviewerEmails:
-          description: Top reviewer emails by Risk count in the result set.
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        vendorNames:
-          description: Top vendor names by Risk count in the result set.
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-        riskRegisterId:
-          description: Bucket counts of Risks per Risk Register in the result set. Only meaningful on the cross-register endpoint (`GET /risks-search`).
-          type: array
-          items:
-            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
-    RiskTreatmentPlanEnum:
-      type: string
-      enum:
-      - UNTREATED
-      - ACCEPT
-      - TRANSFER
-      - AVOID
-      - MITIGATE
-    RiskOwnerRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique identifier for the Risk owner (user)
-      required:
-      - id
-    RiskSearchFacetEnum:
-      type: string
-      enum:
-      - status
-      - treatmentPlan
-      - type
-      - categories
-      - controls
-      - ownerEmails
-      - reviewerEmails
-      - vendorNames
-      - riskRegisterId
-    RiskSearchExpandEnum:
-      type: string
-      enum:
-      - owners
-      - reviewers
-      - controls
-      - categories
-      - documents
-      - notes
-      - tickets
-      - tasks
-      - customFields
-    CustomFieldFilterPublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 42
-          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
-        name:
-          type: string
-          example: Department
-          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
-        value:
-          type: string
-          example: Engineering
-          description: The Custom Field value to match. Equality (case-sensitive).
-      required:
-      - value
-    ControlCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Control ID
-        code:
-          type: string
-          example: AC-1
-          description: Control code
-        name:
-          type: string
-          example: Access Control
-          description: Control name
-        description:
-          type:
-          - string
-          - 'null'
-          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
-          description: Control description
-        isReady:
-          type: boolean
-          example: true
-          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date the Control was last updated
-      required:
-      - id
-      - code
-      - name
-      - description
-      - createdAt
-      - updatedAt
-    RiskControlRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique identifier for the Control
-      required:
-      - id
-    RiskTicketsSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of tickets linked to this Risk. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/TicketCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 3
-          description: Total count of all tickets linked to this Risk.
-      required:
-      - data
-      - totalCount
-    RiskVersionTypeEnum:
-      type: string
-      enum:
-      - INTERNAL
-      - EXTERNAL
-    RiskControlsSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of controls mapped to this Risk. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 4
-          description: Total count of all controls mapped to this Risk.
-      required:
-      - data
-      - totalCount
-    CustomTaskCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique internal identifier for the Custom Task
-        title:
-          type: string
-          example: Review quarterly security policies
-          description: Title or name of the Custom Task describing what needs to be accomplished
-        description:
-          type:
-          - string
-          - 'null'
-          example: Conduct a comprehensive review of all security policies to ensure compliance with current regulations.
-          description: Detailed description providing additional context about the Custom Task requirements and objectives
-        dueDate:
-          type: string
-          format: date
-          example: '2020-07-06'
-          description: Due date for Custom Task completion in ISO 8601 date format (YYYY-MM-DD)
-        completedAt:
-          type:
-          - string
-          - 'null'
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date and time when the Custom Task was marked as completed, null if still pending
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date and time when the Custom Task was created in the system
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date and time when the Custom Task was last updated
-      required:
-      - id
-      - title
-      - dueDate
-      - createdAt
-      - updatedAt
-    RiskDocumentsSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of documents attached to this Risk. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/DocumentCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 5
-          description: Total count of all documents attached to this Risk.
-      required:
-      - data
-      - totalCount
-    SortTypeLimitedEnum:
-      type: string
-      enum:
-      - createdAt
-      - updatedAt
-    ExceptionResponseDto:
-      type: object
-      properties:
-        statusCode:
-          type: number
-        message:
-          type: string
-        code:
-          type: number
-        debugInfo:
-          type: object
-          properties:
-            name:
-              type: string
-            message:
-              type: string
-            stack:
-              type: string
-          required:
-          - name
-          - message
-      required:
-      - statusCode
-      - message
-      - code
-    CustomFieldResponsePublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 1
-          description: The ID of the Custom Field
-        name:
-          type: string
-          example: Stakeholders
-          description: The name of the Custom Field
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field
-      required:
-      - customFieldId
-      - name
-    CustomRangeFieldFilterPublicV2Dto:
-      type: object
-      properties:
-        customFieldId:
-          type: number
-          example: 99
-          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
-        name:
-          type: string
-          example: Headcount
-          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
-        gte:
-          type: string
-          example: '5'
-          description: Greater than or equal to. Numeric or ISO-8601 date string.
-        lte:
-          type: string
-          example: '10'
-          description: Less than or equal to. Numeric or ISO-8601 date string.
-    ReviewerRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique identifier for the Risk reviewer (user)
-      required:
-      - id
-    RiskExpandV2Enum:
-      type: string
-      enum:
-      - owners
-      - reviewers
-      - controls
-      - categories
-      - documents
-      - notes
-      - tickets
-      - tasks
-      - customFields
-    RiskCustomFieldsSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of Custom Field values for this Risk. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 8
-          description: Total count of all Custom Field values for this Risk.
-      required:
-      - data
-      - totalCount
-    RiskUpdateRequestPublicV2Dto:
-      type: object
-      properties:
-        title:
-          type: string
-          maxLength: 191
-          example: Password Management - Weak Password Policies
-          description: Descriptive title that clearly identifies the nature and scope of the Risk
-        description:
-          type: string
-          maxLength: 768
-          example: Weak password policies may allow unauthorized access to organizational systems and data through password-based attacks such as brute force, dictionary attacks, or credential stuffing.
-          description: Comprehensive description of the Risk scenario, potential threats, business impact, and affected systems or processes
-        identifiedAt:
-          type:
-          - string
-          - 'null'
-          format: date
-          example: '2020-07-06'
-          description: Date when the Risk was first identified
-        impact:
-          type: number
-          minimum: 1
-          maximum: 10
-          example: 4
-          description: Impact score representing the potential severity of consequences if the Risk materializes. Default is 1-5 scale (where 5 is most severe), but can be configured from 3x3 up to 10x10 matrices.
-        likelihood:
-          type: number
-          minimum: 1
-          maximum: 10
-          example: 3
-          description: Likelihood score representing the probability of the Risk occurring. Default is 1-5 scale (where 5 is most likely), but can be configured from 3x3 up to 10x10 matrices.
-        treatmentPlan:
-          example: MITIGATE
-          description: 'Strategy for addressing the Risk: ACCEPT (acknowledge and monitor), AVOID (eliminate source), MITIGATE (reduce impact/likelihood), TRANSFER (shift to third party), UNTREATED (no action taken)'
-          allOf:
-          - $ref: '#/components/schemas/RiskTreatmentPlanEnum'
-        treatmentDetails:
-          type: string
-          maxLength: 30000
-          example: Implement multi-factor authentication and enforce strong password complexity requirements across all systems.
-          description: Detailed explanation of the specific actions, controls, or measures being implemented to address the Risk. Cannot be provided when treatmentPlan is UNTREATED
-        anticipatedCompletionDate:
-          type: string
-          format: date
-          example: '2020-07-06'
-          description: Target date for completing Risk treatment activities. Cannot be provided when treatmentPlan is UNTREATED
-        completionDate:
-          type: string
-          format: date
-          example: '2024-12-01'
-          description: Actual date when Risk treatment was completed. Cannot be provided when treatmentPlan is UNTREATED
-        residualImpact:
-          type: number
-          minimum: 1
-          maximum: 10
-          example: 2
-          description: Residual impact score after treatment implementation. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices. Cannot be provided when treatmentPlan is UNTREATED
-        residualLikelihood:
-          type: number
-          minimum: 1
-          maximum: 10
-          example: 2
-          description: Residual likelihood score after treatment implementation. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices. Cannot be provided when treatmentPlan is UNTREATED
-        status:
-          example: ACTIVE
-          description: Current status of the Risk in the Risk management lifecycle
-          allOf:
-          - $ref: '#/components/schemas/RiskStatusTypeEnum'
-        categories:
-          uniqueItems: true
-          description: Risk categories for classification and reporting purposes
-          type: array
-          items:
-            $ref: '#/components/schemas/CategoryRequestPublicV2Dto'
-        owners:
-          uniqueItems: true
-          description: Users responsible for managing and monitoring this Risk
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskOwnerRequestPublicV2Dto'
-        reviewers:
-          uniqueItems: true
-          description: Users responsible for reviewing and approving Risk treatment plans. Cannot be provided when treatmentPlan is UNTREATED
-          type: array
-          items:
-            $ref: '#/components/schemas/ReviewerRequestPublicV2Dto'
-        controls:
-          uniqueItems: true
-          description: Security controls implemented to mitigate this Risk
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskControlRequestPublicV2Dto'
-        customFields:
-          description: Custom Fields for the Risk
-          type: array
-          items:
-            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
-    PaginationTotalCountResponsePublicV2Dto:
-      type: object
-      properties:
-        cursor:
-          type:
-          - string
-          - 'null'
-          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
-        totalCount:
-          type:
-          - number
-          - 'null'
-          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
-      required:
-      - cursor
-    RiskExpandEnum:
-      type: string
-      enum:
-      - owners
-      - reviewers
-      - controls
-      - categories
-      - documents
-      - notes
-      - tickets
-      - tasks
-      - customFields
-    RiskThresholdCountResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: ID of the Risk Threshold
-        title:
-          type: string
-          example: Low
-          description: Title of the Risk Threshold
-        count:
-          type: number
-          example: 5
-          description: Count of Risks in this Risk Threshold
-      required:
-      - id
-      - title
-      - count
-    RiskReviewersSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of reviewer users for this Risk. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 2
-          description: Total count of all reviewer users for this Risk.
-      required:
-      - data
-      - totalCount
-    SortDirectionEnum:
-      type: string
-      enum:
-      - ASC
-      - DESC
-    DocumentCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Document ID
-        name:
-          type: string
-          example: Risk Assessment Report Q4 2023.pdf
-          description: Document name as uploaded by the user
-        downloadUrl:
-          type: string
-          example: https://example.com/document.pdf
-          description: Signed URL to download the Document
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Document was uploaded
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Document was last updated
-      required:
-      - id
-      - name
-      - downloadUrl
-      - createdAt
-      - updatedAt
-    RiskCategoryResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Risk Category ID
-        name:
-          type: string
-          example: Access Control
-          description: Risk Category name used to group and organize related Risks
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was last updated
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
-    TreatmentOverviewResponsePublicV2Dto:
-      type: object
-      properties:
-        untreated:
-          type: number
-          example: 5
-          description: Count of Risks with UNTREATED treatment plan
-        accept:
-          type: number
-          example: 23
-          description: Count of Risks with ACCEPT treatment plan
-        transfer:
-          type: number
-          example: 13
-          description: Count of Risks with TRANSFER treatment plan
-        avoid:
-          type: number
-          example: 10
-          description: 'Count of Risks with AVOID treatment plan '
-        mitigate:
-          type: number
-          example: 33
-          description: Count of Risks with MITIGATE treatment plan
-    RiskCategoryCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Risk Category ID
-        name:
-          type: string
-          example: Access Control
-          description: Risk Category name used to group and organize related Risks
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was created
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Risk Category was last updated
-      required:
-      - id
-      - name
-      - createdAt
-      - updatedAt
     RiskCreateRequestPublicV2Dto:
       type: object
       properties:
@@ -1891,32 +1272,347 @@ components:
       required:
       - title
       - description
-    RiskNoteCompactResponsePublicV2Dto:
+    RiskSearchInRegisterFacetEnum:
+      type: string
+      enum:
+      - status
+      - treatmentPlan
+      - type
+      - categories
+      - controls
+      - ownerEmails
+      - reviewerEmails
+      - vendorNames
+    CategoryRequestPublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Note ID
-        comment:
+          description: Unique identifier for the Risk category
+      required:
+      - id
+    ExceptionResponsePublicV2Dto:
+      type: object
+      properties:
+        name:
           type: string
-          example: This Risk has been reviewed and approved by the security team. Implementation timeline updated.
-          description: Note content providing additional context or updates about the risk
+        statusCode:
+          type: number
+        message:
+          type: string
+        code:
+          type: number
+        debugInfo:
+          type: object
+          properties:
+            name:
+              type: string
+            message:
+              type: string
+            stack:
+              type: string
+          required:
+          - name
+          - message
+      required:
+      - name
+      - statusCode
+      - message
+      - code
+    RiskHeatmapResponsePublicV2Dto:
+      type: object
+      properties:
+        impact:
+          type: number
+          example: 2
+          description: Impact level based on the configured risk matrix dimensions. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices.
+          minimum: 1
+          maximum: 10
+        likelihood:
+          type: number
+          example: 2
+          description: Likelihood level based on the configured risk matrix dimensions. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices.
+          minimum: 1
+          maximum: 10
+        total:
+          type: number
+          example: 11
+          description: Count of Risks at this impact/likelihood combination
+      required:
+      - impact
+      - likelihood
+      - total
+    CategorySeverityResponsePublicV2Dto:
+      type: object
+      properties:
+        category:
+          description: Risk Category information
+          allOf:
+          - $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
+        severity:
+          description: Distribution of Risks across severity levels for this category.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskThresholdCountResponsePublicV2Dto'
+      required:
+      - category
+      - severity
+    RiskSearchFacetsResponsePublicV2Dto:
+      type: object
+      properties:
+        status:
+          description: Bucket counts for the Risk workflow `status` facet.
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        treatmentPlan:
+          description: Bucket counts for the Risk `treatmentPlan` facet (ACCEPT / AVOID / MITIGATE / TRANSFER / UNTREATED).
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        type:
+          description: Bucket counts for the Risk version `type` facet.
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        categories:
+          description: Top category names by Risk count in the result set.
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        controls:
+          description: Top control codes by Risk count in the result set.
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        ownerEmails:
+          description: Top owner emails by Risk count in the result set.
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        reviewerEmails:
+          description: Top reviewer emails by Risk count in the result set.
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        vendorNames:
+          description: Top vendor names by Risk count in the result set.
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+        riskRegisterId:
+          description: Bucket counts of Risks per Risk Register in the result set. Only meaningful on the cross-register endpoint (`GET /risks-search`).
+          type: array
+          items:
+            $ref: '#/components/schemas/FacetBucketResponsePublicV2Dto'
+    RiskExpandEnum:
+      type: string
+      enum:
+      - owners
+      - reviewers
+      - controls
+      - categories
+      - documents
+      - notes
+      - tickets
+      - tasks
+      - customFields
+    UserCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: User ID
+        email:
+          type: string
+          example: email@example.com
+          description: User email
+        firstName:
+          type:
+          - string
+          - 'null'
+          example: Sally
+          description: User first name
+        lastName:
+          type:
+          - string
+          - 'null'
+          example: Smith
+          description: User last name
         createdAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Note was created
+          description: User created at
         updatedAt:
           type: string
           format: date-time
           example: '2025-07-01T16:45:55.246Z'
-          description: Date when the Note was last updated
+          description: User last updated at
       required:
       - id
-      - comment
+      - email
+      - firstName
+      - lastName
       - createdAt
       - updatedAt
+    RiskStatusTypeEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ARCHIVED
+      - CLOSED
+    TreatmentOverviewResponsePublicV2Dto:
+      type: object
+      properties:
+        untreated:
+          type: number
+          example: 5
+          description: Count of Risks with UNTREATED treatment plan
+        accept:
+          type: number
+          example: 23
+          description: Count of Risks with ACCEPT treatment plan
+        transfer:
+          type: number
+          example: 13
+          description: Count of Risks with TRANSFER treatment plan
+        avoid:
+          type: number
+          example: 10
+          description: 'Count of Risks with AVOID treatment plan '
+        mitigate:
+          type: number
+          example: 33
+          description: Count of Risks with MITIGATE treatment plan
+    RiskUpdateRequestPublicV2Dto:
+      type: object
+      properties:
+        title:
+          type: string
+          maxLength: 191
+          example: Password Management - Weak Password Policies
+          description: Descriptive title that clearly identifies the nature and scope of the Risk
+        description:
+          type: string
+          maxLength: 768
+          example: Weak password policies may allow unauthorized access to organizational systems and data through password-based attacks such as brute force, dictionary attacks, or credential stuffing.
+          description: Comprehensive description of the Risk scenario, potential threats, business impact, and affected systems or processes
+        identifiedAt:
+          type:
+          - string
+          - 'null'
+          format: date
+          example: '2020-07-06'
+          description: Date when the Risk was first identified
+        impact:
+          type: number
+          minimum: 1
+          maximum: 10
+          example: 4
+          description: Impact score representing the potential severity of consequences if the Risk materializes. Default is 1-5 scale (where 5 is most severe), but can be configured from 3x3 up to 10x10 matrices.
+        likelihood:
+          type: number
+          minimum: 1
+          maximum: 10
+          example: 3
+          description: Likelihood score representing the probability of the Risk occurring. Default is 1-5 scale (where 5 is most likely), but can be configured from 3x3 up to 10x10 matrices.
+        treatmentPlan:
+          example: MITIGATE
+          description: 'Strategy for addressing the Risk: ACCEPT (acknowledge and monitor), AVOID (eliminate source), MITIGATE (reduce impact/likelihood), TRANSFER (shift to third party), UNTREATED (no action taken)'
+          allOf:
+          - $ref: '#/components/schemas/RiskTreatmentPlanEnum'
+        treatmentDetails:
+          type: string
+          maxLength: 30000
+          example: Implement multi-factor authentication and enforce strong password complexity requirements across all systems.
+          description: Detailed explanation of the specific actions, controls, or measures being implemented to address the Risk. Cannot be provided when treatmentPlan is UNTREATED
+        anticipatedCompletionDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Target date for completing Risk treatment activities. Cannot be provided when treatmentPlan is UNTREATED
+        completionDate:
+          type: string
+          format: date
+          example: '2024-12-01'
+          description: Actual date when Risk treatment was completed. Cannot be provided when treatmentPlan is UNTREATED
+        residualImpact:
+          type: number
+          minimum: 1
+          maximum: 10
+          example: 2
+          description: Residual impact score after treatment implementation. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices. Cannot be provided when treatmentPlan is UNTREATED
+        residualLikelihood:
+          type: number
+          minimum: 1
+          maximum: 10
+          example: 2
+          description: Residual likelihood score after treatment implementation. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices. Cannot be provided when treatmentPlan is UNTREATED
+        status:
+          example: ACTIVE
+          description: Current status of the Risk in the Risk management lifecycle
+          allOf:
+          - $ref: '#/components/schemas/RiskStatusTypeEnum'
+        categories:
+          uniqueItems: true
+          description: Risk categories for classification and reporting purposes
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryRequestPublicV2Dto'
+        owners:
+          uniqueItems: true
+          description: Users responsible for managing and monitoring this Risk
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskOwnerRequestPublicV2Dto'
+        reviewers:
+          uniqueItems: true
+          description: Users responsible for reviewing and approving Risk treatment plans. Cannot be provided when treatmentPlan is UNTREATED
+          type: array
+          items:
+            $ref: '#/components/schemas/ReviewerRequestPublicV2Dto'
+        controls:
+          uniqueItems: true
+          description: Security controls implemented to mitigate this Risk
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskControlRequestPublicV2Dto'
+        customFields:
+          description: Custom Fields for the Risk
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldSubmitRequestPublicV2Dto'
+    RiskControlRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier for the Control
+      required:
+      - id
+    FacetBucketResponsePublicV2Dto:
+      type: object
+      properties:
+        value:
+          type: string
+          example: CURRENT_EMPLOYEE
+          description: The facet bucket value.
+        count:
+          type: number
+          example: 312
+          description: Count of personnel records matching this value within the current result set.
+      required:
+      - value
+      - count
+    RiskVersionTypeEnum:
+      type: string
+      enum:
+      - INTERNAL
+      - EXTERNAL
     RiskSearchResponsePublicV2Dto:
       type: object
       properties:
@@ -1942,21 +1638,245 @@ components:
       required:
       - data
       - pagination
-    RiskTasksSubcollectionPublicV2Dto:
+    ControlCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Control ID
+        code:
+          type: string
+          example: AC-1
+          description: Control code
+        name:
+          type: string
+          example: Access Control
+          description: Control name
+        description:
+          type:
+          - string
+          - 'null'
+          example: "Drata has implemented tools to monitor Drata's databases and notify appropriate personnel of any events or incidents based on\n                 predetermined criteria. Incidents are escalated per policy."
+          description: Control description
+        isReady:
+          type: boolean
+          example: true
+          description: Indicates if the control is ready for compliance assessment. A control is considered ready when it has at least one valid component (tests, evidence, policies, or reports) and no failing components (no failing tests, invalid evidence, unapproved policies, etc.). This is calculated in real-time based on the current state of all control components.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date the Control was last updated
+      required:
+      - id
+      - code
+      - name
+      - description
+      - createdAt
+      - updatedAt
+    RiskRegisterCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique internal identifier for the Risk Register
+        name:
+          type: string
+          example: Default Risk Register
+          description: Name of the Risk Register
+        description:
+          type:
+          - string
+          - 'null'
+          example: Primary risk register for organizational risks
+          description: Description of the Risk Register
+      required:
+      - id
+      - name
+      - description
+    PaginationTotalCountResponsePublicV2Dto:
+      type: object
+      properties:
+        cursor:
+          type:
+          - string
+          - 'null'
+          description: When this is not null, it indicates there is additional data. Pass this value in to the `cursor` parameter to fetch the next page of data.
+        totalCount:
+          type:
+          - number
+          - 'null'
+          description: Total count of all matching items (not limited by page size). Only included when `includeTotalCount=true` is passed on the first page (no cursor).
+      required:
+      - cursor
+    DocumentCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Document ID
+        name:
+          type: string
+          example: Risk Assessment Report Q4 2023.pdf
+          description: Document name as uploaded by the user
+        downloadUrl:
+          type: string
+          example: https://example.com/document.pdf
+          description: Signed URL to download the Document
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Document was uploaded
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Document was last updated
+      required:
+      - id
+      - name
+      - downloadUrl
+      - createdAt
+      - updatedAt
+    RiskExpandV2Enum:
+      type: string
+      enum:
+      - owners
+      - reviewers
+      - controls
+      - categories
+      - documents
+      - notes
+      - tickets
+      - tasks
+      - customFields
+    RiskOverTimeResponsePublicV2Dto:
+      type: object
+      properties:
+        period:
+          type: string
+          example: 2026-02
+          description: Time period in YYYY-MM format
+        severityCounts:
+          description: Distribution of Risks across severity levels for this time period
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskThresholdCountResponsePublicV2Dto'
+      required:
+      - period
+      - severityCounts
+    TicketCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique internal identifier for the Ticket record
+        externalTicketId:
+          type: string
+          example: ENG-11245
+          description: External ticket identifier from the connected ticket management system (e.g., Jira, ServiceNow, GitHub Issues)
+        isDone:
+          type: boolean
+          example: false
+          description: Indicates whether the ticket has been completed or resolved. True means the ticket is closed/done, false means it is still open/in progress.
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date and time when the ticket record was created in Drata
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date and time when the ticket record was last updated in Drata
+      required:
+      - id
+      - externalTicketId
+      - isDone
+      - createdAt
+      - updatedAt
+    RiskThresholdCountResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: ID of the Risk Threshold
+        title:
+          type: string
+          example: Low
+          description: Title of the Risk Threshold
+        count:
+          type: number
+          example: 5
+          description: Count of Risks in this Risk Threshold
+      required:
+      - id
+      - title
+      - count
+    RiskSearchExpandEnum:
+      type: string
+      enum:
+      - owners
+      - reviewers
+      - controls
+      - categories
+      - documents
+      - notes
+      - tickets
+      - tasks
+      - customFields
+    RisksResponsePublicV2Dto:
       type: object
       properties:
         data:
-          description: Array of custom tasks linked to this Risk. Limited to a maximum of 10 items.
+          description: Data set based on the pagination limits
           type: array
           items:
-            $ref: '#/components/schemas/CustomTaskCompactResponsePublicV2Dto'
+            $ref: '#/components/schemas/RiskResponsePublicV2Dto'
+        pagination:
+          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
+      required:
+      - data
+      - pagination
+    RiskControlsSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of controls mapped to this Risk. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/ControlCompactResponsePublicV2Dto'
         totalCount:
           type: number
           example: 4
-          description: Total count of all custom tasks linked to this Risk.
+          description: Total count of all controls mapped to this Risk.
       required:
       - data
       - totalCount
+    RiskSortEnum:
+      type: string
+      enum:
+      - residualScore
+      - inherentScore
+      - anticipatedCompletionDate
+      - completedDate
+      - title
+      - riskId
+      - status
+      - vendorName
+      - createdAt
+      - updatedAt
     RiskItemSearchResponsePublicV2Dto:
       type: object
       properties:
@@ -2112,6 +2032,121 @@ components:
       - status
       - createdAt
       - updatedAt
+    RiskDocumentsSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of documents attached to this Risk. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/DocumentCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 5
+          description: Total count of all documents attached to this Risk.
+      required:
+      - data
+      - totalCount
+    CustomFieldFilterPublicV2Dto:
+      type: object
+      properties:
+        customFieldId:
+          type: number
+          example: 42
+          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
+        name:
+          type: string
+          example: Department
+          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
+        value:
+          type: string
+          example: Engineering
+          description: The Custom Field value to match. Equality (case-sensitive).
+      required:
+      - value
+    RiskCategoryCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Risk Category ID
+        name:
+          type: string
+          example: Access Control
+          description: Risk Category name used to group and organize related Risks
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was last updated
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+    RiskSearchFacetEnum:
+      type: string
+      enum:
+      - status
+      - treatmentPlan
+      - type
+      - categories
+      - controls
+      - ownerEmails
+      - reviewerEmails
+      - vendorNames
+      - riskRegisterId
+    RiskReviewersSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of reviewer users for this Risk. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/UserCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 2
+          description: Total count of all reviewer users for this Risk.
+      required:
+      - data
+      - totalCount
+    RiskTasksSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of custom tasks linked to this Risk. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomTaskCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 4
+          description: Total count of all custom tasks linked to this Risk.
+      required:
+      - data
+      - totalCount
+    RiskCustomFieldsSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of Custom Field values for this Risk. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/CustomFieldResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 8
+          description: Total count of all Custom Field values for this Risk.
+      required:
+      - data
+      - totalCount
     RiskOwnersSubcollectionPublicV2Dto:
       type: object
       properties:
@@ -2127,6 +2162,173 @@ components:
       required:
       - data
       - totalCount
+    RiskDashboardResponsePublicV2Dto:
+      type: object
+      properties:
+        riskPosture:
+          description: Distribution of Risks by severity level. Shows the count of Risks in each severity category based on their calculated Risk scores.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskThresholdCountResponsePublicV2Dto'
+        treatmentOverview:
+          description: 'Distribution of Risks by treatment strategy. Shows how many Risks are assigned to each treatment plan: ACCEPT (acknowledge and monitor), AVOID (eliminate Risk source), MITIGATE (reduce impact/likelihood), TRANSFER (shift to third party), UNTREATED (no action taken).'
+          allOf:
+          - $ref: '#/components/schemas/TreatmentOverviewResponsePublicV2Dto'
+        riskHeatmap:
+          description: Risk heatmap data showing the distribution of Risks across impact and likelihood dimensions. Each entry represents the count of Risks at a specific impact/likelihood intersection, useful for visualizing Risk concentration in a matrix format.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskHeatmapResponsePublicV2Dto'
+        categoryBreakdown:
+          description: Breakdown of Risks by category and severity. For each Risk category, shows the distribution of Risks across severity levels, enabling analysis of which Risk categories have the most critical issues.
+          type: array
+          items:
+            $ref: '#/components/schemas/CategorySeverityResponsePublicV2Dto'
+        scored:
+          type: number
+          example: 63
+          description: Count of Risks that have been scored (have both impact and likelihood values assigned). Scored Risks contribute to the Risk posture and heatmap analytics.
+        remaining:
+          type: number
+          example: 8
+          description: Count of Risks that have not yet been scored (missing impact or likelihood values). These Risks require assessment to be included in comprehensive Risk analytics.
+        riskOverTime:
+          description: Historical trend data showing Risk severity distribution over time. Each entry represents a month with counts of Risks at each severity level, enabling time-series analysis and trend visualization. Sorted by most recent first.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskOverTimeResponsePublicV2Dto'
+      required:
+      - riskPosture
+      - treatmentOverview
+      - riskHeatmap
+      - categoryBreakdown
+      - scored
+      - remaining
+      - riskOverTime
+    RiskTicketsSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of tickets linked to this Risk. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 3
+          description: Total count of all tickets linked to this Risk.
+      required:
+      - data
+      - totalCount
+    SortTypeLimitedEnum:
+      type: string
+      enum:
+      - createdAt
+      - updatedAt
+    CustomFieldSubmitRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: The ID of the Custom Field. Either this or the name must be provided.
+        name:
+          type: string
+          example: Compliance Status
+          description: The name of the Custom Field. Either this or the ID must be provided.
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
+      required:
+      - value
+    RiskOwnerRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier for the Risk owner (user)
+      required:
+      - id
+    RiskNoteCompactResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Note ID
+        comment:
+          type: string
+          example: This Risk has been reviewed and approved by the security team. Implementation timeline updated.
+          description: Note content providing additional context or updates about the risk
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Note was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Note was last updated
+      required:
+      - id
+      - comment
+      - createdAt
+      - updatedAt
+    RiskCategoriesSubcollectionPublicV2Dto:
+      type: object
+      properties:
+        data:
+          description: Array of categories this Risk belongs to. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
+        totalCount:
+          type: number
+          example: 2
+          description: Total count of all categories this Risk belongs to.
+      required:
+      - data
+      - totalCount
+    RiskCategoryResponsePublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Risk Category ID
+        name:
+          type: string
+          example: Access Control
+          description: Risk Category name used to group and organize related Risks
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was created
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date when the Risk Category was last updated
+      required:
+      - id
+      - name
+      - createdAt
+      - updatedAt
+    ReviewerRequestPublicV2Dto:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
+          description: Unique identifier for the Risk reviewer (user)
+      required:
+      - id
     RiskResponsePublicV2Dto:
       type: object
       properties:
@@ -2294,74 +2496,121 @@ components:
       - status
       - createdAt
       - updatedAt
-    RiskCategoriesSubcollectionPublicV2Dto:
+    CustomFieldResponsePublicV2Dto:
       type: object
       properties:
-        data:
-          description: Array of categories this Risk belongs to. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
-        totalCount:
+        customFieldId:
           type: number
-          example: 2
-          description: Total count of all categories this Risk belongs to.
+          example: 1
+          description: The ID of the Custom Field
+        name:
+          type: string
+          example: Stakeholders
+          description: The name of the Custom Field
+        value:
+          type:
+          - string
+          - 'null'
+          example: Security & IT
+          description: The value of the Custom Field
       required:
-      - data
-      - totalCount
-    RisksResponsePublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Data set based on the pagination limits
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskResponsePublicV2Dto'
-        pagination:
-          $ref: '#/components/schemas/PaginationTotalCountResponsePublicV2Dto'
-      required:
-      - data
-      - pagination
-    RiskRegisterCompactResponsePublicV2Dto:
+      - customFieldId
+      - name
+    CustomTaskCompactResponsePublicV2Dto:
       type: object
       properties:
         id:
           type: number
           example: 1
-          description: Unique internal identifier for the Risk Register
-        name:
+          description: Unique internal identifier for the Custom Task
+        title:
           type: string
-          example: Default Risk Register
-          description: Name of the Risk Register
+          example: Review quarterly security policies
+          description: Title or name of the Custom Task describing what needs to be accomplished
         description:
           type:
           - string
           - 'null'
-          example: Primary risk register for organizational risks
-          description: Description of the Risk Register
+          example: Conduct a comprehensive review of all security policies to ensure compliance with current regulations.
+          description: Detailed description providing additional context about the Custom Task requirements and objectives
+        dueDate:
+          type: string
+          format: date
+          example: '2020-07-06'
+          description: Due date for Custom Task completion in ISO 8601 date format (YYYY-MM-DD)
+        completedAt:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date and time when the Custom Task was marked as completed, null if still pending
+        createdAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date and time when the Custom Task was created in the system
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-07-01T16:45:55.246Z'
+          description: Date and time when the Custom Task was last updated
       required:
       - id
-      - name
-      - description
-    FacetBucketResponsePublicV2Dto:
+      - title
+      - dueDate
+      - createdAt
+      - updatedAt
+    RiskNotesSubcollectionPublicV2Dto:
       type: object
       properties:
-        value:
-          type: string
-          example: CURRENT_EMPLOYEE
-          description: The facet bucket value.
-        count:
+        data:
+          description: Array of notes on this Risk. Limited to a maximum of 10 items.
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskNoteCompactResponsePublicV2Dto'
+        totalCount:
           type: number
-          example: 312
-          description: Count of personnel records matching this value within the current result set.
+          example: 6
+          description: Total count of all notes on this Risk.
       required:
-      - value
-      - count
-    ExceptionResponsePublicV2Dto:
+      - data
+      - totalCount
+    CustomRangeFieldFilterPublicV2Dto:
       type: object
       properties:
+        customFieldId:
+          type: number
+          example: 99
+          description: The ID of the Custom Field to filter on. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
         name:
           type: string
+          example: Headcount
+          description: The name of the Custom Field to filter on. Case-insensitive; scoped to fields placed on the Personnel section. Either `customFieldId` or `name` (or both, as a consistency check) must be supplied.
+        gte:
+          type: string
+          example: '5'
+          description: Greater than or equal to. Numeric or ISO-8601 date string.
+        lte:
+          type: string
+          example: '10'
+          description: Less than or equal to. Numeric or ISO-8601 date string.
+    RiskTreatmentPlanEnum:
+      type: string
+      enum:
+      - UNTREATED
+      - ACCEPT
+      - TRANSFER
+      - AVOID
+      - MITIGATE
+    SortDirectionEnum:
+      type: string
+      enum:
+      - ASC
+      - DESC
+    ExceptionResponseDto:
+      type: object
+      properties:
         statusCode:
           type: number
         message:
@@ -2381,196 +2630,9 @@ components:
           - name
           - message
       required:
-      - name
       - statusCode
       - message
       - code
-    RiskSortEnum:
-      type: string
-      enum:
-      - residualScore
-      - inherentScore
-      - anticipatedCompletionDate
-      - completedDate
-      - title
-      - riskId
-      - status
-      - vendorName
-      - createdAt
-      - updatedAt
-    UserCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: User ID
-        email:
-          type: string
-          example: email@example.com
-          description: User email
-        firstName:
-          type:
-          - string
-          - 'null'
-          example: Sally
-          description: User first name
-        lastName:
-          type:
-          - string
-          - 'null'
-          example: Smith
-          description: User last name
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User created at
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: User last updated at
-      required:
-      - id
-      - email
-      - firstName
-      - lastName
-      - createdAt
-      - updatedAt
-    RiskStatusTypeEnum:
-      type: string
-      enum:
-      - ACTIVE
-      - ARCHIVED
-      - CLOSED
-    CategoryRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique identifier for the Risk category
-      required:
-      - id
-    CategorySeverityResponsePublicV2Dto:
-      type: object
-      properties:
-        category:
-          description: Risk Category information
-          allOf:
-          - $ref: '#/components/schemas/RiskCategoryCompactResponsePublicV2Dto'
-        severity:
-          description: Distribution of Risks across severity levels for this category.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskThresholdCountResponsePublicV2Dto'
-      required:
-      - category
-      - severity
-    RiskNotesSubcollectionPublicV2Dto:
-      type: object
-      properties:
-        data:
-          description: Array of notes on this Risk. Limited to a maximum of 10 items.
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskNoteCompactResponsePublicV2Dto'
-        totalCount:
-          type: number
-          example: 6
-          description: Total count of all notes on this Risk.
-      required:
-      - data
-      - totalCount
-    TicketCompactResponsePublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: Unique internal identifier for the Ticket record
-        externalTicketId:
-          type: string
-          example: ENG-11245
-          description: External ticket identifier from the connected ticket management system (e.g., Jira, ServiceNow, GitHub Issues)
-        isDone:
-          type: boolean
-          example: false
-          description: Indicates whether the ticket has been completed or resolved. True means the ticket is closed/done, false means it is still open/in progress.
-        createdAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date and time when the ticket record was created in Drata
-        updatedAt:
-          type: string
-          format: date-time
-          example: '2025-07-01T16:45:55.246Z'
-          description: Date and time when the ticket record was last updated in Drata
-      required:
-      - id
-      - externalTicketId
-      - isDone
-      - createdAt
-      - updatedAt
-    RiskHeatmapResponsePublicV2Dto:
-      type: object
-      properties:
-        impact:
-          type: number
-          example: 2
-          description: Impact level based on the configured risk matrix dimensions. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices.
-          minimum: 1
-          maximum: 10
-        likelihood:
-          type: number
-          example: 2
-          description: Likelihood level based on the configured risk matrix dimensions. Default is 1-5 scale, but can be configured from 3x3 up to 10x10 matrices.
-          minimum: 1
-          maximum: 10
-        total:
-          type: number
-          example: 11
-          description: Count of Risks at this impact/likelihood combination
-      required:
-      - impact
-      - likelihood
-      - total
-    RiskOverTimeResponsePublicV2Dto:
-      type: object
-      properties:
-        period:
-          type: string
-          example: 2026-02
-          description: Time period in YYYY-MM format
-        severityCounts:
-          description: Distribution of Risks across severity levels for this time period
-          type: array
-          items:
-            $ref: '#/components/schemas/RiskThresholdCountResponsePublicV2Dto'
-      required:
-      - period
-      - severityCounts
-    CustomFieldSubmitRequestPublicV2Dto:
-      type: object
-      properties:
-        id:
-          type: number
-          example: 1
-          description: The ID of the Custom Field. Either this or the name must be provided.
-        name:
-          type: string
-          example: Compliance Status
-          description: The name of the Custom Field. Either this or the ID must be provided.
-        value:
-          type:
-          - string
-          - 'null'
-          example: Security & IT
-          description: The value of the Custom Field.  If a value of null is used, the value will be deleted.
-      required:
-      - value
   securitySchemes:
     bearer:
       scheme: bearer
